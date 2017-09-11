@@ -1,0 +1,35 @@
+{
+    "name": "aerospike/aerospike-client-php",
+    "description": "The Aerospike PHP client as a C-extension for PHP7",
+    "keywords": ["extension","database","aerospike"],
+    "homepage": "http://www.aerospike.com/docs/client/php/",
+    "license": "Apache-2.0",
+    "version": "7.0.0",
+    "authors": [
+        {
+            "name": "Aerospike",
+            "homepage": "http://www.aerospike.com"
+        },
+        {
+            "name": "Contributors",
+            "homepage": "https://github.com/aerospike/aerospike-client-php/graphs/contributors"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/aerospike/aerospike-client-php/issues?state=open",
+        "forum": "http://discuss.aerospike.com/category/client-libraries/php-client",
+        "source": "https://github.com/aerospike/aerospike-client-php"
+    },
+    "require": {
+        "php": "~7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Aerospike\\": "src/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": ["cd src && ./build.sh"],
+        "post-update-cmd": ["cd src && ./build.sh"]
+    }
+}

@@ -1,0 +1,55 @@
+language: php
+php:
+- 7.0
+- 7.1
+os:
+- linux
+addons:
+  apt:
+    packages:
+      - libssl-dev
+      - autoconf
+env:
+  global:
+  - LUA_SYSPATH=~/udf/sys
+  - LUA_USRPATH=~/udf/usr
+  - secure: fJ2nIo5OYkrOFQFo/TXCqiyLXABuhYmLO8037ALplv3JbEZLMI7/NtZptKop+YZVO/HQ2jolWRVeKrXDY6ZDjdnI67hk+FSeIdhviNeWOoWEUt1Yk+YE6lLSFgtgZ0gI11hHrqqU9uzZ1h4MgkPpMPbA85O6RFWLrvjE9fcHLR4=
+  - secure: 3zu4iH0VlDWPps9cT8Jz4LOsjKErbrqNabHqAKKHA1GfVZjd9C/UKxqjfCzF+F196rmZZgiOy5hG6zYPn9dM6JMpMPiKbnrguRTB6me79zP5FGWakp5B4IwkjQAm/eRCPa0VV3Ft//vG0/OgyrHQtrR0eFEDv1DVSonZ4s91QtM=
+install:
+- wget -O aerospike-server.tgz http://aerospike.com/download/server/latest/artifact/tgz
+- tar xvzf aerospike-server.tgz
+- cp -f .travis/aerospike.conf ./aerospike-server/share/etc
+- cd aerospike-server
+- sed -i -e 's/\${me}/"root"/' share/libexec/aerospike-start
+- sed -i -e 's/set_shmall$/#set_shmall/' share/libexec/aerospike-start
+- sed -i -e 's/set_shmmax$/#set_shmmax/' share/libexec/aerospike-start
+- mkdir instance1
+- mkdir instance2
+- ./bin/aerospike init --home instance1 --instance 1 --service-port 3000
+- ./bin/aerospike init --home instance2 --instance 2 --service-port 3010
+- cd instance1
+- ./bin/aerospike start
+- ls ../../src/scripts/
+- chmod +x ../../src/scripts/wait-for-node.sh
+- ../../src/scripts/wait-for-node.sh var/log/aerospike.log
+- cd ..
+- cd instance2
+- ./bin/aerospike start
+- cd ../..
+- sleep 3
+script:
+- cd src/
+- ./build.sh
+- make install
+- ../.travis/edit-php-ini.sh
+- cp ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini tmp-php.ini
+- make test TESTS=tests/phpt TEST_PHP_ARGS="--show-diff"
+notifications:
+  slack:
+    secure: CvYjLs0z+Y7NnhhoDLU61GSEKaPr0AM6fGrLHqqpXmNgl4AlaLSL46eSA6Zu/6cpnwr7m5REpjR6p4iNT57may783Ud+d89offuXK4nwiexi0MBPaPNb7MlBl07k1eOfX9GfbEYYo6vbp6q2DSn3RgrGIlyT20ocXPOLNJrh58U=
+  hipchat:
+    rooms:
+      secure: R6iFduoL5HSUx634xGgNe4Rz4arm3M5oRoA2mJF7v5B0TO01jkac+Kpr5M30dUL1neHOBo1S446H9kI3M1QnfBxJLlBZST5P0xaJ1DsuLuN9FPs/h+0/gLZvATfCkjeJvZVKL8MyG/FwOuV18ciZ+XCg85qwJXqqvdahBk2S9TY=
+  email:
+    - qe-notices@aerospike.com
+    - qe-notices-clients@aerospike.com

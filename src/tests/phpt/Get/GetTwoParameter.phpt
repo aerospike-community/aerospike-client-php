@@ -1,0 +1,9 @@
+--TEST--
+Get - GET With Two Parameter
+
+--FILE--
+<?php
+include dirname(__FILE__)."/../../astestframework/astest-phpt-loader.inc";
+aerospike_phpt_runtest("Get", "testGETTwoParameter");
+--EXPECT--
+OK

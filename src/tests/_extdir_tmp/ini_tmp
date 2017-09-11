@@ -1,0 +1,4 @@
+extension_dir=_extdir_tmp;
+extension=aerospike.so
+
+report_memleaks=1

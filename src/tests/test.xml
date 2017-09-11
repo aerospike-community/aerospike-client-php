@@ -1,0 +1,34 @@
+<phpunit>
+    <testsuites>
+        <testsuite name="CommonTests">
+            <file>Connection.inc</file>
+        </testsuite>
+        <testsuite name="CommonTests">
+            <file>Put.inc</file>
+        </testsuite>
+        <testsuite name="CommonTests">
+            <file>Get.inc</file>
+        </testsuite>
+        <testsuite name="CommonTests">
+            <file>Touch.inc</file>
+        </testsuite>
+        <testsuite name="CommonTests">
+            <file>Increment.inc</file>
+        </testsuite>
+        <testsuite name="CommonTests">
+            <file>Exist.inc</file>
+        </testsuite>
+        <testsuite name="CommonTests">
+            <file>Append.inc</file>
+        </testsuite>
+        <testsuite name="CommonTests">
+            <file>Prepend.inc</file>
+        </testsuite>
+        <testsuite name="CommonTests">
+            <file>InitKey.inc</file>
+        </testsuite>
+        <testsuite name="CommonTests">
+            <file>Remove.inc</file>
+        </testsuite>
+    </testsuites>
+</phpunit>

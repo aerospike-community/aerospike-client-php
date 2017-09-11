@@ -1,0 +1,15 @@
+Connection
+Put
+Get
+Touch
+Increment
+Exist
+Append
+Prepend
+InitKey
+Remove
+Predicate
+Udf
+AerospikeSession
+Reconnect
+
