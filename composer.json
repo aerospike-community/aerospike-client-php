@@ -4,7 +4,6 @@
     "keywords": ["extension","database","aerospike"],
     "homepage": "http://www.aerospike.com/docs/client/php/",
     "license": "Apache-2.0",
-    "version": "7.0.0",
     "authors": [
         {
             "name": "Aerospike",
