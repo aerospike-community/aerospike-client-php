@@ -3,8 +3,8 @@
 ## Build Instructions
 
 Follow the build and installation steps described in this repository's main
-[README.md](../../../README.md) file.  Please use a standard build
-(without the **-l** flag), as a debug build will cause the tests to fail.
+[README.md](../../../README.md) file. Certian tests will be skipped if running in
+a ZTS PHP environment.
 
 ## Configuration:
 
@@ -18,17 +18,8 @@ cp tests/aerospike.local.skeleton tests/aerospike.local.inc
 ```
 
 ## Running Tests:
-
-```
-make test TESTS=tests/phpt
-```
-
-To run only the phpt test cases for Put:
-
-```
-make test TESTS=tests/phpt/Put
-```
-
+To run the tests with PHPUnit, from the `src/` directory
+`phpunit tests`
 
 ## Cleanup
 
