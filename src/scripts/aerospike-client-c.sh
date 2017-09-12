@@ -113,7 +113,7 @@ if [ $DOWNLOAD ] && [ $DOWNLOAD == 1 ]; then
     # LINUX
     ############################################################################
     "linux" )
-      PKG_DIST=$($SCRIPT_DIR/os_version)
+      PKG_DIST=$($SCRIPT_DIR/os_version.sh)
       if [ $? -ne 0 ]; then
         printf "%s\n" "$PKG_DIST" >&2
         exit 1
