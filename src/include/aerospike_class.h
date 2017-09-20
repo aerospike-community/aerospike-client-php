@@ -261,6 +261,13 @@ PHP_METHOD(Aerospike, touch);
 ZEND_BEGIN_ARG_INFO_EX(touch_arg_info, 0, 0, 1)
 ZEND_END_ARG_INFO();
 
+PHP_METHOD(Aerospike, truncate);
+ZEND_BEGIN_ARG_INFO_EX(truncate_arg_info, 0, 0, 3)
+ZEND_ARG_PASS_INFO(0)
+ZEND_ARG_PASS_INFO(0)
+ZEND_ARG_PASS_INFO(0)
+ZEND_ARG_PASS_INFO(0)
+ZEND_END_ARG_INFO();
 
 /* UDF METHODS */
 PHP_METHOD(Aerospike, getRegistered);
