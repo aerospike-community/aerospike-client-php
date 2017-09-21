@@ -61,9 +61,18 @@ The dependencies can be installed through the OS X package manager [Homebrew](ht
 
 To switch PHP versions [see this gist](https://gist.github.com/rbotzer/198a04f2315e88c75322).
 
-If you run into issues with linking to openssl during compile time, it may be necessary to edit
-the ./build.sh file and add the path to your openssl files to the compile and link options.
-e.g  `-I/usr/local/opt/openssl/include` `-L/usr/local/opt/openssl/lib`
+Do to the dependence of this Library upon OpenSSL, there will ocassionally be linking issues which will show up during installation.
+To Solve these we recommend running
+    brew info openssl
+
+This command will show some information about where the openssl headers and library are located. In particular there should a stanza which looks something like:
+    For compilers to find this software you may need to set:
+    LDFLAGS:  -L/usr/local/opt/openssl/lib
+    CPPFLAGS: -I/usr/local/opt/openssl/include
+
+in order to properly link and compile against the library you can set the two environment variables `AS_OSX_OPENSSL_INC` and `AS_OSX_OPENSSL_LINK` to the respective paths (if the paths were as specified above):
+    export AS_OSX_OPENSSL_INC=/usr/local/opt/openssl/include
+    export AS_OSX_OPENSSL_LINK=/usr/local/opt/openssl/lib
 
 Windows is currently not supported.
 
