@@ -70,9 +70,9 @@ This command will show some information about where the openssl headers and libr
     LDFLAGS:  -L/usr/local/opt/openssl/lib
     CPPFLAGS: -I/usr/local/opt/openssl/include
 
-in order to properly link and compile against the library you can set the two environment variables `AS_OSX_OPENSSL_INC` and `AS_OSX_OPENSSL_LINK` to the respective paths (if the paths were as specified above):
-    export AS_OSX_OPENSSL_INC=/usr/local/opt/openssl/include
-    export AS_OSX_OPENSSL_LINK=/usr/local/opt/openssl/lib
+in order to properly link and compile against the library you can set the two environment variables `AS_OSX_OPENSSL_INC` and `AS_OSX_OPENSSL_LINK` to the respective values (if the paths were as specified above):
+    export AS_OSX_OPENSSL_INC="-I/usr/local/opt/openssl/include"
+    export AS_OSX_OPENSSL_LINK="-L/usr/local/opt/openssl/lib"
 
 Windows is currently not supported.
 
