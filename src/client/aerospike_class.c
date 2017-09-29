@@ -98,6 +98,7 @@ static zend_function_entry Aerospike_class_functions[] =
 	PHP_ME(Aerospike, setDeserializer, set_deserializer_arg_info, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Aerospike, setSerializer, set_serializer_arg_info, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Aerospike, shmKey, shm_key_arg_info, ZEND_ACC_PUBLIC)
+	PHP_ME(Aerospike, truncate, truncate_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, touch, touch_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, predicateEquals, predicate_equals_arg_info, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Aerospike, predicateGeoContainsGeoJSONPoint, predicate_geo_contains_json_point_arg_info, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
