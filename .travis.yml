@@ -43,7 +43,7 @@ script:
 - make install
 - ../.travis/edit-php-ini.sh
 - cp ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini tmp-php.ini
-- make test TESTS=tests/phpt TEST_PHP_ARGS="--show-diff"
+- phpunit tests
 notifications:
   slack:
     secure: CvYjLs0z+Y7NnhhoDLU61GSEKaPr0AM6fGrLHqqpXmNgl4AlaLSL46eSA6Zu/6cpnwr7m5REpjR6p4iNT57may783Ud+d89offuXK4nwiexi0MBPaPNb7MlBl07k1eOfX9GfbEYYo6vbp6q2DSn3RgrGIlyT20ocXPOLNJrh58U=

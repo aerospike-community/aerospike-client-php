@@ -50,7 +50,7 @@ PHP_METHOD(Aerospike, truncate)
 	AerospikeClient* client = get_aerospike_from_zobj(Z_OBJ_P(getThis()));
 	aerospike* as_client = client->as_client;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss!L|z",
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss!l|z",
 							  &ns, &ns_len, &set, &set_len, &nanos, &z_info_policy) == FAILURE) {
 		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to truncate");
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
@@ -61,6 +61,11 @@ PHP_METHOD(Aerospike, truncate)
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	nanos64 = (uint64_t)nanos;
+
+	if (ns_len == 0) {
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Namespace must not be empty");
+		RETURN_LONG(AEROSPIKE_ERR_PARAM);
+	}
 
 	if (ns_len >= AS_NAMESPACE_MAX_SIZE) {
 		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Namespace too long");
