@@ -46,6 +46,11 @@ static bool aerospike_helper_log_callback(as_log_level level, const char * func,
 	zval retval;
 	bool call_status = true;
 
+/* Accessing global thread local storage will cause issues here, so we just return if ZTS is enabled */
+#ifdef ZTS
+	return true;
+#endif
+
 	ZVAL_NULL(&retval);
 
 	/* This should not ever happen, but if it does indicate logging failure */
@@ -137,6 +142,13 @@ PHP_METHOD(Aerospike, setLogHandler) {
 		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid argument to setLogHandler");
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
+
+/* Since non ZE threads can call the callback, TLS will cause issues, so disallow this */
+#ifdef ZTS
+	update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "User log callback not currently supported in ZTS environments");
+	RETURN_LONG(AEROSPIKE_ERR_CLIENT);
+#endif
+
 	/* If there was a log callback registered before, we need to release it */
 	if AEROSPIKE_G(is_log_callback_registered) {
 		zval_dtor(&AEROSPIKE_G(log_callback_call_info).function_name);
