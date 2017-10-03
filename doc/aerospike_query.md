@@ -50,7 +50,7 @@ or an empty array() for no predicate.
 
 **[options](aerospike.md)** including
 - **Aerospike::OPT_READ_TIMEOUT**
-
+- **Aerospike::OPT_SOCKET_TIMEOUT** Maximum socket idle time in milliseconds when processing a database command. 0 means do not apply a socket idle timeout.
 ## Return Values
 
 Returns an integer status code.  Compare to the Aerospike class status

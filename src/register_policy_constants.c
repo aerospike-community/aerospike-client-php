@@ -81,7 +81,8 @@ AerospikeOptionConstant aerospike_option_constants[] = {
 	{ AS_PRIVILEGE_READ_WRITE               ,   "PRIV_READ_WRITE"                   },
 	{ AS_PRIVILEGE_READ_WRITE_UDF           ,   "PRIV_READ_WRITE_UDF"               },
 	{ AS_PRIVILEGE_DATA_ADMIN               ,   "PRIV_DATA_ADMIN"                   },
-	{ OPT_POLICY_DURABLE_DELETE             ,   "OPT_POLICY_DURABLE_DELETE"         }
+	{ OPT_POLICY_DURABLE_DELETE             ,   "OPT_POLICY_DURABLE_DELETE"         },
+	{ OPT_SOCKET_TIMEOUT                    ,   "OPT_SOCKET_TIMEOUT"                }
 };
 
 bool register_aerospike_option_constants(zend_class_entry* aerospike_ce) {

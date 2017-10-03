@@ -763,8 +763,6 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 		config->policies.read.timeout = int_ini_value;
 		config->policies.info.timeout = int_ini_value;
 		config->policies.batch.timeout = int_ini_value;
-		config->policies.scan.timeout = int_ini_value;
-		config->policies.query.timeout = int_ini_value;
 	}
 
 	policy_zval = zend_hash_index_find(policy_hash, OPT_WRITE_TIMEOUT);

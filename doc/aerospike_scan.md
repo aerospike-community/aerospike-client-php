@@ -28,6 +28,7 @@ Non-existent bins will appear in the *record* with a NULL value.
 
 **[options](aerospike.md)** including
 - **Aerospike::OPT_READ_TIMEOUT**
+- **Aerospike::OPT_SOCKET_TIMEOUT** Maximum socket idle time in milliseconds when processing a database command. 0 means do not apply a socket idle timeout.
 - **Aerospike::OPT_SCAN_PRIORITY**
 - **Aerospike::OPT_SCAN_PERCENTAGE** of the records in the set to return
 - **Aerospike::OPT_SCAN_CONCURRENTLY** whether to run the scan in parallel

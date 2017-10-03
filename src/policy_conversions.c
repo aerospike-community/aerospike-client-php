@@ -487,6 +487,16 @@ as_status zval_to_as_policy_scan(zval* z_policy, as_policy_scan* scan_policy,
 			}
 		}
 	}
+
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_SOCKET_TIMEOUT);
+	if (setting_val) {
+		if (Z_TYPE_P(setting_val) == IS_LONG) {
+			scan_policy->socket_timeout = Z_LVAL_P(setting_val);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
 	return AEROSPIKE_OK;
 }
 
@@ -522,7 +532,15 @@ as_status zval_to_as_policy_query(zval* z_policy, as_policy_query* query_policy,
 		}
 		setting_val = NULL;
 	}
-	z_policy_hash = Z_ARRVAL_P(z_policy);
+
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_SOCKET_TIMEOUT);
+	if (setting_val) {
+		if (Z_TYPE_P(setting_val) == IS_LONG) {
+			query_policy->socket_timeout = Z_LVAL_P(setting_val);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
 
 	return AEROSPIKE_OK;
 }

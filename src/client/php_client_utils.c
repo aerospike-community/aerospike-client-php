@@ -74,8 +74,6 @@ void set_policy_defaults_from_ini(as_config* config, AerospikeClient* client) {
 	config->policies.read.timeout = int_ini_value;
 	config->policies.info.timeout = int_ini_value;
 	config->policies.batch.timeout = int_ini_value;
-	config->policies.scan.timeout = int_ini_value;
-	config->policies.query.timeout = int_ini_value;
 
 	int_ini_value = INI_INT("aerospike.write_timeout");
 	config->policies.write.timeout = int_ini_value;
