@@ -401,6 +401,11 @@ as_status zval_to_as_policy_info(zval* z_info_policy, as_policy_info* info_polic
 		info_policy->timeout = (uint32_t)Z_LVAL_P(setting_val);
 	}
 
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_READ_TIMEOUT);
+	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
+		info_policy->timeout = (uint32_t)Z_LVAL_P(setting_val);
+	}
+
 	return AEROSPIKE_OK;
 }
 
