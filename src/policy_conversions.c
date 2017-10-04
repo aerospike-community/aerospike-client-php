@@ -157,7 +157,7 @@ as_status zval_to_as_policy_remove(zval* z_policy, as_policy_remove* remove_poli
 	}
 
 
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_RETRY);
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_WRITE_TIMEOUT);
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
 		remove_policy->timeout = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
