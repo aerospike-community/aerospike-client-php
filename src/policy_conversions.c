@@ -163,6 +163,12 @@ as_status zval_to_as_policy_remove(zval* z_policy, as_policy_remove* remove_poli
 		setting_val = NULL;
 	}
 
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_DURABLE_DELETE);
+	if (setting_val && (Z_TYPE_P(setting_val) == IS_TRUE || Z_TYPE_P(setting_val) == IS_FALSE )) {
+		remove_policy->durable_delete = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
+		setting_val = NULL;
+	}
+
 	return AEROSPIKE_OK;
 
 }
@@ -324,7 +330,7 @@ as_status zval_to_as_policy_operate(zval* z_policy, as_policy_operate* operate_p
 		setting_val = NULL;
 	}
 
-	setting_val = zend_hash_str_find(z_policy_hash, "durable_delete", strlen("durable_delete"));
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_DURABLE_DELETE);
 	if (setting_val && (Z_TYPE_P(setting_val) == IS_TRUE || Z_TYPE_P(setting_val) == IS_FALSE )) {
 		operate_policy->durable_delete = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
 		setting_val = NULL;
@@ -438,6 +444,12 @@ as_status zval_to_as_policy_apply(zval* z_apply_policy, as_policy_apply* apply_p
 		setting_val = NULL;
 	}
 
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_DURABLE_DELETE);
+	if (setting_val && (Z_TYPE_P(setting_val) == IS_TRUE || Z_TYPE_P(setting_val) == IS_FALSE )) {
+		apply_policy->durable_delete = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
+		setting_val = NULL;
+	}
+
 	return AEROSPIKE_OK;
 }
 
@@ -495,6 +507,12 @@ as_status zval_to_as_policy_scan(zval* z_policy, as_policy_scan* scan_policy,
 		} else {
 			return AEROSPIKE_ERR_PARAM;
 		}
+	}
+
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_DURABLE_DELETE);
+	if (setting_val && (Z_TYPE_P(setting_val) == IS_TRUE || Z_TYPE_P(setting_val) == IS_FALSE )) {
+		scan_policy->durable_delete = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
+		setting_val = NULL;
 	}
 
 	return AEROSPIKE_OK;

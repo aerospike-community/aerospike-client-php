@@ -13,6 +13,8 @@ public int Aerospike::truncate ( string $ns, string $set, int $nanos [, array $p
 
 This asynchronous server call may return before the truncation is complete. The user can still write new records after the server returns because new records will have last update times greater than the truncate cutoff (set at the time of truncate call)
 
+The truncate command does not durably delete records in the Community Edition. The Enterprise Edition provides durability through the truncate command.
+
 ## Parameters
 
 **ns** The namespace to perform truncation on.
