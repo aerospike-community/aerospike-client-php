@@ -98,6 +98,7 @@ static zend_function_entry Aerospike_class_functions[] =
 	PHP_ME(Aerospike, setDeserializer, set_deserializer_arg_info, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Aerospike, setSerializer, set_serializer_arg_info, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Aerospike, shmKey, shm_key_arg_info, ZEND_ACC_PUBLIC)
+	PHP_ME(Aerospike, truncate, truncate_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, touch, touch_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, predicateEquals, predicate_equals_arg_info, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Aerospike, predicateGeoContainsGeoJSONPoint, predicate_geo_contains_json_point_arg_info, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
@@ -762,8 +763,6 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 		config->policies.read.timeout = int_ini_value;
 		config->policies.info.timeout = int_ini_value;
 		config->policies.batch.timeout = int_ini_value;
-		config->policies.scan.timeout = int_ini_value;
-		config->policies.query.timeout = int_ini_value;
 	}
 
 	policy_zval = zend_hash_index_find(policy_hash, OPT_WRITE_TIMEOUT);
