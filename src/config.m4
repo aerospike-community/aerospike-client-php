@@ -45,6 +45,7 @@ if test "$PHP_AEROSPIKE" != "no"; then
                     client/secondary_index.c\
                     client/select.c\
                     client/touch.c\
+                    client/truncate.c\
                     client/udf.c\
                     client/user_serializers.c,
                     $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)

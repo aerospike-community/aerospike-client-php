@@ -9,6 +9,8 @@ Aerospike::setLogHandler - sets a handler for log events
 public Aerospike::setLogHandler ( callback $log_handler )
 ```
 
+**note** User defined logging is currently unsupported in PHP built with ZTS enabled. Attempting to use it in that environment will fail.
+
 **Aerospike::setLogHandler()** registers a callback method that will be triggered
 whenever a logging event above the declared [log threshold](aerospike_setloglevel.md) occurs.
 
