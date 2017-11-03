@@ -20,6 +20,7 @@
 #define AEROSPIKE_PHP_AEROSPIKE_TYPES_H
 #include "aerospike/aerospike.h"
 #include "aerospike/as_error.h"
+
 #include "php.h"
 
 // Keys in the php hash form of a key
@@ -77,6 +78,34 @@ enum Aerospike_list_operations {
 	OP_LIST_SIZE
 };
 
+enum Aerospike_map_operations {
+	OP_MAP_SET_POLICY = 1101,
+	OP_MAP_PUT,
+	OP_MAP_PUT_ITEMS,
+	OP_MAP_INCREMENT,
+	OP_MAP_DECREMENT,
+	OP_MAP_SIZE,
+	OP_MAP_CLEAR,
+	OP_MAP_REMOVE_BY_KEY,
+	OP_MAP_REMOVE_BY_KEY_LIST,
+	OP_MAP_REMOVE_BY_KEY_RANGE,
+	OP_MAP_REMOVE_BY_VALUE,
+	OP_MAP_REMOVE_BY_VALUE_LIST,
+	OP_MAP_REMOVE_BY_VALUE_RANGE,
+	OP_MAP_REMOVE_BY_INDEX,
+	OP_MAP_REMOVE_BY_INDEX_RANGE,
+	OP_MAP_REMOVE_BY_RANK,
+	OP_MAP_REMOVE_BY_RANK_RANGE,
+	OP_MAP_GET_BY_KEY,
+	OP_MAP_GET_BY_KEY_RANGE,
+	OP_MAP_GET_BY_VALUE,
+	OP_MAP_GET_BY_VALUE_RANGE,
+	OP_MAP_GET_BY_INDEX,
+	OP_MAP_GET_BY_INDEX_RANGE,
+	OP_MAP_GET_BY_RANK,
+	OP_MAP_GET_BY_RANK_RANGE,
+};
+
 enum Aerospike_opt_keys {
 	OPT_CONNECT_TIMEOUT = 1, /* value in milliseconds, default: 1000                                          */
 	OPT_READ_TIMEOUT,        /* value in milliseconds, default: 1000                                          */
@@ -98,7 +127,9 @@ enum Aerospike_opt_keys {
 	USE_BATCH_DIRECT,        /* use new batch index protocol if server supports it                            */
 	COMPRESSION_THRESHOLD,   /* Minimum record size beyond which it is compressed and sent to the server      */
 	OPT_POLICY_DURABLE_DELETE, /* set to true to enable durable delete for the operation                       */
-	OPT_SOCKET_TIMEOUT       /* Socket timeout to be applied to server as well as client */
+	OPT_SOCKET_TIMEOUT,       /* Socket timeout to be applied to server as well as client */
+	OPT_MAP_ORDER,            /* Ordering for an as_map */
+	OPT_MAP_WRITE_MODE        /* Write mode for as_maps*/
 };
 
 #endif

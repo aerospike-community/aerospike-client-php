@@ -6,6 +6,8 @@
 #include "aerospike/as_scan.h"
 #include "aerospike/as_job.h"
 #include "aerospike/as_admin.h"
+#include "aerospike/as_operations.h"
+#include "aerospike/as_map_operations.h"
 
 #define AEROSPIKE_OPTION_CONSTANTS_ARR_SIZE (sizeof(aerospike_option_constants)/sizeof(AerospikeOptionConstant))
 
@@ -82,7 +84,15 @@ AerospikeOptionConstant aerospike_option_constants[] = {
 	{ AS_PRIVILEGE_READ_WRITE_UDF           ,   "PRIV_READ_WRITE_UDF"               },
 	{ AS_PRIVILEGE_DATA_ADMIN               ,   "PRIV_DATA_ADMIN"                   },
 	{ OPT_POLICY_DURABLE_DELETE             ,   "OPT_POLICY_DURABLE_DELETE"         },
-	{ OPT_SOCKET_TIMEOUT                    ,   "OPT_SOCKET_TIMEOUT"                }
+	{ OPT_SOCKET_TIMEOUT                    ,   "OPT_SOCKET_TIMEOUT"                },
+	{ OPT_MAP_ORDER                         ,   "OPT_MAP_ORDER"                     },
+	{ OPT_MAP_WRITE_MODE                    ,   "OPT_MAP_WRITE_MODE"                },
+	{ AS_MAP_UNORDERED                      ,   "AS_MAP_UNORDERED"                  },
+	{ AS_MAP_KEY_ORDERED                    ,   "AS_MAP_KEY_ORDERED"                },
+	{ AS_MAP_KEY_VALUE_ORDERED              ,   "AS_MAP_KEY_VALUE_ORDERED"          },
+	{ AS_MAP_UPDATE                         ,   "AS_MAP_UPDATE"                     },
+	{ AS_MAP_UPDATE_ONLY                    ,   "AS_MAP_UPDATE_ONLY"                },
+	{ AS_MAP_CREATE_ONLY                    ,   "AS_MAP_CREATE_ONLY"                }
 };
 
 bool register_aerospike_option_constants(zend_class_entry* aerospike_ce) {

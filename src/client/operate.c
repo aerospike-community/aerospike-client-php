@@ -614,7 +614,8 @@ static inline bool op_requires_val(int op_type) {
 	return (op_type != AS_OPERATOR_TOUCH && op_type != OP_LIST_CLEAR  &&
 			op_type != AS_OPERATOR_READ  && op_type != OP_LIST_SIZE   &&
 			op_type != OP_LIST_POP       && op_type != OP_LIST_REMOVE &&
-			op_type != OP_LIST_GET);
+			op_type != OP_LIST_GET       && op_type != OP_MAP_SIZE    &&
+			op_type != OP_MAP_CLEAR);
 }
 
 static inline bool op_requires_list_val(int op_type) {
