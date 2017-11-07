@@ -24,10 +24,39 @@ static inline bool op_requires_list_val(int op_type);
 static inline bool op_requires_val(int op_type);
 static inline bool op_requires_as_val(int op_type);
 static inline bool op_requires_index(int op_type);
-//static inline bool requires_range(op);
-//static inline bool requires_index(op);
+static inline bool op_is_map_op(int op_type);
 
+/* Map op helpers */
+static inline bool map_op_requires_key(int op_type);
+static inline bool map_op_requires_rank(int op_type);
+static inline bool map_op_requires_return_type(int op_type);
+static inline bool map_op_requires_map_policy(int op_type);
+static inline bool map_op_requires_val(int op_type);
+static inline bool map_op_requires_index(int op_type);
+static inline bool map_op_requires_count(int op_type);
+static inline bool map_op_requires_range_end(int op_type);
+
+static as_status add_map_op_to_operations(HashTable* op_array, int op_type, const char* bin_name,
+		as_operations* ops, as_error* err, int serializer_type);
 static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, as_error* err, int serializer_type);
+
+static as_status get_count_from_op_hash(as_error* err, HashTable* op_hash, uint64_t* count);
+static as_status get_rank_from_op_hash(as_error* err, HashTable* op_hash, int64_t* rank);
+static as_status get_index_from_op_hash(as_error* err, HashTable* op_hash, int64_t* index);
+static as_status get_key_from_op_hash(as_error* err, HashTable* op_hash, as_val** key, int serializer_type);
+static as_status get_value_from_op_hash(as_error* err, HashTable* op_hash, as_val** val, int serializer_type);
+static as_status get_range_end_from_op_hash(as_error* err, HashTable* op_hash, as_val** range_end, int serializer_type);
+static as_status get_map_policy_from_op_hash(as_error* err, HashTable* op_hash, as_map_policy* map_policy_p);
+static as_status get_return_type_from_op_hash(as_error* err, HashTable* op_hash, as_map_return_type* return_type);
+
+#define AS_MAP_POLICY_KEY "map_policy"
+#define AS_MAP_RANK_KEY "rank"
+#define AS_MAP_COUNT_KEY "count"
+#define AS_MAP_KEY_KEY "key"
+#define AS_MAP_INDEX_KEY "index"
+#define AS_MAP_RETURN_TYPE_KEY "return_type"
+#define AS_MAP_VALUE_KEY "val"
+#define AS_MAP_RANGE_END "range_end"
 
 
 /* {{{ proto int Aerospike::operate( array key, array operations [,array &returned [,array options ]] )
@@ -364,6 +393,12 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 		}
 		index = Z_LVAL_P(z_index);
 	}
+
+	/* If it's a map operation, use the map op helper function */
+	if (op_is_map_op(op_type)) {
+		return add_map_op_to_operations(op_array, op_type, bin_name, ops, err, serializer_type);
+	}
+
 	/*
 	 * Type check "val" member of the op array
 	 */
@@ -610,12 +645,315 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 	return AEROSPIKE_OK;
 }
 
+static as_status add_map_op_to_operations(HashTable* op_array, int op_type, const char* bin_name,
+		as_operations* ops, as_error* err, int serializer_type) {
+	uint64_t count;
+	int64_t index;
+	int64_t rank;
+	as_val* range_end = NULL;
+	as_val* val = NULL;
+	as_val* key = NULL;
+	as_map_policy map_policy;
+	as_map_return_type return_type;
+
+	if (map_op_requires_count(op_type)) {
+		if (get_count_from_op_hash(err, op_array, &count) != AEROSPIKE_OK) {
+			return err->code;
+		}
+	}
+
+	if (map_op_requires_index(op_type)) {
+		if (get_index_from_op_hash(err, op_array, &index) != AEROSPIKE_OK) {
+			return err->code;
+		}
+	}
+
+	if (map_op_requires_rank(op_type)) {
+		if (get_rank_from_op_hash(err, op_array, &rank) != AEROSPIKE_OK) {
+			return err->code;
+		}
+	}
+
+	if (map_op_requires_return_type(op_type)) {
+		if (get_return_type_from_op_hash(err, op_array, &return_type) != AEROSPIKE_OK) {
+			return err->code;
+		}
+	}
+
+	if (map_op_requires_map_policy(op_type)) {
+		if (get_map_policy_from_op_hash(err, op_array, &map_policy) != AEROSPIKE_OK) {
+			return err->code;
+		}
+	}
+
+	if (map_op_requires_key(op_type)) {
+		if (get_key_from_op_hash(err, op_array, &key, serializer_type) != AEROSPIKE_OK) {
+			return err->code;
+		}
+	}
+
+	if (map_op_requires_range_end(op_type)) {
+		if (get_range_end_from_op_hash(err, op_array, &range_end, serializer_type) != AEROSPIKE_OK) {
+			return err->code;
+		}
+	}
+
+	if (map_op_requires_val(op_type)) {
+		if (get_value_from_op_hash(err, op_array, &val, serializer_type) != AEROSPIKE_OK) {
+			return err->code;
+		}
+	}
+
+	switch(op_type) {
+
+		/* 1 */
+		case OP_MAP_SET_POLICY:
+			if (!as_operations_add_map_set_policy(ops, bin_name, &map_policy)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_SET_POLICY operation");
+			}
+			break;
+		/* 2 */
+		case OP_MAP_PUT:
+			if (!as_operations_add_map_put(ops, bin_name, &map_policy, key, val)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_PUT operation");
+			}
+			break;
+
+		/* 3 */
+		case OP_MAP_PUT_ITEMS: {
+			as_map* map = NULL;
+			if (as_val_type(val) != AS_MAP) {
+				return as_error_update(err, AEROSPIKE_ERR_PARAM, "Value must be a hashtable for OP_MAP_PUT_ITEMS");
+			}
+			map = as_map_fromval(val);
+			if (!val) {
+				return as_error_update(err, AEROSPIKE_ERR_PARAM, "Failed to store map put items");
+			}
+			if (!as_operations_add_map_put_items(ops, bin_name, &map_policy, map)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_PUT_ITEMS operation");
+			}
+			break;
+		}
+
+		/* 4 */
+		case OP_MAP_INCREMENT:
+			if (!as_operations_add_map_increment(ops, bin_name, &map_policy, key, val)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_INCREMENT operation");
+			}
+			break;
+
+		/* 5 */
+		case OP_MAP_DECREMENT:
+			if (!as_operations_add_map_decrement(ops, bin_name, &map_policy, key, val)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_INCREMENT operation");
+			}
+			break;
+
+		/* 6 */
+		case OP_MAP_SIZE:
+			if (!as_operations_add_map_size(ops, bin_name)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_SIZE operation");
+			}
+			break;
+
+		/* 7 */
+		case OP_MAP_CLEAR:
+			if (!as_operations_add_map_clear(ops, bin_name)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_CLEAR operation");
+			}
+			break;
+
+		/* 8 */
+		case OP_MAP_REMOVE_BY_KEY:
+			if (!as_operations_add_map_remove_by_key(ops, bin_name, key, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_KEY operation");
+			}
+			break;
+
+		/* 9 */
+		case OP_MAP_REMOVE_BY_KEY_LIST: {
+			as_list* key_list = NULL;
+			if (as_val_type(key) != AS_LIST) {
+				return as_error_update(err, AEROSPIKE_ERR_PARAM, "list of keys must be an array");
+			}
+			key_list = as_list_fromval(key);
+
+			if (!key_list) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to store key list for remove by key list");
+			}
+			if (!as_operations_add_map_remove_by_key_list(ops, bin_name, key_list, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_KEY_LIST operation");
+			}
+
+			break;
+		}
+
+		/* 10 */
+		case OP_MAP_REMOVE_BY_KEY_RANGE:
+			if (!as_operations_add_map_remove_by_key_range(ops, bin_name, key, range_end, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_KEY_RANGE operation");
+			}
+			break;
+
+		/* 11 */
+		case OP_MAP_REMOVE_BY_VALUE:
+			if (!as_operations_add_map_remove_by_value(ops, bin_name, val, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_VALUE operation");
+			}
+			break;
+
+		/* 12 */
+		case OP_MAP_REMOVE_BY_VALUE_LIST: {
+			as_list* val_list = NULL;
+			if (as_val_type(val) != AS_LIST) {
+				return as_error_update(err, AEROSPIKE_ERR_PARAM, "list of values must be an array");
+			}
+			val_list = as_list_fromval(val);
+
+			if (!val_list) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to store key list for remove by value list");
+			}
+			if (!as_operations_add_map_remove_by_value_list(ops, bin_name, val_list, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_VALUE_LIST operation");
+			}
+			break;
+		}
+
+		/* 13 */
+		case OP_MAP_REMOVE_BY_VALUE_RANGE:
+			if (!as_operations_add_map_remove_by_value_range(ops, bin_name, val, range_end, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_VALUE_RANGE operation");
+			}
+			break;
+
+		/* 14 */
+		case OP_MAP_REMOVE_BY_INDEX:
+			if (!as_operations_add_map_remove_by_index(ops, bin_name, index, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_INDEX operation");
+			}
+			break;
+
+		/* 15 */
+		case OP_MAP_REMOVE_BY_INDEX_RANGE:
+			if (!as_operations_add_map_remove_by_index_range(ops, bin_name, index, count, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_INDEX_RANGE operation");
+			}
+			break;
+
+		/* 16 */
+		case OP_MAP_REMOVE_BY_RANK:
+			if (!as_operations_add_map_remove_by_rank(ops, bin_name, rank, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_RANK operation");
+			}
+			break;
+
+		/* 17 */
+		case OP_MAP_REMOVE_BY_RANK_RANGE:
+			if (!as_operations_add_map_remove_by_rank_range(ops, bin_name, rank, count, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_RANK_RANGE operation");
+			}
+			break;
+
+		/* 18 */
+		case OP_MAP_GET_BY_KEY:
+			if (!as_operations_add_map_get_by_key(ops, bin_name, key, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_KEY operation");
+			}
+			break;
+
+		/* 19 */
+		case OP_MAP_GET_BY_KEY_RANGE:
+			if (!as_operations_add_map_get_by_key_range(ops, bin_name, key, range_end, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_KEY_RANGE operation");
+			}
+			break;
+
+		/* 20 */
+		case OP_MAP_GET_BY_VALUE:
+			if (!as_operations_add_map_get_by_value(ops, bin_name, val, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_VALUE operation");
+			}
+			break;
+
+		/* 21 */
+		case OP_MAP_GET_BY_VALUE_RANGE:
+			if (!as_operations_add_map_get_by_value_range(ops, bin_name, val, range_end, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_VALUE_RANGE operation");
+			}
+			break;
+
+		/* 22 */
+		case OP_MAP_GET_BY_INDEX:
+			if (!as_operations_add_map_get_by_index(ops, bin_name, index, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_INDEX operation");
+			}
+			break;
+
+		/* 23 */
+		case OP_MAP_GET_BY_INDEX_RANGE:
+			if (!as_operations_add_map_get_by_index_range(ops, bin_name, index, count, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_INDEX_RANGE operation");
+			}
+			break;
+
+		/* 24 */
+		case OP_MAP_GET_BY_RANK:
+			if (!as_operations_add_map_get_by_rank(ops, bin_name, rank, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_RANK operation");
+			}
+			break;
+
+		/* 25 */
+		case OP_MAP_GET_BY_RANK_RANGE:
+			if (!as_operations_add_map_get_by_rank_range(ops, bin_name, rank, count, return_type)) {
+				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_RANK_RANGE operation");
+			}
+			break;
+		default:
+			return as_error_update(err, AEROSPIKE_ERR_PARAM, "Unknown map operation");
+	}
+
+	return AEROSPIKE_OK;
+
+}
+
+
 static inline bool op_requires_val(int op_type) {
 	return (op_type != AS_OPERATOR_TOUCH && op_type != OP_LIST_CLEAR  &&
 			op_type != AS_OPERATOR_READ  && op_type != OP_LIST_SIZE   &&
 			op_type != OP_LIST_POP       && op_type != OP_LIST_REMOVE &&
 			op_type != OP_LIST_GET       && op_type != OP_MAP_SIZE    &&
 			op_type != OP_MAP_CLEAR);
+}
+
+static inline bool
+op_is_map_op(int op_type) {
+	return (
+			 op_type == OP_MAP_SET_POLICY ||
+			 op_type == OP_MAP_PUT ||
+			 op_type == OP_MAP_PUT_ITEMS ||
+			 op_type == OP_MAP_INCREMENT ||
+			 op_type == OP_MAP_DECREMENT ||
+			 op_type == OP_MAP_SIZE ||
+			 op_type == OP_MAP_CLEAR ||
+			 op_type == OP_MAP_REMOVE_BY_KEY ||
+			 op_type == OP_MAP_REMOVE_BY_KEY_LIST ||
+			 op_type == OP_MAP_REMOVE_BY_KEY_RANGE ||
+			 op_type == OP_MAP_REMOVE_BY_VALUE ||
+			 op_type == OP_MAP_REMOVE_BY_VALUE_LIST ||
+			 op_type == OP_MAP_REMOVE_BY_VALUE_RANGE ||
+			 op_type == OP_MAP_REMOVE_BY_INDEX ||
+			 op_type == OP_MAP_REMOVE_BY_INDEX_RANGE ||
+			 op_type == OP_MAP_REMOVE_BY_RANK ||
+			 op_type == OP_MAP_REMOVE_BY_RANK_RANGE ||
+			 op_type == OP_MAP_GET_BY_KEY ||
+			 op_type == OP_MAP_GET_BY_KEY_RANGE ||
+			 op_type == OP_MAP_GET_BY_VALUE ||
+			 op_type == OP_MAP_GET_BY_VALUE_RANGE ||
+			 op_type == OP_MAP_GET_BY_INDEX ||
+			 op_type == OP_MAP_GET_BY_INDEX_RANGE ||
+			 op_type == OP_MAP_GET_BY_RANK ||
+			 op_type == OP_MAP_GET_BY_RANK_RANGE);
 }
 
 static inline bool op_requires_list_val(int op_type) {
@@ -638,4 +976,275 @@ static inline bool op_requires_index(int op_type) {
 			op_type == OP_LIST_REMOVE    || op_type == OP_LIST_REMOVE_RANGE ||
 			op_type == OP_LIST_SET       || op_type == OP_LIST_GET          ||
 			op_type == OP_LIST_GET_RANGE || op_type == OP_LIST_TRIM);
+}
+
+
+/* Map op argument classifiers */
+static inline bool
+map_op_requires_map_return_type(int op_type) {
+	return (
+			op_type == OP_MAP_REMOVE_BY_KEY ||
+			op_type == OP_MAP_REMOVE_BY_KEY_LIST ||
+			op_type == OP_MAP_REMOVE_BY_KEY_RANGE ||
+			op_type == OP_MAP_REMOVE_BY_VALUE ||
+			op_type == OP_MAP_REMOVE_BY_VALUE_LIST ||
+			op_type == OP_MAP_REMOVE_BY_VALUE_RANGE ||
+			op_type == OP_MAP_REMOVE_BY_INDEX ||
+			op_type == OP_MAP_REMOVE_BY_INDEX_RANGE ||
+			op_type == OP_MAP_REMOVE_BY_RANK ||
+			op_type == OP_MAP_REMOVE_BY_RANK_RANGE ||
+			op_type == OP_MAP_GET_BY_KEY ||
+			op_type == OP_MAP_GET_BY_KEY_RANGE ||
+			op_type == OP_MAP_GET_BY_VALUE ||
+			op_type == OP_MAP_GET_BY_VALUE_RANGE ||
+			op_type == OP_MAP_GET_BY_INDEX ||
+			op_type == OP_MAP_GET_BY_INDEX_RANGE ||
+			op_type == OP_MAP_GET_BY_RANK ||
+			op_type == OP_MAP_GET_BY_RANK_RANGE);
+
+}
+
+static inline bool map_op_requires_key(int op_type) {
+	return (
+			op_type == OP_MAP_PUT ||
+			op_type == OP_MAP_INCREMENT ||
+			op_type == OP_MAP_DECREMENT ||
+			op_type == OP_MAP_REMOVE_BY_KEY ||
+			op_type == OP_MAP_REMOVE_BY_KEY_LIST ||
+			op_type == OP_MAP_REMOVE_BY_KEY_RANGE ||
+			op_type == OP_MAP_GET_BY_KEY ||
+			op_type == OP_MAP_GET_BY_KEY_RANGE
+			);
+
+}
+
+static inline bool map_op_requires_val(int op_type) {
+	return (
+			op_type == OP_MAP_PUT ||
+			op_type == OP_MAP_INCREMENT ||
+			op_type == OP_MAP_DECREMENT ||
+			op_type == OP_MAP_REMOVE_BY_VALUE ||
+			op_type == OP_MAP_REMOVE_BY_VALUE_LIST ||
+			op_type == OP_MAP_REMOVE_BY_VALUE_RANGE ||
+			op_type == OP_MAP_GET_BY_VALUE ||
+			op_type == OP_MAP_GET_BY_VALUE_RANGE ||
+			op_type == OP_MAP_PUT_ITEMS);
+}
+
+static inline bool map_op_requires_rank(int op_type) {
+	return (
+			op_type == OP_MAP_REMOVE_BY_RANK ||
+			op_type == OP_MAP_REMOVE_BY_RANK_RANGE ||
+			op_type == OP_MAP_GET_BY_RANK ||
+			op_type == OP_MAP_GET_BY_RANK_RANGE);
+}
+
+static inline bool map_op_requires_return_type(int op_type) {
+	return (
+			op_type == OP_MAP_REMOVE_BY_KEY ||
+			op_type == OP_MAP_REMOVE_BY_KEY_LIST ||
+			op_type == OP_MAP_REMOVE_BY_KEY_RANGE ||
+			op_type == OP_MAP_REMOVE_BY_VALUE ||
+			op_type == OP_MAP_REMOVE_BY_VALUE_LIST ||
+			op_type == OP_MAP_REMOVE_BY_VALUE_RANGE ||
+			op_type == OP_MAP_REMOVE_BY_INDEX ||
+			op_type == OP_MAP_REMOVE_BY_INDEX_RANGE ||
+			op_type == OP_MAP_REMOVE_BY_RANK ||
+			op_type == OP_MAP_REMOVE_BY_RANK_RANGE ||
+			op_type == OP_MAP_GET_BY_KEY ||
+			op_type == OP_MAP_GET_BY_KEY_RANGE ||
+			op_type == OP_MAP_GET_BY_VALUE ||
+			op_type == OP_MAP_GET_BY_VALUE_RANGE ||
+			op_type == OP_MAP_GET_BY_INDEX ||
+			op_type == OP_MAP_GET_BY_INDEX_RANGE ||
+			op_type == OP_MAP_GET_BY_RANK ||
+			op_type == OP_MAP_GET_BY_RANK_RANGE);
+}
+
+static inline bool map_op_requires_map_policy(int op_type) {
+	return (
+			op_type == OP_MAP_PUT ||
+			op_type == OP_MAP_PUT_ITEMS ||
+			op_type == OP_MAP_INCREMENT ||
+			op_type == OP_MAP_DECREMENT);
+}
+
+static inline bool map_op_requires_index(int op_type) {
+	return (
+			op_type == OP_MAP_REMOVE_BY_INDEX ||
+			op_type == OP_MAP_REMOVE_BY_INDEX_RANGE ||
+			op_type == OP_MAP_GET_BY_INDEX ||
+			op_type == OP_MAP_GET_BY_INDEX_RANGE);
+}
+
+static inline bool map_op_requires_count(int op_type) {
+	return (
+			op_type == OP_MAP_REMOVE_BY_INDEX_RANGE ||
+			op_type == OP_MAP_REMOVE_BY_RANK_RANGE ||
+			op_type == OP_MAP_GET_BY_INDEX_RANGE ||
+			op_type == OP_MAP_GET_BY_RANK_RANGE);
+}
+
+static inline bool map_op_requires_range_end(int op_type) {
+	return (
+			op_type == OP_MAP_REMOVE_BY_KEY_RANGE ||
+			op_type == OP_MAP_REMOVE_BY_VALUE_RANGE ||
+			op_type == OP_MAP_GET_BY_KEY_RANGE ||
+			op_type == OP_MAP_GET_BY_VALUE_RANGE);
+}
+
+static as_status get_count_from_op_hash(as_error* err, HashTable* op_hash, uint64_t* count) {
+	zval* z_count = NULL;
+	if (!op_hash) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
+	}
+
+	z_count = zend_hash_str_find(op_hash, AS_MAP_COUNT_KEY, strlen(AS_MAP_COUNT_KEY));
+	if (!z_count) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required count entry");
+	}
+
+	if (Z_TYPE_P(z_count) != IS_LONG) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Count entry must be a long type");
+	}
+
+	if (Z_LVAL_P(z_count) < 0) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Count must not be negative");
+	}
+
+	*count = Z_LVAL_P(z_count);
+	return AEROSPIKE_OK;
+}
+
+static as_status get_index_from_op_hash(as_error* err, HashTable* op_hash, int64_t* index) {
+	zval* z_index = NULL;
+	if (!op_hash) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
+	}
+
+	z_index = zend_hash_str_find(op_hash, AS_MAP_INDEX_KEY, strlen(AS_MAP_INDEX_KEY));
+	if (!z_index) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required index entry");
+	}
+
+	if (Z_TYPE_P(z_index) != IS_LONG) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Index entry must be a long type");
+	}
+
+	*index = Z_LVAL_P(z_index);
+	return AEROSPIKE_OK;
+}
+
+static as_status get_rank_from_op_hash(as_error* err, HashTable* op_hash, int64_t* rank) {
+	zval* z_rank = NULL;
+	if (!op_hash) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
+	}
+
+	z_rank = zend_hash_str_find(op_hash, AS_MAP_RANK_KEY, strlen(AS_MAP_RANK_KEY));
+	if (!z_rank) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required rank entry");
+	}
+
+	if (Z_TYPE_P(z_rank) != IS_LONG) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "rank entry must be a long type");
+	}
+
+	*rank = Z_LVAL_P(z_rank);
+	return AEROSPIKE_OK;
+}
+
+/* This is limited for now, This really should allow any of the primitive as_vals, but that causes
+ * some weird issues with PHP converting them back to arrays :(, At the very least, this should take
+ * an int*/
+static as_status get_key_from_op_hash(as_error* err, HashTable* op_hash, as_val** key, int serializer_type) {
+	zval* z_key = NULL;
+	if (!op_hash) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
+	}
+
+	z_key = zend_hash_str_find(op_hash, AS_MAP_KEY_KEY, strlen(AS_MAP_KEY_KEY));
+	if (!z_key) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required key entry");
+	}
+
+	if (zval_to_as_val(z_key, key, err, serializer_type) != AEROSPIKE_OK) {
+		return err->code;
+	}
+	return AEROSPIKE_OK;
+}
+
+static as_status get_value_from_op_hash(as_error* err, HashTable* op_hash, as_val** val, int serializer_type) {
+	zval* z_value = NULL;
+	if (!op_hash) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
+	}
+
+	z_value = zend_hash_str_find(op_hash, AS_MAP_VALUE_KEY, strlen(AS_MAP_VALUE_KEY));
+	if (!z_value) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required val entry");
+	}
+
+	if (zval_to_as_val(z_value, val, err, serializer_type) != AEROSPIKE_OK) {
+		return err->code;
+	}
+
+	return AEROSPIKE_OK;
+}
+
+static as_status get_range_end_from_op_hash(as_error* err, HashTable* op_hash, as_val** range_end, int serializer_type) {
+	zval* z_range_end = NULL;
+	if (!op_hash) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
+	}
+
+	z_range_end = zend_hash_str_find(op_hash, AS_MAP_RANGE_END, strlen(AS_MAP_RANGE_END));
+	if (!z_range_end) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required range_end entry");
+	}
+
+	if (zval_to_as_val(z_range_end, range_end, err, serializer_type) != AEROSPIKE_OK) {
+		return err->code;
+	}
+
+	return AEROSPIKE_OK;
+}
+
+static as_status get_map_policy_from_op_hash(as_error* err, HashTable* op_hash, as_map_policy* map_policy_p) {
+	zval* z_map_policy = NULL;
+	as_status status = AEROSPIKE_OK;
+	if (!op_hash) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
+	}
+
+	z_map_policy = zend_hash_str_find(op_hash, AS_MAP_POLICY_KEY, strlen(AS_MAP_POLICY_KEY));
+	if (!z_map_policy) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required map_policy entry");
+	}
+
+	status = zval_to_as_policy_map(z_map_policy, map_policy_p);
+	if (status != AEROSPIKE_OK) {
+		return as_error_update(err, status, "Invalid map_policy");
+	}
+	return AEROSPIKE_OK;
+}
+
+static as_status get_return_type_from_op_hash(as_error* err, HashTable* op_hash, as_map_return_type* return_type) {
+	zval* z_return_type = NULL;
+
+	if (!op_hash) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
+	}
+
+	z_return_type = zend_hash_str_find(op_hash, AS_MAP_RETURN_TYPE_KEY, strlen(AS_MAP_RETURN_TYPE_KEY));
+	if (!z_return_type) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required return_type entry");
+	}
+
+	if (Z_TYPE_P(z_return_type) != IS_LONG) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "return_type must be a long");
+	}
+	*return_type = (as_map_return_type)Z_LVAL_P(z_return_type);
+
+	return AEROSPIKE_OK;
 }

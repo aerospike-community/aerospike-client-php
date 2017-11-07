@@ -92,7 +92,16 @@ AerospikeOptionConstant aerospike_option_constants[] = {
 	{ AS_MAP_KEY_VALUE_ORDERED              ,   "AS_MAP_KEY_VALUE_ORDERED"          },
 	{ AS_MAP_UPDATE                         ,   "AS_MAP_UPDATE"                     },
 	{ AS_MAP_UPDATE_ONLY                    ,   "AS_MAP_UPDATE_ONLY"                },
-	{ AS_MAP_CREATE_ONLY                    ,   "AS_MAP_CREATE_ONLY"                }
+	{ AS_MAP_CREATE_ONLY                    ,   "AS_MAP_CREATE_ONLY"                },
+	{AS_MAP_RETURN_NONE                     ,   "MAP_RETURN_NONE"                   },
+	{AS_MAP_RETURN_INDEX                    ,   "MAP_RETURN_INDEX"                  },
+	{AS_MAP_RETURN_REVERSE_INDEX            ,   "MAP_RETURN_REVERSE_INDEX"          },
+	{AS_MAP_RETURN_RANK                     ,   "MAP_RETURN_RANK"                   },
+	{AS_MAP_RETURN_REVERSE_RANK             ,   "MAP_RETURN_REVERSE_RANK"           },
+	{AS_MAP_RETURN_COUNT                    ,   "MAP_RETURN_COUNT"                  },
+	{AS_MAP_RETURN_KEY                      ,   "MAP_RETURN_KEY"                    },
+	{AS_MAP_RETURN_VALUE                    ,   "MAP_RETURN_VALUE"                  },
+	{AS_MAP_RETURN_KEY_VALUE                ,   "MAP_RETURN_KEY_VALUE"              }
 };
 
 bool register_aerospike_option_constants(zend_class_entry* aerospike_ce) {
