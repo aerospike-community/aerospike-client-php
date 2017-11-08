@@ -3,7 +3,7 @@
 require_once 'Util.inc';
 use PHPUnit\Framework\TestCase;
 
-final class MapOperationsTest extends TestCase { 
+final class MapOperationsTest extends TestCase {
     /*
         These are tests of incorrect usage for each map operation type.
     */
