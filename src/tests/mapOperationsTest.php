@@ -23,7 +23,6 @@ final class MapOperationsTest extends TestCase {
         }
         $this->db->put($key, ["map" => $bin]);
         $this->test_rec = $bin;
-        // Give some time for any clock differences to resolve.
     }
 
     protected function tearDown()
