@@ -1063,6 +1063,7 @@ static inline bool map_op_requires_return_type(int op_type) {
 
 static inline bool map_op_requires_map_policy(int op_type) {
 	return (
+			op_type == OP_MAP_SET_POLICY ||
 			op_type == OP_MAP_PUT ||
 			op_type == OP_MAP_PUT_ITEMS ||
 			op_type == OP_MAP_INCREMENT ||
