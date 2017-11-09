@@ -710,6 +710,24 @@ static as_status set_as_config(as_config* config, HashTable* z_conf_hash) {
 		config->policies.write.compression_threshold = Z_LVAL_P(setting_value);
 	}
 
+	setting_value = zend_hash_str_find(z_conf_hash, "tender_interval", strlen("tender_interval"));
+	if (setting_value) {
+		if (Z_TYPE_P(setting_value) != IS_LONG) {
+			return AEROSPIKE_ERR_PARAM;
+		}
+		config->tender_interval = Z_LVAL_P(setting_value);
+	}
+
+	/* Set the cluster name */
+	setting_value = zend_hash_str_find(z_conf_hash, "cluster_name", strlen("cluster_name"));
+	if (setting_value) {
+		if (Z_TYPE_P(setting_value) != IS_STRING) {
+			return AEROSPIKE_ERR_PARAM;
+		}
+		as_config_set_cluster_name(config, Z_STRVAL_P(setting_value));
+	}
+
+
 	return AEROSPIKE_OK;
 }
 

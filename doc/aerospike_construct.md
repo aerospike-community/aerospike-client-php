@@ -41,6 +41,8 @@ Shared-memory cluster tending is enabled if an array (even an empty one) is prov
 - *max_threads* (default: 300)
 - *thread_pool_size* (default: 16) In ZTS builds this is set to 0.
 - *compression_threshold* client will compress records larger than this value for transport (default: 0)
+- *tender_interval* Polling interval in milliseconds for cluster tender (default: 1000)
+- *cluster_name* If specified, only server nodes matching this name will be used when determining the cluster
 
 **persistent_connection** whether the connections will persist between requests.
 

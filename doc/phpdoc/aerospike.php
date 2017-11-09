@@ -1727,7 +1727,7 @@ class Aerospike {
      */
     const LOG_LEVEL_TRACE = "LOG_LEVEL_TRACE";
 
-/*
+
     // Aerospike Status Codes:
     //
     // Each Aerospike API method invocation returns a status code
@@ -1839,12 +1839,12 @@ class Aerospike {
 
     // Security role privileges
     const PRIV_READ; // user can read data only
-    const PRIV_WRITE; // user can read and write data
+    const PRIV_READ_WRITE; // user can read and write data
     const PRIV_READ_WRITE_UDF; // can read and write data through User-Defined Functions
     const PRIV_USER_ADMIN; // user can edit/remove other users
     const PRIV_SYS_ADMIN; // can perform sysadmin functions that do not involve user admin
     const PRIV_DATA_ADMIN; // can perform data admin functions that do not involve user admin
-
+/*
     // key-value methods
     public int listSize ( array $key, string $bin, int &$count [, array $options ] )
     public int listAppend ( array $key, string $bin, mixed $value [, array $options ] )
