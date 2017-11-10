@@ -645,7 +645,8 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 	return AEROSPIKE_OK;
 }
 
-static as_status add_map_op_to_operations(HashTable* op_array, int op_type, const char* bin_name,
+static as_status
+add_map_op_to_operations(HashTable* op_array, int op_type, const char* bin_name,
 		as_operations* ops, as_error* err, int serializer_type) {
 	uint64_t count;
 	int64_t index;
@@ -688,19 +689,19 @@ static as_status add_map_op_to_operations(HashTable* op_array, int op_type, cons
 
 	if (map_op_requires_key(op_type)) {
 		if (get_key_from_op_hash(err, op_array, &key, serializer_type) != AEROSPIKE_OK) {
-			return err->code;
+			goto CLEANUP;
 		}
 	}
 
 	if (map_op_requires_range_end(op_type)) {
 		if (get_range_end_from_op_hash(err, op_array, &range_end, serializer_type) != AEROSPIKE_OK) {
-			return err->code;
+			goto CLEANUP;
 		}
 	}
 
 	if (map_op_requires_val(op_type)) {
 		if (get_value_from_op_hash(err, op_array, &val, serializer_type) != AEROSPIKE_OK) {
-			return err->code;
+			goto CLEANUP;
 		}
 	}
 
@@ -709,13 +710,13 @@ static as_status add_map_op_to_operations(HashTable* op_array, int op_type, cons
 		/* 1 */
 		case OP_MAP_SET_POLICY:
 			if (!as_operations_add_map_set_policy(ops, bin_name, &map_policy)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_SET_POLICY operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_SET_POLICY operation");
 			}
 			break;
 		/* 2 */
 		case OP_MAP_PUT:
 			if (!as_operations_add_map_put(ops, bin_name, &map_policy, key, val)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_PUT operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_PUT operation");
 			}
 			break;
 
@@ -723,14 +724,16 @@ static as_status add_map_op_to_operations(HashTable* op_array, int op_type, cons
 		case OP_MAP_PUT_ITEMS: {
 			as_map* map = NULL;
 			if (as_val_type(val) != AS_MAP) {
-				return as_error_update(err, AEROSPIKE_ERR_PARAM, "Value must be a hashtable for OP_MAP_PUT_ITEMS");
+				as_error_update(err, AEROSPIKE_ERR_PARAM, "Value must be a hashtable for OP_MAP_PUT_ITEMS");
+				goto CLEANUP;
 			}
 			map = as_map_fromval(val);
-			if (!val) {
-				return as_error_update(err, AEROSPIKE_ERR_PARAM, "Failed to store map put items");
+			if (!map) {
+				as_error_update(err, AEROSPIKE_ERR_PARAM, "Failed to store map put items");
+				goto CLEANUP;
 			}
 			if (!as_operations_add_map_put_items(ops, bin_name, &map_policy, map)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_PUT_ITEMS operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_PUT_ITEMS operation");
 			}
 			break;
 		}
@@ -738,35 +741,35 @@ static as_status add_map_op_to_operations(HashTable* op_array, int op_type, cons
 		/* 4 */
 		case OP_MAP_INCREMENT:
 			if (!as_operations_add_map_increment(ops, bin_name, &map_policy, key, val)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_INCREMENT operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_INCREMENT operation");
 			}
 			break;
 
 		/* 5 */
 		case OP_MAP_DECREMENT:
 			if (!as_operations_add_map_decrement(ops, bin_name, &map_policy, key, val)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_INCREMENT operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_INCREMENT operation");
 			}
 			break;
 
 		/* 6 */
 		case OP_MAP_SIZE:
 			if (!as_operations_add_map_size(ops, bin_name)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_SIZE operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_SIZE operation");
 			}
 			break;
 
 		/* 7 */
 		case OP_MAP_CLEAR:
 			if (!as_operations_add_map_clear(ops, bin_name)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_CLEAR operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_CLEAR operation");
 			}
 			break;
 
 		/* 8 */
 		case OP_MAP_REMOVE_BY_KEY:
 			if (!as_operations_add_map_remove_by_key(ops, bin_name, key, return_type)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_KEY operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_KEY operation");
 			}
 			break;
 
@@ -774,15 +777,17 @@ static as_status add_map_op_to_operations(HashTable* op_array, int op_type, cons
 		case OP_MAP_REMOVE_BY_KEY_LIST: {
 			as_list* key_list = NULL;
 			if (as_val_type(key) != AS_LIST) {
-				return as_error_update(err, AEROSPIKE_ERR_PARAM, "list of keys must be an array");
+				as_error_update(err, AEROSPIKE_ERR_PARAM, "list of keys must be an array");
+				goto CLEANUP;
 			}
 			key_list = as_list_fromval(key);
 
 			if (!key_list) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to store key list for remove by key list");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to store key list for remove by key list");
+				goto CLEANUP;
 			}
 			if (!as_operations_add_map_remove_by_key_list(ops, bin_name, key_list, return_type)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_KEY_LIST operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_KEY_LIST operation");
 			}
 
 			break;
@@ -791,14 +796,14 @@ static as_status add_map_op_to_operations(HashTable* op_array, int op_type, cons
 		/* 10 */
 		case OP_MAP_REMOVE_BY_KEY_RANGE:
 			if (!as_operations_add_map_remove_by_key_range(ops, bin_name, key, range_end, return_type)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_KEY_RANGE operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_KEY_RANGE operation");
 			}
 			break;
 
 		/* 11 */
 		case OP_MAP_REMOVE_BY_VALUE:
 			if (!as_operations_add_map_remove_by_value(ops, bin_name, val, return_type)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_VALUE operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_VALUE operation");
 			}
 			break;
 
@@ -806,15 +811,17 @@ static as_status add_map_op_to_operations(HashTable* op_array, int op_type, cons
 		case OP_MAP_REMOVE_BY_VALUE_LIST: {
 			as_list* val_list = NULL;
 			if (as_val_type(val) != AS_LIST) {
-				return as_error_update(err, AEROSPIKE_ERR_PARAM, "list of values must be an array");
+				as_error_update(err, AEROSPIKE_ERR_PARAM, "list of values must be an array");
+				goto CLEANUP;
 			}
 			val_list = as_list_fromval(val);
 
 			if (!val_list) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to store key list for remove by value list");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to store key list for remove by value list");
+				goto CLEANUP;
 			}
 			if (!as_operations_add_map_remove_by_value_list(ops, bin_name, val_list, return_type)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_VALUE_LIST operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_VALUE_LIST operation");
 			}
 			break;
 		}
@@ -822,28 +829,28 @@ static as_status add_map_op_to_operations(HashTable* op_array, int op_type, cons
 		/* 13 */
 		case OP_MAP_REMOVE_BY_VALUE_RANGE:
 			if (!as_operations_add_map_remove_by_value_range(ops, bin_name, val, range_end, return_type)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_VALUE_RANGE operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_VALUE_RANGE operation");
 			}
 			break;
 
 		/* 14 */
 		case OP_MAP_REMOVE_BY_INDEX:
 			if (!as_operations_add_map_remove_by_index(ops, bin_name, index, return_type)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_INDEX operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_INDEX operation");
 			}
 			break;
 
 		/* 15 */
 		case OP_MAP_REMOVE_BY_INDEX_RANGE:
 			if (!as_operations_add_map_remove_by_index_range(ops, bin_name, index, count, return_type)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_INDEX_RANGE operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_INDEX_RANGE operation");
 			}
 			break;
 
 		/* 16 */
 		case OP_MAP_REMOVE_BY_RANK:
 			if (!as_operations_add_map_remove_by_rank(ops, bin_name, rank, return_type)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_RANK operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_REMOVE_BY_RANK operation");
 			}
 			break;
 
@@ -857,63 +864,82 @@ static as_status add_map_op_to_operations(HashTable* op_array, int op_type, cons
 		/* 18 */
 		case OP_MAP_GET_BY_KEY:
 			if (!as_operations_add_map_get_by_key(ops, bin_name, key, return_type)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_KEY operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_KEY operation");
 			}
 			break;
 
 		/* 19 */
 		case OP_MAP_GET_BY_KEY_RANGE:
 			if (!as_operations_add_map_get_by_key_range(ops, bin_name, key, range_end, return_type)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_KEY_RANGE operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_KEY_RANGE operation");
 			}
 			break;
 
 		/* 20 */
 		case OP_MAP_GET_BY_VALUE:
 			if (!as_operations_add_map_get_by_value(ops, bin_name, val, return_type)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_VALUE operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_VALUE operation");
 			}
 			break;
 
 		/* 21 */
 		case OP_MAP_GET_BY_VALUE_RANGE:
 			if (!as_operations_add_map_get_by_value_range(ops, bin_name, val, range_end, return_type)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_VALUE_RANGE operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_VALUE_RANGE operation");
 			}
 			break;
 
 		/* 22 */
 		case OP_MAP_GET_BY_INDEX:
 			if (!as_operations_add_map_get_by_index(ops, bin_name, index, return_type)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_INDEX operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_INDEX operation");
 			}
 			break;
 
 		/* 23 */
 		case OP_MAP_GET_BY_INDEX_RANGE:
 			if (!as_operations_add_map_get_by_index_range(ops, bin_name, index, count, return_type)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_INDEX_RANGE operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_INDEX_RANGE operation");
 			}
 			break;
 
 		/* 24 */
 		case OP_MAP_GET_BY_RANK:
 			if (!as_operations_add_map_get_by_rank(ops, bin_name, rank, return_type)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_RANK operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_RANK operation");
 			}
 			break;
 
 		/* 25 */
 		case OP_MAP_GET_BY_RANK_RANGE:
 			if (!as_operations_add_map_get_by_rank_range(ops, bin_name, rank, count, return_type)) {
-				return as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_RANK_RANGE operation");
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add OP_MAP_GET_BY_RANK_RANGE operation");
 			}
 			break;
 		default:
-			return as_error_update(err, AEROSPIKE_ERR_PARAM, "Unknown map operation");
+			as_error_update(err, AEROSPIKE_ERR_PARAM, "Unknown map operation");
+			break;
 	}
 
-	return AEROSPIKE_OK;
+CLEANUP:
+
+/*
+ * 	as_val* range_end = NULL;
+	as_val* val = NULL;
+	as_val* key = NULL;
+ */
+	if (err->code != AEROSPIKE_OK) {
+		if (range_end) {
+			as_val_destroy(range_end);
+		}
+		if (val) {
+			as_val_destroy(val);
+		}
+		if (key) {
+			as_val_destroy(key);
+		}
+	}
+	return err->code;
 
 }
 
