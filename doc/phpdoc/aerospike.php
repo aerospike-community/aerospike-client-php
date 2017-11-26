@@ -659,10 +659,12 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * * Aerospike::OPT_POLICY_RETRY
+     * * Aerospike::OPT_POLICY_DURABLE_DELETE
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
+     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
@@ -1451,6 +1453,12 @@ class Aerospike {
      * @const OPT_WRITE_TIMEOUT value in milliseconds (default: 1000)
      */
     const OPT_WRITE_TIMEOUT = 0;
+    /**
+     * Defines the max socket idle time (in milliseconds) for a database
+     * operation.
+     * @const OPT_SOCKET_TIMEOUT value in milliseconds (default: 10000)
+     */
+    const OPT_SOCKET_TIMEOUT = 0;
 
     /**
      * Sets the TTL of the record along with a write operation.
@@ -1469,7 +1477,7 @@ class Aerospike {
      * {@link http://www.aerospike.com/docs/client/php/usage/kvs/record-structure.html Records}
      * are uniquely identified by their digest, and can optionally store the value of their primary key
      * (their unique ID in the application).
-     * @const OPT_POLICY_KEY Key policy option (digest-only or send key)
+     * @const OPT_POLICY_KEY Key storage policy option (digest-only or send key)
      */
     const OPT_POLICY_KEY = "OPT_POLICY_KEY";
     /**
@@ -1703,6 +1711,14 @@ class Aerospike {
     const USE_BATCH_DIRECT = "USE_BATCH_DIRECT";
 
     /**
+     * Set to true to enable durable delete for the operation.
+     * Durable deletes are an Enterprise Edition feature
+     *
+     * @const OPT_POLICY_DURABLE_DELETE boolean value (default: false)
+     */
+    const OPT_POLICY_DURABLE_DELETE = "OPT_POLICY_DURABLE_DELETE";
+
+    /**
      * @const LOG_LEVEL_OFF
      */
     const LOG_LEVEL_OFF = "LOG_LEVEL_OFF";
@@ -1727,77 +1743,409 @@ class Aerospike {
      */
     const LOG_LEVEL_TRACE = "LOG_LEVEL_TRACE";
 
+    /**
+     * Aerospike Status Codes
+     *
+     * Each Aerospike API method invocation returns a status code from the
+     * server.
+     *
+     * The status codes map to the
+     * {@link https://github.com/aerospike/aerospike-client-c/blob/master/src/include/aerospike/as_status.h status codes}
+     * of the C client.
+     *
+     * @const OK Success
+     */
+    const OK = "AEROSPIKE_OK";
 
-    // Aerospike Status Codes:
-    //
-    // Each Aerospike API method invocation returns a status code
-    //  depending upon the success or failure condition of the call.
-    //
-    // The error status codes map to the C client
-    //  src/include/aerospike/as_status.h
+    // -10 - -1 - Client Errors
 
-    // Client status codes:
-    //
-    const ERR_PARAM              ; // Invalid client parameter
-    const ERR_CLIENT             ; // Generic client error
+    /**
+     * Synchronous connection error
+     * @const ERR_CONNECTION
+     */
+    const ERR_CONNECTION = "AEROSPIKE_ERR_CONNECTION";
+    /**
+     * Node invalid or could not be found
+     * @const ERR_TLS_ERROR
+     */
+    const ERR_TLS_ERROR = "AEROSPIKE_ERR_TLS";
+    /**
+     * Node invalid or could not be found
+     * @const ERR_INVALID_NODE
+     */
+    const ERR_INVALID_NODE = "AEROSPIKE_ERR_INVALID_NODE";
+    /**
+     * Client hit the max asynchronous connections
+     * @const ERR_NO_MORE_CONNECTIONS
+     */
+    const ERR_NO_MORE_CONNECTIONS = "AEROSPIKE_ERR_NO_MORE_CONNECTIONS";
+    /**
+     * Asynchronous connection error
+     * @const ERR_ASYNC_CONNECTION
+     */
+    const ERR_ASYNC_CONNECTION = "AEROSPIKE_ERR_ASYNC_CONNECTION";
+    /**
+     * Query or scan was aborted in user's callback
+     * @const ERR_CLIENT_ABORT
+     */
+    const ERR_CLIENT_ABORT = "AEROSPIKE_ERR_CLIENT_ABORT";
+    /**
+     * Host name could not be found in DNS lookup
+     * @const ERR_INVALID_HOST
+     */
+    const ERR_INVALID_HOST = "AEROSPIKE_ERR_INVALID_HOST";
+    /**
+     * Invalid client API parameter
+     * @const ERR_PARAM
+     */
+    const ERR_PARAM = "AEROSPIKE_ERR_PARAM";
+    /**
+     * Generic client API usage error
+     * @const ERR_CLIENT
+     */
+    const ERR_CLIENT = "AEROSPIKE_ERR_CLIENT";
 
-    // Server status codes:
+    // 1-49 - Basic Server Errors
+
+    /**
+     * Generic error returned by server
+     * @const ERR_SERVER
+     */
+    const ERR_SERVER = "AEROSPIKE_ERR_SERVER";
+    /**
+     * No record is found with the specified namespace/set/key combination.
+     * May be returned by a read, or a write with OPT_POLICY_EXISTS
+     * set to POLICY_EXISTS_UPDATE
+     * @const ERR_RECORD_NOT_FOUND
+     */
+    const ERR_RECORD_NOT_FOUND = "AEROSPIKE_ERR_RECORD_NOT_FOUND";
+    /**
+     * Generation of record does not satisfy the OPT_POLICY_GEN write policy
+     * @const ERR_RECORD_GENERATION
+     */
+    const ERR_RECORD_GENERATION = "AEROSPIKE_ERR_RECORD_GENERATION";
+    /**
+     * Illegal parameter sent from client. Check client parameters and verify
+     * each is supported by current server version
+     * @const ERR_REQUEST_INVALID
+     */
+    const ERR_REQUEST_INVALID = "AEROSPIKE_ERR_REQUEST_INVALID";
+    /**
+     * Record already exists. May be returned by a write with the
+     * OPT_POLICY_EXISTS write policy set to POLICY_EXISTS_CREATE
+     * @const ERR_RECORD_EXISTS
+     */
+    const ERR_RECORD_EXISTS = "AEROSPIKE_ERR_RECORD_EXISTS";
+    /**
+     * (future) For future write requests which specify 'BIN_CREATE_ONLY',
+     * request failed because one of the bins in the write already exists
+     * @const ERR_BIN_EXISTS
+     */
+    const ERR_BIN_EXISTS = "AEROSPIKE_ERR_BIN_EXISTS";
+    /**
+     * On scan requests, the scan terminates because cluster is in migration.
+     * Only occur when client requested 'fail_on_cluster_change' policy on scan
+     * @const ERR_CLUSTER_CHANGE
+     */
+    const ERR_CLUSTER_CHANGE = "AEROSPIKE_ERR_CLUSTER_CHANGE";
+    /**
+     * Occurs when stop_writes is true (either memory - stop-writes-pct -
+     * or disk - min-avail-pct). Can also occur if memory cannot be allocated
+     * anymore (but stop_writes should in general hit first). Namespace will no
+     * longer be able to accept write requests
+     * @const ERR_SERVER_FULL
+     */
+    const ERR_SERVER_FULL = "AEROSPIKE_ERR_SERVER_FULL";
+    /**
+     * Request was not completed during the allocated time, thus aborted
+     * @const ERR_TIMEOUT
+     */
+    const ERR_TIMEOUT = "AEROSPIKE_ERR_TIMEOUT";
+    /**
+     * Write request is rejected because XDR is not running.
+     * Only occur when XDR configuration xdr-stop-writes-noxdr is on
+     * @deprecated Will be reused as ERR_ALWAYS_FORBIDDEN
+     * @const ERR_NO_XDR
+     */
+    const ERR_NO_XDR = "AEROSPIKE_ERR_NO_XDR";
+    /**
+     * Server is not accepting requests.
+     * Occur during single node on a quick restart to join existing cluster
+     * @const ERR_CLUSTER
+     */
+    const ERR_CLUSTER = "AEROSPIKE_ERR_CLUSTER";
+    /**
+     * Operation is not allowed due to data type or namespace configuration incompatibility.
+     * For example, append to a float data type, or insert a non-integer when
+     * namespace is configured as data-in-index
+     * @const ERR_BIN_INCOMPATIBLE_TYPE
+     */
+    const ERR_BIN_INCOMPATIBLE_TYPE = "AEROSPIKE_ERR_BIN_INCOMPATIBLE_TYPE";
+    /**
+     * Attempt to write a record whose size is bigger than the configured write-block-size
+     * @const ERR_RECORD_TOO_BIG
+     */
+    const ERR_RECORD_TOO_BIG = "AEROSPIKE_ERR_RECORD_TOO_BIG";
+    /**
+     * Too many concurrent operations (> transaction-pending-limit) on the same record.
+     * A "hot-key" situation
+     * @const ERR_RECORD_BUSY
+     */
+    const ERR_RECORD_BUSY = "AEROSPIKE_ERR_RECORD_BUSY";
+    /**
+     * Scan aborted by user on server
+     * @const ERR_SCAN_ABORTED
+     */
+    const ERR_SCAN_ABORTED = "AEROSPIKE_ERR_SCAN_ABORTED";
+    /**
+     * The client is trying to use a feature that does not yet exist in the
+     * version of the server node it is talking to
+     * @const ERR_UNSUPPORTED_FEATURE
+     */
+    const ERR_UNSUPPORTED_FEATURE = "AEROSPIKE_ERR_UNSUPPORTED_FEATURE";
+    /**
+     * (future) For future write requests which specify 'REPLACE_ONLY',
+     * request fail because specified bin name does not exist in record
+     * @const ERR_BIN_NOT_FOUND
+     */
+    const ERR_BIN_NOT_FOUND = "AEROSPIKE_ERR_BIN_NOT_FOUND";
+    /**
+     * Write request is rejected because one or more storage devices of the node are not keeping up
+     * @const ERR_DEVICE_OVERLOAD
+     */
+    const ERR_DEVICE_OVERLOAD = "AEROSPIKE_ERR_DEVICE_OVERLOAD";
+    /**
+     * For update request on records which has key stored, the incoming key does not match
+     * the existing stored key. This indicates a RIPEMD160 key collision has happend (report as a bug)
+     * @const ERR_RECORD_KEY_MISMATCH
+     */
+    const ERR_RECORD_KEY_MISMATCH = "AEROSPIKE_ERR_RECORD_KEY_MISMATCH";
+    /**
+     * Namespace in request not found on server
+     * @const ERR_NAMESPACE_NOT_FOUND
+     */
+    const ERR_NAMESPACE_NOT_FOUND = "AEROSPIKE_ERR_NAMESPACE_NOT_FOUND";
+    /**
+     * Bin name length greater than 14 characters, or maximum number of unique bin names are exceeded
+     * @const ERR_BIN_NAME
+     */
+    const ERR_BIN_NAME = "AEROSPIKE_ERR_BIN_NAME";
+    /**
+     * Operation not allowed at this time.
+     * For writes, the set is in the middle of being deleted, or the set's stop-write is reached;
+     * For scan, too many concurrent scan jobs (> scan-max-active);
+     * For XDR-ed cluster, fail writes which are not replicated from another datacenter
+     * @const ERR_FAIL_FORBIDDEN
+     */
+    const ERR_FAIL_FORBIDDEN = "AEROSPIKE_ERR_FORBIDDEN";
+    /**
+     * Target was not found for operations that requires a target to be found
+     * @const ERR_FAIL_ELEMENT_NOT_FOUND
+     */
+    const ERR_FAIL_ELEMENT_NOT_FOUND = "AEROSPIKE_ERR_FAIL_NOT_FOUND";
+    /**
+     * Target already exist for operations that requires the target to not exist
+     * @const ERR_FAIL_ELEMENT_EXISTS
+     */
+    const ERR_FAIL_ELEMENT_EXISTS = "AEROSPIKE_ERR_FAIL_ELEMENT_EXISTS";
+
+    // 50-89 - Security Specific Errors
+
+    /**
+     * Security functionality not supported by connected server
+     * @const SECURITY_NOT_SUPPORTED
+     */
+    const SECURITY_NOT_SUPPORTED = "AEROSPIKE_ERR_SECURITY_NOT_SUPPORTED";
+    /**
+     * Security functionality not enabled by connected server
+     * @const SECURITY_NOT_ENABLED
+     */
+    const SECURITY_NOT_ENABLED = "AEROSPIKE_ERR_SECURITY_NOT_ENABLED";
+    /**
+     * Security scheme not supported
+     * @const SECURITY_SCHEME_NOT_SUPPORTED
+     */
+    const SECURITY_SCHEME_NOT_SUPPORTED = "AEROSPIKE_ERR_SECURITY_SCHEME_NOT_SUPPORTED";
+    /**
+     * Unrecognized security command
+     * @const INVALID_COMMAND
+     */
+    const INVALID_COMMAND = "AEROSPIKE_ERR_INVALID_COMMAND";
+    /**
+     * Field is not valid
+     * @const INVALID_FIELD
+     */
+    const INVALID_FIELD = "AEROSPIKE_ERR_INVALID_FIELD";
+    /**
+     * Security protocol not followed
+     * @const ILLEGAL_STATE
+     */
+    const ILLEGAL_STATE = "AEROSPIKE_ERR_ILLEGAL_STATE";
+    /**
+     * No user supplied or unknown user
+     * @const INVALID_USER
+     */
+    const INVALID_USER = "AEROSPIKE_ERR_INVALID_USER";
+    /**
+     * User already exists
+     * @const USER_ALREADY_EXISTS
+     */
+    const USER_ALREADY_EXISTS = "AEROSPIKE_ERR_USER_ALREADY_EXISTS";
+    /**
+     * Password does not exists or not recognized
+     * @const INVALID_PASSWORD
+     */
+    const INVALID_PASSWORD = "AEROSPIKE_ERR_INVALID_PASSWORD";
+    /**
+     * Expired password
+     * @const EXPIRED_PASSWORD
+     */
+    const EXPIRED_PASSWORD = "AEROSPIKE_ERR_EXPIRED_PASSWORD";
+    /**
+     * Forbidden password (e.g. recently used)
+     * @const FORBIDDEN_PASSWORD
+     */
+    const FORBIDDEN_PASSWORD = "AEROSPIKE_ERR_FORBIDDEN_PASSWORD";
+    /**
+     * Invalid credential or credential does not exist
+     * @const INVALID_CREDENTIAL
+     */
+    const INVALID_CREDENTIAL = "AEROSPIKE_ERR_INVALID_CREDENTIAL";
+    /**
+     * No role(s) or unknown role(s)
+     * @const INVALID_ROLE
+     */
+    const INVALID_ROLE = "AEROSPIKE_ERR_INVALID_ROLE";
+    /**
+     * Privilege is invalid
+     * @const INVALID_PRIVILEGE
+     */
+    const INVALID_PRIVILEGE = "AEROSPIKE_ERR_INVALID_PRIVILEGE";
+    /**
+     * User must be authenticated before performing database operations
+     * @const NOT_AUTHENTICATED
+     */
+    const NOT_AUTHENTICATED = "AEROSPIKE_ERR_NOT_AUTHENTICATED";
+    /**
+     * User does not possess the required role to perform the database operation
+     * @const ROLE_VIOLATION
+     */
+    const ROLE_VIOLATION = "AEROSPIKE_ERR_ROLE_VIOLATION";
+    /**
+     * Role already exists
+     * @const ROLE_ALREADY_EXISTS
+     */
+    const ROLE_ALREADY_EXISTS = "AEROSPIKE_ERR_ROLE_ALREADY_EXISTS";
+
+    // 100-109 - UDF Specific Errors
     //
-    const OK                     ; // Success status
-    const ERR_SERVER             ; // Generic server error
-    const ERR_SERVER_FULL        ; // Node running out of memory/storage
-    const ERR_DEVICE_OVERLOAD    ; // Node storage lagging write load
-    const ERR_TIMEOUT            ; // Client or server side timeout error
-    const ERR_CLUSTER            ; // Generic cluster discovery and connection error
-    const ERR_CLUSTER_CHANGE     ; // Cluster state changed during the request
-    const ERR_REQUEST_INVALID    ; // Invalid request protocol or protocol field
-    const ERR_UNSUPPORTED_FEATURE;
-    const ERR_NO_XDR             ; // XDR not available for the cluster
-    // Record specific:
-    const ERR_NAMESPACE_NOT_FOUND;
-    const ERR_RECORD_NOT_FOUND   ;
-    const ERR_RECORD_EXISTS      ; // Record already exists
-    const ERR_RECORD_GENERATION  ; // Write policy regarding generation violated
-    const ERR_RECORD_TOO_BIG     ; // Record written cannot fit in storage write block
-    const ERR_RECORD_BUSY        ; // Hot key: too many concurrent requests for the record
-    const ERR_RECORD_KEY_MISMATCH; // Digest incompatibility?
-    // Bin specific:
-    const ERR_BIN_NAME           ; // Name too long or exceeds the unique name quota for the namespace
-    const ERR_BIN_NOT_FOUND      ;
-    const ERR_BIN_EXISTS         ; // Bin already exists
-    const ERR_BIN_INCOMPATIBLE_TYPE;
-    // Query and Scan operations:
-    const ERR_SCAN_ABORTED       ; // Scan aborted by the user
-    const ERR_QUERY              ; // Generic query error
-    const ERR_QUERY_END          ; // Out of records to query
-    const ERR_QUERY_ABORTED      ; // Query aborted by the user
-    const ERR_QUERY_QUEUE_FULL   ;
-    // Index operations:
-    const ERR_INDEX              ; // Generic secondary index error
-    const ERR_INDEX_OOM          ; // Index out of memory
-    const ERR_INDEX_NOT_FOUND    ;
-    const ERR_INDEX_FOUND        ;
-    const ERR_INDEX_NOT_READABLE ;
-    const ERR_INDEX_NAME_MAXLEN  ;
-    const ERR_INDEX_MAXCOUNT     ; // Max number of indexes reached
-    // UDF operations:
-    const ERR_UDF                ; // Generic UDF error
-    const ERR_UDF_NOT_FOUND      ; // UDF does not exist
-    const ERR_LUA_FILE_NOT_FOUND ; // Source file for the module not found
-    // Security operations:
-    const ERR_SECURITY_NOT_SUPPORTED;
-    const ERR_SECURITY_NOT_ENABLED;
-    const ERR_SECURITY_SCHEME_NOT_SUPPORTED;
-    const ERR_INVALID_USER;
-    const ERR_USER_ALREADY_EXISTS;
-    const ERR_INVALID_PASSWORD;
-    const ERR_EXPIRED_PASSWORD;
-    const ERR_FORBIDDEN_PASSWORD;
-    const ERR_INVALID_CREDENTIAL;
-    const ERR_INVALID_ROLE;
-    const ERR_INVALID_PRIVILEGE;
-    const ERR_NOT_AUTHENTICATED;
-    const ERR_ROLE_VIOLATION;
+    /**
+     * A user defined function failed to execute
+     * @const ERR_UDF
+     */
+    const ERR_UDF = "AEROSPIKE_ERR_UDF";
+    /**
+     * The UDF does not exist
+     * @const ERR_UDF_NOT_FOUND
+     */
+    const ERR_UDF_NOT_FOUND = "AEROSPIKE_ERR_UDF_NOT_FOUND";
+    /**
+     * The LUA file does not exist
+     * @const ERR_LUA_FILE_NOT_FOUND
+     */
+    const ERR_LUA_FILE_NOT_FOUND = "AEROSPIKE_ERR_LUA_FILE_NOT_FOUND";
+
+    // 150-159 - Batch Specific Errors
+
+    /**
+     * Batch functionality has been disabled by configuring the batch-index-thread=0
+     * @const ERR_BATCH_DISABLED
+     */
+    const ERR_BATCH_DISABLED = "AEROSPIKE_ERR_BATCH_DISABLED";
+    /**
+     * Batch max requests has been exceeded
+     * @const ERR_BATCH_MAX_REQUESTS_EXCEEDED
+     */
+    const ERR_BATCH_MAX_REQUESTS_EXCEEDED= "AEROSPIKE_ERR_BATCH_MAX_REQUESTS_EXCEEDED";
+    /**
+     * All batch queues are full
+     * @const ERR_BATCH_QUEUES_FULL
+     */
+    const ERR_BATCH_QUEUES_FULL = "AEROSPIKE_ERR_BATCH_QUEUES_FULL";
+
+    // 160-169 - Geo Specific Errors
+
+    /**
+     * GeoJSON is malformed or not supported
+     * @const ERR_GEO_INVALID_GEOJSON
+     */
+    const ERR_GEO_INVALID_GEOJSON = "AEROSPIKE_ERR_GEO_INVALID_GEOJSON";
+
+    // 200-219 - Secondary Index Specific Errors
+
+    /**
+     * Secondary index already exists
+     * @const ERR_INDEX_FOUND
+     */
+    const ERR_INDEX_FOUND = "AEROSPIKE_ERR_INDEX_FOUND";
+    /**
+     * Secondary index does not exist
+     * @const ERR_INDEX_NOT_FOUND
+     */
+    const ERR_INDEX_NOT_FOUND = "AEROSPIKE_ERR_INDEX_NOT_FOUND";
+    /**
+     * Secondary index memory space exceeded
+     * @const ERR_INDEX_OOM
+     */
+    const ERR_INDEX_OOM = "AEROSPIKE_ERR_INDEX_OOM";
+    /**
+     * Secondary index not available for query. Occurs when indexing creation has not finished
+     * @const ERR_INDEX_NOT_READABLE
+     */
+    const ERR_INDEX_NOT_READABLE = "AEROSPIKE_ERR_INDEX_NOT_READABLE";
+    /**
+     * Generic secondary index error
+     * @const ERR_INDEX
+     */
+    const ERR_INDEX = "AEROSPIKE_ERR_INDEX";
+    /**
+     * Index name maximun length exceeded
+     * @const ERR_INDEX_NAME_MAXLEN
+     */
+    const ERR_INDEX_NAME_MAXLEN = "AEROSPIKE_ERR_INDEX_NAME_MAXLEN";
+    /**
+     * Maximum number of indicies exceeded
+     * @const ERR_INDEX_MAXCOUNT
+     */
+    const ERR_INDEX_MAXCOUNT = "AEROSPIKE_ERR_INDEX_MAXCOUNT";
+    /**
+     * Secondary index query aborted
+     * @const ERR_QUERY_ABORTED
+     */
+    const ERR_QUERY_ABORTED = "AEROSPIKE_ERR_QUERY_ABORTED";
+    /**
+     * Secondary index queue full
+     * @const ERR_QUERY_QUEUE_FULL
+     */
+    const ERR_QUERY_QUEUE_FULL = "AEROSPIKE_ERR_QUERY_QUEUE_FULL";
+    /**
+     * Secondary index query timed out on server
+     * @const ERR_QUERY_TIMEOUT
+     */
+    const ERR_QUERY_TIMEOUT = "AEROSPIKE_ERR_QUERY_TIMEOUT";
+    /**
+     * Generic query error
+     * @const ERR_QUERY
+     */
+    const ERR_QUERY = "AEROSPIKE_ERR_QUERY";
+
+    /**
+     * @deprecated
+     * @const ERR_LARGE_ITEM_NOT_FOUND
+     */
+    const ERR_LARGE_ITEM_NOT_FOUND = "AEROSPIKE_ERR_LARGE_ITEM_NOT_FOUND";
+
+    /*
 
     // Status values returned by scanInfo(). Deprecated in favor of jobInfo()
     const SCAN_STATUS_UNDEF;      // scan status is undefined. deprecated.
