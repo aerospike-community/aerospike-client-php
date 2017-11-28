@@ -745,8 +745,12 @@ as_status set_record_generation_from_write_policy(as_record* record, zval* z_wri
 }
 
 as_status set_operations_generation_from_operate_policy(as_operations* operations, zval* z_op_policy) {
-	if (!z_op_policy || Z_TYPE_P(z_op_policy) != IS_ARRAY) {
+	if (!z_op_policy || Z_TYPE_P(z_op_policy) == IS_NULL) {
 		return AEROSPIKE_OK;
+	}
+
+	if (Z_TYPE_P(z_op_policy) != IS_ARRAY) {
+		return AEROSPIKE_ERR_PARAM;
 	}
 	HashTable* opt_ary = Z_ARRVAL_P(z_op_policy);
 	zval* gen_zval = zend_hash_index_find(opt_ary, OPT_POLICY_GEN);
@@ -774,6 +778,34 @@ as_status set_operations_generation_from_operate_policy(as_operations* operation
 	return AEROSPIKE_OK;
 }
 
+/*
+ * Look for the value of [AEROSPIKE::OPT_TTL => ####] and assign it to the operations ttl field
+ * Return error if the value is not an integer
+ */
+as_status set_operations_ttl_from_operate_policy(as_operations* operations, zval* z_op_policy) {
+	if (!z_op_policy || Z_TYPE_P(z_op_policy) == IS_NULL) {
+		return AEROSPIKE_OK;
+	}
+
+	if (Z_TYPE_P(z_op_policy) != IS_ARRAY) {
+		return AEROSPIKE_ERR_PARAM;
+	}
+
+	HashTable* opt_ary = Z_ARRVAL_P(z_op_policy);
+	zval* ttl_zval = zend_hash_index_find(opt_ary, OPT_TTL);
+
+	if (!ttl_zval) {
+		return AEROSPIKE_OK;
+	}
+
+	if (Z_TYPE_P(ttl_zval) != IS_LONG) {
+		return AEROSPIKE_ERR_PARAM; //error
+	}
+
+	operations->ttl = (uint32_t)Z_LVAL_P(ttl_zval);
+
+	return AEROSPIKE_OK;
+}
 
 as_status set_serializer_from_policy_hash(int* serializer_type, zval* z_policy) {
 	HashTable* z_policy_ary = NULL;

@@ -82,6 +82,11 @@ PHP_METHOD(Aerospike, append)
 		goto CLEANUP;
 	}
 
+	if (set_operations_ttl_from_operate_policy(&operations, z_op_policy) != AEROSPIKE_OK) {
+		as_error_update(&err, AEROSPIKE_ERR_PARAM, "Invalid TTL");
+		goto CLEANUP;
+	}
+
 	aerospike_key_operate(as_ptr, &err, operate_policy_p, &key, &operations, &rec);
 
 CLEANUP:

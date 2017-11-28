@@ -107,6 +107,12 @@ PHP_METHOD(Aerospike, operate) {
 		goto CLEANUP;
 	}
 
+	if (set_operations_ttl_from_operate_policy(&ops, z_operate_policy) != AEROSPIKE_OK) {
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid generation policy");
+		err.code = AEROSPIKE_ERR_PARAM;
+		goto CLEANUP;
+	}
+
 	if (!hashtable_is_list(z_ops)) {
 		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Operations array must be a list");
 		err.code = AEROSPIKE_ERR_PARAM;
@@ -231,6 +237,13 @@ PHP_METHOD(Aerospike, operateOrdered) {
 
 	if (set_operations_generation_from_operate_policy(&ops, z_operate_policy) != AEROSPIKE_OK) {
 		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid generation policy");
+		err.code = AEROSPIKE_ERR_PARAM;
+		goto CLEANUP;
+	}
+
+
+	if (set_operations_ttl_from_operate_policy(&ops, z_operate_policy) != AEROSPIKE_OK) {
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid TTL");
 		err.code = AEROSPIKE_ERR_PARAM;
 		goto CLEANUP;
 	}
