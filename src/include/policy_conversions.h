@@ -54,4 +54,5 @@ as_status set_serializer_from_policy_hash(int* serializer_type, zval* z_policy);
 as_status set_deserializer_from_policy_hash(int* deserializer_type, zval* z_policy);
 as_status set_record_generation_from_write_policy(as_record* record, zval* z_write_policy);
 as_status set_operations_generation_from_operate_policy(as_operations* operations, zval* z_write_policy);
+as_status set_operations_ttl_from_operate_policy(as_operations* operations, zval* z_write_policy);
 as_status set_scan_options_from_policy_hash(as_scan* scan, zval* z_policy);
