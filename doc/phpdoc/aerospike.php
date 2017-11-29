@@ -975,6 +975,190 @@ class Aerospike {
      *   op => Aerospike::OP_LIST_SIZE, # returns a value
      *   bin =>  "events" # gets the size of a list contained in the bin
      *
+     *
+     * Map operations
+     *
+     * Map Policies:
+     * Many of the following operations require a map policy, the policy is an array
+     * containing any of the keys AEROSPIKE::OPT_MAP_ORDER, AEROSPIKE::OPT_MAP_WRITE_MODE
+     *
+     * the value for AEROSPIKE::OPT_MAP_ORDER should be one of AEROSPIKE::AS_MAP_UNORDERED , AEROSPIKE::AS_MAP_KEY_ORDERED , AEROSPIKE::AS_MAP_KEY_VALUE_ORDERED
+     * the default value is currently AEROSPIKE::AS_MAP_UNORDERED
+     *
+     * the value for AEROSPIKE::OPT_MAP_WRITE_MODE should be one of: AEROSPIKE::AS_MAP_UPDATE, AEROSPIKE::AS_MAP_UPDATE_ONLY , AEROSPIKE::AS_MAP_CREATE_ONLY
+     * the default value is currently AEROSPIKE::AS_MAP_UPDATE
+     *
+     * Map return types:
+     * many of the map operations require a return_type entry.
+     * this specifies the format in which the response should be returned. The options are:
+     * AEROSPIKE::AS_MAP_RETURN_NONE # Do not return a result.
+     * AEROSPIKE::AS_MAP_RETURN_INDEX # Return key index order.
+     * AEROSPIKE::AS_MAP_RETURN_REVERSE_INDEX # Return reverse key order.
+     * AEROSPIKE::AS_MAP_RETURN_RANK # Return value order.
+     * AEROSPIKE::AS_MAP_RETURN_REVERSE_RANK # Return reserve value order.
+     * AEROSPIKE::AS_MAP_RETURN_COUNT # Return count of items selected.
+     * AEROSPIKE::AS_MAP_RETURN_KEY # Return key for single key read and key list for range read.
+     * AEROSPIKE::AS_MAP_RETURN_VALUE # Return value for single key read and value list for range read.
+     * AEROSPIKE::AS_MAP_RETURN_KEY_VALUE # Return key/value items. Will be of the form ['key1', 'val1', 'key2', 'val2', 'key3', 'val3]
+     *
+     * Map policy Operation:
+     *   op => Aerospike::OP_MAP_SET_POLICY,
+     *   bin =>  "map",
+     *   map_policy =>  [ AEROSPIKE::OPT_MAP_ORDER => AEROSPIKE::AS_MAP_KEY_ORDERED]
+     *
+     * Map clear operation: (Remove all items from a map)
+     *   op => AEROSPIKE::OP_MAP_CLEAR,
+     *   bin => "bin_name"
+     *
+     *
+     * Map Size Operation: Return the number of items in a map
+     *   op => AEROSPIKE::OP_MAP_SIZE,
+     *   bin => "bin_name"
+     *
+     * Map Get by Key operation
+     *   op => AEROSPIKE::OP_MAP_GET_BY_KEY ,
+     *   bin => "bin_name",
+     *   key => "my_key",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get By Key Range operation:
+     *   op => AEROSPIKE::OP_MAP_GET_BY_KEY_RANGE ,
+     *   bin => "bin_name",
+     *   key => "aaa",
+     *   range_end => "bbb"
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get By Value operation:
+     *   op => AEROSPIKE::OP_MAP_GET_BY_VALUE ,
+     *   bin => "bin_name",
+     *   value => "my_val"
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get by Value Range operation:
+     *   op => AEROSPIKE::OP_MAP_GET_BY_VALUE_RANGE ,
+     *   bin => "bin_name",
+     *   value => "value_a",
+     *   range_end => "value_z",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get By Index operation
+     *   op => AEROSPIKE::OP_MAP_GET_BY_INDEX ,
+     *   bin => "bin_name",
+     *   index => 2,
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get by Index Range operation
+     *   op => AEROSPIKE::OP_MAP_GET_BY_INDEX_RANGE,
+     *   bin => "bin_name",
+     *   index => 2,
+     *   count => 2,
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get By Rank operation
+     *   op => AEROSPIKE::OP_MAP_GET_BY_RANK ,
+     *   bin => "bin_name",
+     *   rank => -1, # get the item with the largest value
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get by Rank Range operation
+     *   op => AEROSPIKE::OP_MAP_GET_BY_RANK_RANGE ,
+     *   rank => -2 ,
+     *   count => 2 ,
+     *   bin => "bin_name",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Put operation
+     *   op => AEROSPIKE::OP_MAP_PUT ,
+     *   bin => "bin_name",
+     *   key => "aero",
+     *   val => "spike",
+     *   map_policy => [ AEROSPIKE::OPT_MAP_ORDER => AEROSPIKE::AS_MAP_KEY_ORDERED]
+     *
+     * Map Put Items operations
+     *  op => AEROSPIKE::OP_MAP_PUT_ITEMS ,
+     *  bin => "bin_name",
+     *  val => [1, "a", 1.5],
+     *  map_policy => [ AEROSPIKE::OPT_MAP_ORDER => AEROSPIKE::AS_MAP_KEY_ORDERED]
+     *
+     * Map Increment operation
+     *   op => AEROSPIKE::OP_MAP_INCREMENT ,
+     *   bin => "bin_name",
+     *   val => 5, #increment the value by 5
+     *   key => "key_to_increment",
+     *   map_policy => [ AEROSPIKE::OPT_MAP_ORDER => AEROSPIKE::AS_MAP_KEY_ORDERED]
+     *
+     * Map Decrement operation
+     *   op => AEROSPIKE::OP_MAP_DECREMENT ,
+     *   bin => "bin_name",
+     *   key => "key_to_decrement",
+     *   val => 5, #decrement by 5
+     *   map_policy => [ AEROSPIKE::OPT_MAP_ORDER => AEROSPIKE::AS_MAP_KEY_ORDERED]
+     *
+     * Map Remove by Key operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_KEY ,
+     *   bin => "bin_name",
+     *   key => "key_to_remove",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Remove by Key list operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_KEY_LIST ,
+     *   bin => "bin_name",
+     *   key => ["key1", 2, "key3"],
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map remove by Key Range operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_KEY_RANGE ,
+     *   bin => "bin",
+     *   key => "a",
+     *   range_end => "d",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map remove by Value operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_VALUE ,
+     *   bin => "bin_name",
+     *   val => 5,
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map remove by value range operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_VALUE_RANGE ,
+     *   bin => "bin_name",
+     *   val => "a",
+     *   range_end => "d"
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map remove by value list operation
+     *  op => AEROSPIKE::OP_MAP_REMOVE_BY_VALUE_LIST ,
+     *  bin => "bin_name",
+     *  val => [1, 2, 3, 4],
+     *  return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Remove by Index operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_INDEX ,
+     *   index => 2,
+     *   bin => "bin_name",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Remove By Index Range operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_INDEX_RANGE ,
+     *   bin => "bin_name",
+     *   index => 3 ,
+     *   count => 3 ,
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Remove by Rank operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_RANK ,
+     *   rank => -1 ,
+     *   bin => "bin_name",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map remove by rank range
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_RANK_RANGE,
+     *   bin => "bin_name",
+     *   rank => -1,
+     *   count => return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     *
+     *
      * ```
      *
      * @param array $returned an array of bins retrieved by read operations. If multiple operations exist for a specific bin name, the last operation will be the one placed as the value
