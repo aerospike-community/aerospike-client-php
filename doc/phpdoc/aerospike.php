@@ -1800,6 +1800,13 @@ class Aerospike {
      * @const POLICY_REPLICA_ANY read from any replica node  (default)
      */
     const POLICY_REPLICA_ANY = 1;
+    /**
+     *   Always try node containing master partition first. If connection fails and
+     *   `retry_on_timeout` is true, try node containing prole partition.
+     *   Currently restricted to master and one prole.
+     * @const POLICY_REPLICA_SEQUENCE attempto read from master first, then try the node containing prole partition if connection failed.
+    */
+    const POLICY_REPLICA_SEQUENCE = 2;
 
     /**
      * Accepts one of the POLICY_CONSISTENCY_* values.
@@ -2329,6 +2336,132 @@ class Aerospike {
      */
     const ERR_LARGE_ITEM_NOT_FOUND = "AEROSPIKE_ERR_LARGE_ITEM_NOT_FOUND";
 
+    /* Map operation constants */
+    /**
+     * map-size operator for the operate() method
+     * @const OP_MAP_SIZE
+     */
+    const OP_MAP_SIZE = "OP_MAP_SIZE";
+    /**
+     * map-size operator for the operate() method
+     * @const OP_MAP_CLEAR
+     */
+    const OP_MAP_CLEAR = "OP_MAP_CLEAR";
+    /**
+     * map-set-policy operator for the operate() method
+     * @const OP_MAP_SET_POLICY
+     */
+    const OP_MAP_SET_POLICY = "OP_MAP_SET_POLICY";
+    /**
+     * map-get-by-key operator for the operate() method
+     * @const OP_MAP_GET_BY_KEY
+     */
+    const OP_MAP_GET_BY_KEY = "OP_MAP_GET_BY_KEY";
+    /**
+     * map-get-by-key-range operator for the operate() method
+     * @const OP_MAP_GET_BY_KEY_RANGE
+     */
+    const OP_MAP_GET_BY_KEY_RANGE = "OP_MAP_GET_BY_KEY_RANGE";
+    /**
+     * map-get-by-value operator for the operate() method
+     * @const OP_MAP_GET_BY_VALUE
+     */
+    const OP_MAP_GET_BY_VALUE = "OP_MAP_GET_BY_VALUE";
+    /**
+     * map-get-by-value-range operator for the operate() method
+     * @const OP_MAP_GET_BY_VALUE_RANGE
+     */
+    const OP_MAP_GET_BY_VALUE_RANGE = "OP_MAP_GET_BY_VALUE_RANGE";
+    /**
+     * map-get-by-index operator for the operate() method
+     * @const OP_MAP_GET_BY_INDEX
+     */
+    const OP_MAP_GET_BY_INDEX = "OP_MAP_GET_BY_INDEX";
+    /**
+     * map-get-by-index-range operator for the operate() method
+     * @const OP_MAP_GET_BY_INDEX_RANGE
+     */
+    const OP_MAP_GET_BY_INDEX_RANGE = "OP_MAP_GET_BY_INDEX_RANGE";
+    /**
+     * map-get-by-rank operator for the operate() method
+     * @const OP_MAP_GET_BY_RANK
+     */
+    const OP_MAP_GET_BY_RANK = "OP_MAP_GET_BY_RANK";
+    /**
+     * map-get-by-rank-range operator for the operate() method
+     * @const OP_MAP_GET_BY_RANK_RANGE
+     */
+    const OP_MAP_GET_BY_RANK_RANGE = "OP_MAP_GET_BY_RANK_RANGE";
+    /**
+     * map-put  operator for the operate() method
+     * @const OP_MAP_PUT
+     */
+    const OP_MAP_PUT = "OP_MAP_PUT";
+    /**
+     * map-put-items operator for the operate() method
+     * @const OP_MAP_PUT_ITEMS
+     */
+    const OP_MAP_PUT_ITEMS = "OP_MAP_PUT_ITEMS";
+    /**
+     * map-increment operator for the operate() method
+     * @const OP_MAP_INCREMENT
+     */
+    const OP_MAP_INCREMENT = "OP_MAP_INCREMENT";
+    /**
+     * map-decrement operator for the operate() method
+     * @const OP_MAP_DECREMENT
+     */
+    const OP_MAP_DECREMENT = "OP_MAP_DECREMENT";
+    /**
+     * map-remove-by-key operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_KEY
+     */
+    const OP_MAP_REMOVE_BY_KEY = "OP_MAP_REMOVE_BY_KEY";
+    /**
+     * map-remove-by-key-list operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_KEY_LIST
+     */
+    const OP_MAP_REMOVE_BY_KEY_LIST = "OP_MAP_REMOVE_BY_KEY_LIST";
+    /**
+     * map-remove-by-key-range key operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_KEY_RANGE
+     */
+    const OP_MAP_REMOVE_BY_KEY_RANGE = "OP_MAP_REMOVE_BY_KEY_RANGE";
+    /**
+     * map-remove-by-value operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_VALUE
+     */
+    const OP_MAP_REMOVE_BY_VALUE = "OP_MAP_REMOVE_BY_VALUE";
+    /**
+     * map-remove-by-value operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_VALUE_RANGE
+     */
+    const OP_MAP_REMOVE_BY_VALUE_RANGE = "OP_MAP_REMOVE_BY_VALUE_RANGE";
+    /**
+     * map-remove-by-value-list operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_VALUE_LIST
+     */
+    const OP_MAP_REMOVE_BY_VALUE_LIST = "OP_MAP_REMOVE_BY_VALUE_LIST";
+    /**
+     * map-remove-by-index operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_INDEX
+     */
+    const OP_MAP_REMOVE_BY_INDEX = "OP_MAP_REMOVE_BY_INDEX";
+    /**
+     * map-remove-by-index-range operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_INDEX_RANGE
+     */
+    const OP_MAP_REMOVE_BY_INDEX_RANGE = "OP_MAP_REMOVE_BY_INDEX_RANGE";
+    /**
+     * map-remove-by-rank operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_RANK
+     */
+    const OP_MAP_REMOVE_BY_RANK = "OP_MAP_REMOVE_BY_RANK";
+    /**
+     * map-remove-by-rank-range operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_RANK_RANGE
+     */
+    const OP_MAP_REMOVE_BY_RANK_RANGE = "OP_MAP_REMOVE_BY_RANK_RANGE";
     /*
 
     // Status values returned by scanInfo(). Deprecated in favor of jobInfo()

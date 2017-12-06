@@ -523,7 +523,6 @@ class Index extends AerospikeTestCommon
      */
     function testAddIndexListNumericPositive() {
         $status = $this->db->dropIndex("test", "index_list_numeric");
-        ensure_dropped_index($this->db, "test", "index_list_numeric");
         $status = $this->db->addIndex("test", "demo", "numeric_list",
 			"index_list_numeric", Aerospike::INDEX_TYPE_LIST,
 			Aerospike::INDEX_NUMERIC, array(Aerospike::OPT_WRITE_TIMEOUT => 12000));
@@ -531,7 +530,6 @@ class Index extends AerospikeTestCommon
 			return $this->db->errorno();
 		}
         $status = $this->db->dropIndex("test", "index_list_numeric");
-        ensure_dropped_index($this->db, "test", "index_list_numeric");
 		if ($status != AEROSPIKE::OK) {
 			return $this->db->errorno();
 		}
