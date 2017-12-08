@@ -14,6 +14,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ * The Aerospike config options for `php.ini`:
+ * ```php
+ * // The connection timeout in milliseconds.
+ * aerospike.connect_timeout = 1000;
+ * // The read operation timeout in milliseconds.
+ * aerospike.read_timeout = 1000;
+ * // The write operation timeout in milliseconds.
+ * aerospike.write_timeout = 1000;
+ * // Whether to send and store the record's (ns,set,key) data along with
+ * // its (unique identifier) digest. 0: digest, 1: send
+ * aerospike.key_policy = 0; // only digest
+ * // The unsupported type handler. 0: none, 1: PHP, 2: user-defined
+ * aerospike.serializer = 1; // php serializer
+ * // Path to the system support files for Lua UDFs.
+ * aerospike.udf.lua_system_path = /usr/local/aerospike/lua;
+ * // Path to the user-defined Lua function modules.
+ * aerospike.udf.lua_user_path = /usr/local/aerospike/usr-lua;
+ * // Indicates if shared memory should be used for cluster tending.
+ * // Recommended for multi-process cases such as FPM. { true, false }
+ * aerospike.shm.use = false;
+ * // Explicitly sets the shm key for this client to store shared-memory
+ * // cluster tending results in.
+ * aerospike.shm.key = 0xA6000000; // integer value
+ * // Shared memory maximum number of server nodes allowed. Leave a cushion so
+ * // new nodes can be added without needing a client restart.
+ * aerospike.shm.max_nodes = 16;
+ * // Shared memory maximum number of namespaces allowed. Leave a cushion for
+ * // new namespaces.
+ * aerospike.shm.max_namespaces = 8;
+ * // Take over shared memory cluster tending if the cluster hasn't been tended
+ * // by this threshold in seconds.
+ * aerospike.shm.takeover_threshold_sec = 30;
+ * // Control the batch protocol. 0: batch-index, 1: batch-direct
+ * aerospike.use_batch_direct = 0;
+ * // The client will compress records larger than this value in bytes for transport.
+ * aerospike.compression_threshold = 0;
+ * // Max size of the synchronous connection pool for each server node
+ * aerospike.max_threads = 300;
+ * // Number of threads stored in underlying thread pool that is used in
+ * // batch/scan/query commands. In ZTS builds, this is always 0.
+ * aerospike.thread_pool_size = 16;
+ * // When turning on the optional logging in the client, this is the path to the log file.
+ * aerospike.log_path = NULL;
+ * aerospike.log_level = NULL;
+ * aerospike.nesting_depth = 3;
+ * ```
+ *
  * @category   Database
  * @package    Aerospike
  * @author     Robert Marks <robert@aerospike.com>
@@ -68,7 +115,7 @@ class Aerospike {
      *     (even an empty one) is provided. Disabled by default.
      * * _shm\_key_ explicitly sets the shm key for the cluster. It is
      *       otherwise implicitly evaluated per unique hostname, and can be
-     *       inspected with shmKey(). (default: 0xA5000000)
+     *       inspected with shmKey(). (default: 0xA6000000)
      * * _shm\_max\_nodes_ maximum number of nodes allowed. Pad so new nodes
      *       can be added without configuration changes (default: 16)
      * * _shm\_max\_namespaces_ maximum number of namespaces allowed (default: 8)
@@ -77,6 +124,8 @@ class Aerospike {
      * * _max\_threads_ (default: 300)
      * * _thread\_pool\_size_ should be at least the number of nodes in the cluster (default: 16) In ZTS builds this is set to 0
      * * _compression\_threshold_ client will compress records larger than this value for transport (default: 0)
+     * * _tender\_interval_ polling interval in milliseconds for cluster tender (default: 1000)
+     * * _cluster\_name_ if specified, only server nodes matching this name will be used when determining the cluster
      * @param bool $persistent_connection In a multiprocess context, such as a
      *        web server, the client should be configured to use
      *        persistent connections. This allows for reduced overhead,
@@ -108,7 +157,7 @@ class Aerospike {
      * @see Aerospike::errorno() errorno()
      * @return void
      */
-    public function __construct($config, $persistent_connection = true, array $options = []) {}
+    public function __construct(array $config, bool $persistent_connection = true, array $options = []) {}
 
     /**
      * Disconnect from the Aerospike cluster and clean up resources.
@@ -139,6 +188,8 @@ class Aerospike {
      * Disconnect the client from all the cluster nodes.
      *
      * This method should be explicitly called when using non-persistent connections.
+     * @see Aerospike::isConnected()
+     * @see Aerospike::reconnect()
      * @return void
      */
     public function close() {}
@@ -179,7 +230,7 @@ class Aerospike {
      * ```
      * Unable to connect to server [-1]
      * ```
-     * @link http://www.aerospike.com/docs/dev_reference/error_codes.html Error Codes
+     * @see Aerospike::OK Error Codes
      * @return string
      */
     public function error() {}
@@ -187,8 +238,7 @@ class Aerospike {
     /**
      * Return the error code associated with the last operation.
      * If the operation was successful the return value should be 0 (Aerospike::OK)
-     * @link http://www.aerospike.com/docs/dev_reference/error_codes.html Error Codes
-     * @see Aerospike::OK Aerospike::OK
+     * @see Aerospike::OK Error Codes
      * @return int
      */
     public function errorno() {}
@@ -288,7 +338,7 @@ class Aerospike {
      * @return string
      * @see Aerospike::initKey() initKey()
      */
-    public function getKeyDigest ($ns, $set, $pk ) {}
+    public function getKeyDigest (string $ns, string $set, $pk ) {}
 
     /**
      * Write a record identified by the $key with $bins, an array of bin-name => bin-value pairs.
@@ -423,7 +473,7 @@ class Aerospike {
      * @see Aerospike::errorno() errorno()
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
-    public function put(array $key, array $bins, $ttl = 0, array $options = []) {}
+    public function put(array $key, array $bins, int $ttl = 0, array $options = []) {}
 
     /**
      * Read a record with a given key, and store it in $record
@@ -736,7 +786,7 @@ class Aerospike {
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
-    public function increment(array $key, $bin, $offset, array $options = []) {}
+    public function increment(array $key, string $bin, $offset, array $options = []) {}
 
     /**
      * Append a string $value to the one already in $bin, in the record identified by the $key.
@@ -770,7 +820,7 @@ class Aerospike {
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
-    public function append(array $key, $bin, $value, array $options = []) {}
+    public function append(array $key, string $bin, string $value, array $options = []) {}
 
     /**
      * Prepend a string $value to the one already in $bin, in the record identified by the $key.
@@ -804,7 +854,7 @@ class Aerospike {
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
-    public function prepend(array $key, $bin, $value, array $options = []) {}
+    public function prepend(array $key, string $bin, string $value, array $options = []) {}
 
     /**
      *  Perform multiple bin operations on a record with a given key, with write operations happening before read ones.
@@ -1011,7 +1061,6 @@ class Aerospike {
      * @param int    $count pass-by-reference param
      * @param array  $options An optional array of policy options, whose keys include
      * * Aerospike::OPT_WRITE_TIMEOUT
-     * * Aerospike::OPT_TTL
      * * Aerospike::OPT_POLICY_RETRY
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
@@ -1046,16 +1095,13 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
-     * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
+     * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
-     * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1076,16 +1122,13 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
-     * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
+     * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
-     * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1107,16 +1150,13 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
-     * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
+     * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
-     * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1138,16 +1178,13 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
-     * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
+     * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
-     * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1170,16 +1207,13 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
-     * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
+     * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
-     * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1203,16 +1237,13 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
-     * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
+     * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
-     * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1233,16 +1264,13 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
-     * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
+     * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
-     * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1264,16 +1292,12 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
-     * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
-     * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
+     * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
-     * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1295,16 +1319,13 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
-     * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
+     * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
-     * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1324,16 +1345,13 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
-     * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
+     * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
-     * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1355,16 +1373,13 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
-     * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
+     * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
-     * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1380,19 +1395,14 @@ class Aerospike {
      * @param int    $index
      * @param array  $elements pass-by-reference param
      * @param array  $options An optional array of policy options, whose keys include
-     * * Aerospike::OPT_WRITE_TIMEOUT
+     * * Aerospike::OPT_READ_TIMEOUT
      * * Aerospike::OPT_POLICY_RETRY
      * * Aerospike::OPT_POLICY_KEY
-     * * Aerospike::OPT_POLICY_GEN
-     * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * * Aerospike::OPT_POLICY_REPLICA
      * * Aerospike::OPT_POLICY_CONSISTENCY
-     * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
-     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
+     * @see Aerospike::OPT_READ_TIMEOUT Aerospike::OPT_READ_TIMEOUT options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
-     * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
-     * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
      * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
      * @see Aerospike::OK Aerospike::OK and error status codes
@@ -1411,19 +1421,14 @@ class Aerospike {
      * @param int    $count
      * @param array  $elements pass-by-reference param
      * @param array  $options An optional array of policy options, whose keys include
-     * * Aerospike::OPT_WRITE_TIMEOUT
+     * * Aerospike::OPT_READ_TIMEOUT
      * * Aerospike::OPT_POLICY_RETRY
      * * Aerospike::OPT_POLICY_KEY
-     * * Aerospike::OPT_POLICY_GEN
-     * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * * Aerospike::OPT_POLICY_REPLICA
      * * Aerospike::OPT_POLICY_CONSISTENCY
-     * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
-     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
+     * @see Aerospike::OPT_READ_TIMEOUT Aerospike::OPT_READ_TIMEOUT options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
-     * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
-     * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
      * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
      * @see Aerospike::OK Aerospike::OK and error status codes
@@ -1754,6 +1759,279 @@ class Aerospike {
      */
     public function existsMany ( array $keys, array &$metadata, array $options = []) {}
 
+    // Scan and Query
+
+    /**
+     * Scan a namespace or set
+     *
+     * Scan a _ns.set_, and invoke a callback function *record_cb* on each
+     * record streaming back from the cluster.
+     *
+     * Optionally select the bins to be returned. Non-existent bins in this list will appear in the
+     * record with a NULL value.
+     *
+     * ```php
+     * $options = [Aerospike::OPT_SCAN_PRIORITY => Aerospike::SCAN_PRIORITY_MEDIUM];
+     * $processed = 0;
+     * $status = $client->scan('test', 'users', function ($record) use (&$processed) {
+     *     if (!is_null($record['bins']['email'])) echo $record['bins']['email']."\n";
+     *     if ($processed++ > 19) return false; // halt the stream by returning a false
+     * }, ['email'], $options);
+     *
+     * var_dump($status, $processed);
+     * ```
+     * ```
+     * foo@example.com
+     * :
+     * bar@example.com
+     * I think a sample of 20 records is enough
+     * ```
+     * @link https://www.aerospike.com/docs/architecture/data-model.html Aerospike Data Model
+     * @link http://www.aerospike.com/docs/guide/scan.html Scans
+     * @link http://www.aerospike.com/docs/operations/manage/scans/ Managing Scans
+     * @param string   $ns the namespace
+     * @param string   $set the set within the given namespace
+     * @param callable $record_cb A callback function invoked for each record streaming back from the cluster
+     * @param array    $select An array of bin names which are the subset to be returned
+     * @param array    $options An optional array of policy options, whose keys include
+     * * Aerospike::OPT_READ_TIMEOUT
+     * * Aerospike::OPT_SOCKET_TIMEOUT maximum socket idle time in milliseconds (0 means do not apply a socket idle timeout)
+     * * Aerospike::OPT_SCAN_PRIORITY
+     * * Aerospike::OPT_SCAN_PERCENTAGE of the records in the set to return
+     * * Aerospike::OPT_SCAN_CONCURRENTLY whether to run the scan in parallel
+     * * Aerospike::OPT_SCAN_NOBINS whether to not retrieve bins for the records
+     *
+     * @return int The status code of the operation. Compare to the Aerospike class status constants.
+     */
+    public function scan(string $ns, string $set, callable $record_cb, array $select = [], array $options = []) {}
+
+    /**
+     * Query a secondary index on a namespace or set
+     *
+     * Query a _ns.set_ with a specified predicate, and invoke a callback function *record_cb* on each
+     * record matched by the query and streaming back from the cluster.
+     *
+     * Optionally select the bins to be returned. Non-existent bins in this list will appear in the
+     * record with a NULL value.
+     *
+     * ```php
+     * $result = [];
+     * $where = Aerospike::predicateBetween("age", 30, 39);
+     * $status = $client->query("test", "users", $where, function ($record) use (&$result) {
+     *     $result[] = $record['bins'];
+     * });
+     * if ($status !== Aerospike::OK) {
+     *     echo "An error occured while querying[{$client->errorno()}] {$client->error()}\n";
+     * } else {
+     *     echo "The query returned ".count($result)." records\n";
+     * }
+     * ```
+     * ```
+     * foo@example.com
+     * :
+     * bar@example.com
+     * I think a sample of 20 records is enough
+     * ```
+     * @link https://www.aerospike.com/docs/architecture/data-model.html Aerospike Data Model
+     * @link http://www.aerospike.com/docs/guide/query.html Query
+     * @link http://www.aerospike.com/docs/operations/manage/queries/index.html Managing Queries
+     * @param string   $ns the namespace
+     * @param string   $set the set within the given namespace
+     * @param array $where the predicate for the query, usually created by the
+     * predicate helper methods. The arrays conform to one of the following:
+     * ```
+     * Array:
+     *   bin => bin name
+     *   op => one of Aerospike::OP_EQ, Aerospike::OP_BETWEEN, Aerospike::OP_CONTAINS, Aerospike::OP_RANGE, etc
+     *   val => scalar integer/string for OP_EQ and OP_CONTAINS or [$min, $max] for OP_BETWEEN and OP_RANGE
+     *
+     * or an empty array() for no predicate
+     * ```
+     * examples
+     * ```
+     * ["bin"=>"name", "op"=>Aerospike::OP_EQ, "val"=>"foo"]
+     * ["bin"=>"age", "op"=>Aerospike::OP_BETWEEN, "val"=>[35,50]]
+     * ["bin"=>"movies", "op"=>Aerospike::OP_CONTAINS, "val"=>"12 Monkeys"]
+     * ["bin"=>"movies", "op"=>Aerospike::OP_RANGE, "val"=>[10,1000]]
+     * [] // no predicate
+     * ```
+     * @param callable $record_cb A callback function invoked for each record streaming back from the cluster
+     * @param array    $select An array of bin names which are the subset to be returned
+     * @param array    $options An optional array of policy options, whose keys include
+     * * Aerospike::OPT_READ_TIMEOUT
+     * * Aerospike::OPT_SOCKET_TIMEOUT maximum socket idle time in milliseconds (0 means do not apply a socket idle timeout)
+     *
+     * @see Aerospike::predicateEquals()
+     * @see Aerospike::predicateBetween()
+     * @see Aerospike::predicateContains()
+     * @see Aerospike::predicateRange()
+     * @see Aerospike::predicateGeoContainsGeoJSONPoint()
+     * @see Aerospike::predicateGeoWithinGeoJSONRegion()
+     * @see Aerospike::predicateGeoContainsPoint()
+     * @see Aerospike::predicateGeoWithinRadius()
+     * @return int The status code of the operation. Compare to the Aerospike class status constants.
+     */
+    public function query(string $ns, string $set, array $where, callable $record_cb, array $select = [], array $options = []) {}
+
+    /**
+     * Helper method for creating an EQUALS predicate
+     * @param string     $bin name
+     * @param int|string $val
+     * @see Aerospike::query()
+     * @see Aerospike::queryApply()
+     * @see Aerospike::aggregate()
+     * @return array expressing the predicate, to be used by query(), queryApply() or aggregate()
+     * ```
+     * Associative Array:
+     *   bin => bin name
+     *   op => Aerospike::OP_EQ
+     *   val => scalar integer/string value
+     * ```
+     */
+    public static function predicateEquals(string $bin, $val) {}
+
+    /**
+     * Helper method for creating a BETWEEN predicate
+     * @param string $bin name
+     * @param int    $min
+     * @param int    $max
+     * @see Aerospike::query()
+     * @see Aerospike::queryApply()
+     * @see Aerospike::aggregate()
+     * @return array expressing the predicate, to be used by query(), queryApply() or aggregate()
+     * ```
+     * Associative Array:
+     *   bin => bin name
+     *   op  => Aerospike::OP_BETWEEN
+     *   val => [min, max]
+     * ```
+     */
+    public static function predicateBetween(string $bin, int $min, int $max) {}
+
+    /**
+     * Helper method for creating an CONTAINS predicate
+     *
+     * Similar to predicateEquals(), predicateContains() looks for an exact
+     * match of a value inside a complex type - a list containing the value
+     * (if the index type is *INDEX_TYPE_LIST*), the value contained in the keys
+     * of a map (if the index type is *INDEX_TYPE_MAPKEYS*), or a record with the
+     * given value contained in the values of a map (if the index type was
+     * *INDEX_TYPE_MAPVALUES*).
+     * @param string     $bin name
+     * @param int        $index_type one of Aerospike::INDEX_TYPE_*
+     * @param int|string $val
+     * @see Aerospike::query()
+     * @see Aerospike::queryApply()
+     * @see Aerospike::aggregate()
+     * @return array expressing the predicate, to be used by query(), queryApply() or aggregate()
+     * ```
+     * Associative Array:
+     *   bin => bin name
+     *   index_type => Aerospike::INDEX_TYPE_*
+     *   op => Aerospike::OP_CONTAINS
+     *   val => scalar integer/string value
+     * ```
+     */
+    public static function predicateContains(string $bin, int $index_type, $val) {}
+
+    /**
+     * Helper method for creating a RANGE predicate
+     *
+     * Similar to predicateBetween(), predicateRange() looks for records with a
+     * range of values inside a complex type - a list containing the values
+     * (if the index type is *INDEX_TYPE_LIST*), the values contained in the keys
+     * of a map (if the index type is *INDEX_TYPE_MAPKEYS*), or a record with the
+     * given values contained in the values of a map (if the index type was
+     * *INDEX_TYPE_MAPVALUES*)
+     * @param string $bin name
+     * @param int    $index_type one of Aerospike::INDEX_TYPE_*
+     * @param int    $min
+     * @param int    $max
+     * @see Aerospike::query()
+     * @see Aerospike::queryApply()
+     * @see Aerospike::aggregate()
+     * @return array expressing the predicate, to be used by query(), queryApply() or aggregate()
+     * ```
+     * Associative Array:
+     *   bin => bin name
+     *   index_type => Aerospike::INDEX_TYPE_*
+     *   op  => Aerospike::OP_BETWEEN
+     *   val => [min, max]
+     * ```
+     */
+    public static function predicateRange(string $bin, int $index_type, int $min, int $max) {}
+
+    /**
+     * Helper method for creating a GEOCONTAINS point predicate
+     * @param string $bin name
+     * @param string $point GeoJSON string describing a point
+     * @see Aerospike::query()
+     * @see Aerospike::queryApply()
+     * @see Aerospike::aggregate()
+     * @return array expressing the predicate, to be used by query(), queryApply() or aggregate()
+     * ```
+     * Associative Array:
+     *   bin => bin name
+     *   op => Aerospike::OP_GEOCONTAINSPOINT
+     *   val => GeoJSON string
+     * ```
+     */
+    public static function predicateGeoContainsGeoJSONPoint(string $bin, string $point) {}
+
+    /**
+     * Helper method for creating a GEOCONTAINS point predicate
+     * @param string $bin name
+     * @param float  $long longitude of the point
+     * @param float  $lat  latitude of the point
+     * @see Aerospike::query()
+     * @see Aerospike::queryApply()
+     * @see Aerospike::aggregate()
+     * @return array expressing the predicate, to be used by query(), queryApply() or aggregate()
+     * ```
+     * Associative Array:
+     *   bin => bin name
+     *   op => Aerospike::OP_GEOCONTAINSPOINT
+     *   val => GeoJSON string produced from $long and $lat
+     * ```
+     */
+    public static function predicateGeoContainsPoint(string $bin, float $long, float $lat) {}
+
+    /**
+     * Helper method for creating a GEOWITHIN region predicate
+     * @param string $bin name
+     * @param string $region GeoJSON string describing the region (polygon)
+     * @see Aerospike::query()
+     * @see Aerospike::queryApply()
+     * @see Aerospike::aggregate()
+     * @return array expressing the predicate, to be used by query(), queryApply() or aggregate()
+     * ```
+     * Associative Array:
+     *   bin => bin name
+     *   op => Aerospike::OP_GEOWITHINREGION
+     *   val => GeoJSON string
+     * ```
+     */
+    public static function predicateGeoWithinGeoJSONRegion(string $bin, string $region) {}
+
+    /**
+     * Helper method for creating a GEOWITHIN circle region predicate
+     * @param string $bin name
+     * @param float  $long longitude of the point
+     * @param float  $lat  latitude of the point
+     * @param float  $radiusMeter radius of the circle in meters
+     * @see Aerospike::query()
+     * @see Aerospike::queryApply()
+     * @see Aerospike::aggregate()
+     * @return array expressing the predicate, to be used by query(), queryApply() or aggregate()
+     * ```
+     * Associative Array:
+     *   bin => bin name
+     *   op => Aerospike::OP_GEOWITHINREGION
+     *   val => GeoJSON string produced from $long, $lat and $radius
+     * ```
+     */
+    public static function predicateGeoWithinRadius(string $bin, float $long, float $lat, float $radiusMeter) {}
+
     // UDF Methods
 
     /**
@@ -1924,6 +2202,8 @@ class Aerospike {
      * The email of the user with key 1234 starts with 'hey@'.
      * ```
      * @link http://www.aerospike.com/docs/udf/udf_guide.html UDF Development Guide
+     * @link http://www.aerospike.com/docs/udf/developing_record_udfs.html Developing Record UDFs
+     * @link http://www.aerospike.com/docs/udf/api_reference.html Lua UDF - API Reference
      * @param array $key The key identifying the record. An array with keys `['ns','set','key']` or `['ns','set','digest']`
      * @param string $module the name of the UDF module registered with the cluster
      * @param string $function the name of the UDF
@@ -1939,12 +2219,106 @@ class Aerospike {
      * @see Aerospike::ERR_LUA UDF error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
-    public function apply(array $key, $module, $function, array $args = [], &$returned = null, $options = []) {}
+    public function apply(array $key, string $module, string $function, array $args = [], &$returned = null, $options = []) {}
+
+    /**
+     * Apply a UDF to each record in a scan
+     *
+     * Scan the *ns.set* and apply a UDF _module.function_ to each of its records.
+     * Arguments can be passed to the UDF and any returned value optionally captured.
+     *
+     * Currently the only UDF language supported is Lua.
+     * ```php
+     * $status = $client->scanApply("test", "users", "my_udf", "mytransform", array(20), $job_id);
+     * if ($status === Aerospike::OK) {
+     *     var_dump("Job ID is $job_id");
+     * } else if ($status === Aerospike::ERR_CLIENT) {
+     *     echo "An error occured while initiating the BACKGROUND SCAN [{$client->errorno()}] ".$client->error();
+     * } else {
+     *     echo "An error occured while running the BACKGROUND SCAN [{$client->errorno()}] ".$client->error();
+     * }
+     * ```
+     * ```
+     * string(12) "Job ID is 1"
+     * ```
+     * @link http://www.aerospike.com/docs/udf/udf_guide.html UDF Development Guide
+     * @link http://www.aerospike.com/docs/udf/developing_record_udfs.html Developing Record UDFs
+     * @link http://www.aerospike.com/docs/udf/api_reference.html Lua UDF - API Reference
+     * @param string $ns the namespace
+     * @param string $set the set within the given namespace
+     * @param string $module the name of the UDF module registered with the cluster
+     * @param string $function the name of the UDF
+     * @param array  $args optional arguments for the UDF
+     * @param int    $job_id pass-by-reference filled by the job ID of the scan
+     * @param array  $options An optional array of policy options, whose keys include
+     * * Aerospike::OPT_WRITE_TIMEOUT
+     * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
+     * @see Aerospike::ERR_LUA UDF error status codes
+     * @return int The status code of the operation. Compare to the Aerospike class status constants.
+     */
+    public function scanApply(string $ns, string $set, string $module, string $function, array $args, int &$job_id, array $options = []) {}
+
+    /**
+     * Apply a UDF to each record in a query
+     *
+     * Query the *ns.set* with a predicate, and apply a UDF _module.function_
+     * to each of matched records.
+     * Arguments can be passed to the UDF and any returned value optionally captured.
+     *
+     * Currently the only UDF language supported is Lua.
+     * ```php
+     * $where = Aerospike::predicateBetween("age", 30, 39);
+     * $status = $client->queryApply("test", "users", "my_udf", "mytransform", [20], $job_id);
+     * if ($status === Aerospike::OK) {
+     *     var_dump("Job ID is $job_id");
+     * } else if ($status === Aerospike::ERR_CLIENT) {
+     *     echo "An error occured while initiating the BACKGROUND SCAN [{$client->errorno()}] ".$client->error();
+     * } else {
+     *     echo "An error occured while running the BACKGROUND SCAN [{$client->errorno()}] ".$client->error();
+     * }
+     * ```
+     * ```
+     * string(12) "Job ID is 1"
+     * ```
+     * @link http://www.aerospike.com/docs/udf/udf_guide.html UDF Development Guide
+     * @link http://www.aerospike.com/docs/udf/developing_record_udfs.html Developing Record UDFs
+     * @link http://www.aerospike.com/docs/udf/api_reference.html Lua UDF - API Reference
+     * @param string $ns the namespace
+     * @param string $set the set within the given namespace
+     * @param array $where the predicate for the query, usually created by the
+     * predicate methods. The arrays conform to one of the following:
+     * ```
+     * Array:
+     *   bin => bin name
+     *   op => one of Aerospike::OP_EQ, Aerospike::OP_BETWEEN, Aerospike::OP_CONTAINS, Aerospike::OP_RANGE, etc
+     *   val => scalar integer/string for OP_EQ and OP_CONTAINS or [$min, $max] for OP_BETWEEN and OP_RANGE
+     *
+     * or an empty array() for no predicate
+     * ```
+     * examples
+     * ```
+     * ["bin"=>"name", "op"=>Aerospike::OP_EQ, "val"=>"foo"]
+     * ["bin"=>"age", "op"=>Aerospike::OP_BETWEEN, "val"=>[35,50]]
+     * ["bin"=>"movies", "op"=>Aerospike::OP_CONTAINS, "val"=>"12 Monkeys"]
+     * ["bin"=>"movies", "op"=>Aerospike::OP_RANGE, "val"=>[10,1000]]
+     * [] // no predicate
+     * ```
+     * @param string $module the name of the UDF module registered with the cluster
+     * @param string $function the name of the UDF
+     * @param array  $args optional arguments for the UDF
+     * @param int    $job_id pass-by-reference filled by the job ID of the scan
+     * @param array  $options An optional array of policy options, whose keys include
+     * * Aerospike::OPT_WRITE_TIMEOUT
+     * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
+     * @see Aerospike::ERR_LUA UDF error status codes
+     * @return int The status code of the operation. Compare to the Aerospike class status constants.
+     */
+    public function queryApply(string $ns, string $set, array $where, string $module, string $function, array $args, int &$job_id, array $options = []) {}
 
     /**
      * Apply a stream UDF to a scan or secondary index query
      *
-     * Applies the UDF _module.function_ to the result of running a secondary
+     * Apply the UDF _module.function_ to the result of running a secondary
      * index query on _ns.set_. The aggregated _returned_ variable is then
      * filled, with its type depending on the UDF. It may be a string, integer
      * or array, and potentially an array of arrays, such as in the case the
@@ -2036,19 +2410,24 @@ class Aerospike {
      * @link http://www.aerospike.com/docs/udf/developing_stream_udfs.html Developing Stream UDFs
      * @link http://www.aerospike.com/docs/guide/aggregation.html Aggregation
      * @param string $ns The namespace
-     * @param string $set The set within the given *$namespace*
+     * @param string $set The set within the given namespace
      * @param array $where the predicate for the query, usually created by the
      * predicate methods. The arrays conform to one of the following:
      * ```
      * Array:
      *   bin => bin name
-     *   op => one of Aerospike::OP_EQ, Aerospike::OP_BETWEEN
-     *   val => scalar integer/string for OP_EQ or [$min, $max] for OP_BETWEEN
+     *   op => one of Aerospike::OP_EQ, Aerospike::OP_BETWEEN, Aerospike::OP_CONTAINS, Aerospike::OP_RANGE
+     *   val => scalar integer/string for OP_EQ and OP_CONTAINS or [$min, $max] for OP_BETWEEN and OP_RANGE
+     *
+     * or an empty array() for no predicate
      * ```
      * examples
      * ```
      * ["bin"=>"name", "op"=>Aerospike::OP_EQ, "val"=>"foo"]
      * ["bin"=>"age", "op"=>Aerospike::OP_BETWEEN, "val"=>[35,50]]
+     * ["bin"=>"movies", "op"=>Aerospike::OP_CONTAINS, "val"=>"12 Monkeys"]
+     * ["bin"=>"movies", "op"=>Aerospike::OP_RANGE, "val"=>[10,1000]]
+     * [] // no predicate
      * ```
      * @param string $module the name of the UDF module registered with the cluster
      * @param string $function the name of the UDF
@@ -2058,8 +2437,14 @@ class Aerospike {
      * * Aerospike::OPT_READ_TIMEOUT
      * @see Aerospike::OPT_READ_TIMEOUT Aerospike::OPT_READ_TIMEOUT options
      * @see Aerospike::ERR_LUA UDF error status codes
-     * @see Aerospike::predicateEquals
-     * @see Aerospike::predicateBetween
+     * @see Aerospike::predicateEquals()
+     * @see Aerospike::predicateBetween()
+     * @see Aerospike::predicateContains()
+     * @see Aerospike::predicateRange()
+     * @see Aerospike::predicateGeoContainsGeoJSONPoint()
+     * @see Aerospike::predicateGeoWithinGeoJSONRegion()
+     * @see Aerospike::predicateGeoContainsPoint()
+     * @see Aerospike::predicateGeoWithinRadius()
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
     public function aggregate(string $ns, string $set, array $where, string $module, string $function, array $args, &$returned, array $options = []) {}
@@ -2119,12 +2504,12 @@ class Aerospike {
      * ```
      *
      * @see Aerospike::LOG_LEVEL_OFF Aerospike::LOG_LEVEL_* constants
-     * @param callback $log_handler a callback function with the signature
+     * @param callable $log_handler a callback function with the signature
      * ```php
      * function log_handler ( int $level, string $file, string $function, int $line ) : void
      * ```
      */
-    public function setLogHandler ( callback $log_handler ) {}
+    public function setLogHandler ( callable $log_handler ) {}
 
     // Unsupported Type Handler Methods
 
@@ -2141,13 +2526,13 @@ class Aerospike {
      * ```
      *
      * @link https://github.com/citrusleaf/aerospike-client-php7/tree/master/doc#handling-unsupported-types Handling Unsupported Types
-     * @param callback $serialize_cb a callback invoked for each value of an unsupported type, when writing to the cluster. The function must follow the signature
+     * @param callable $serialize_cb a callback invoked for each value of an unsupported type, when writing to the cluster. The function must follow the signature
      * ```php
      * function aerospike_serialize ( mixed $value ) : string
      * ```
      * @see Aerospike::OPT_SERIALIZER Aerospike::OPT_SERIALIZER options
      */
-    public function setSerializer ( callback $serialize_cb ) {}
+    public function setSerializer (callable $serialize_cb ) {}
 
     /**
      * Set a deserialization handler for unsupported types
@@ -2162,14 +2547,14 @@ class Aerospike {
      * ```
      *
      * @link https://github.com/citrusleaf/aerospike-client-php7/tree/master/doc#handling-unsupported-types Handling Unsupported Types
-     * @param callback $unserialize_cb a callback invoked for each value of an unsupported type, when reading from the cluster. The function must follow the signature
+     * @param callable $unserialize_cb a callback invoked for each value of an unsupported type, when reading from the cluster. The function must follow the signature
      * ```php
      * // $value is binary data of type AS_BYTES_BLOB
      * function aerospike_deserialize ( string $value )
      * ```
      * @see Aerospike::OPT_SERIALIZER Aerospike::OPT_SERIALIZER options
      */
-    public function setDeserializer ( callback $unserialize_cb ) {}
+    public function setDeserializer ( callable $unserialize_cb ) {}
 
 
     /**
@@ -2988,60 +3373,135 @@ class Aerospike {
      */
     const OP_LIST_SIZE = "OP_LIST_SIZE";
 
+    // Query Predicate Operators
+
+    /**
+     * predicate operator for equality check of scalar integer or string value
+     * @const OP_EQ
+     * @see Aerospike::predicateEquals
+     */
+    const OP_EQ = "=";
+    /**
+     * predicate operator matching whether an integer falls between a range of integer values
+     * @const OP_BETWEEN
+     * @see Aerospike::predicateBetween
+     */
+    const OP_BETWEEN = "BETWEEN";
+    /**
+     * predicate operator for a whether a specific value is in an indexed list, mapkeys, or mapvalues
+     * @const OP_CONTAINS
+     * @see Aerospike::predicateContains
+     */
+    const OP_CONTAINS = "CONTAINS";
+    /**
+     * predicate operator for whether an indexed list, mapkeys, or mapvalues has an integer value within a specified range
+     * @const OP_RANGE
+     * @see Aerospike::predicateRange
+     */
+    const OP_RANGE = "RANGE";
+    /**
+     * geospatial predicate operator for points within a specified region
+     * @const OP_GEOWITHINREGION
+     */
+    const OP_GEOWITHINREGION = "GEOWITHIN";
+    /**
+     * geospatial predicate operator for regons containing a sepcified point
+     * @const OP_GEOWITHINREGION
+     */
+    const OP_GEOCONTAINSPOINT = "GEOCONTAINS";
+
+    // Status values returned by scanInfo(). Deprecated in favor of jobInfo()
+
+    /**
+     * Scan status is undefined
+     * @deprecated use JOB_STATUS_UNDEF along with jobInfo()
+     */
+    const SCAN_STATUS_UNDEF = "SCAN_STATUS_UNDEF";
+    /**
+     * Scan is currently running
+     * @deprecated use JOB_STATUS_INPROGRESS along with jobInfo()
+     */
+    const SCAN_STATUS_INPROGRESS = "SCAN_STATUS_INPROGRESS";
+    /**
+     * Scan completed successfully
+     * @deprecated
+     */
+    const SCAN_STATUS_ABORTED = "SCAN_STATUS_ABORTED";
+    /**
+     * Scan was aborted due to failure or the user
+     * @deprecated use JOB_STATUS_COMPLETED along with jobInfo()
+     */
+    const SCAN_STATUS_COMPLETED = "SCAN_STATUS_COMPLETED";
+
+    // Status values returned by jobInfo()
+
+    /**
+     * Job status is undefined
+     */
+    const JOB_STATUS_UNDEF = "SCAN_STATUS_UNDEF";
+    /**
+     * Job is currently running
+     */
+    const JOB_STATUS_INPROGRESS = "SCAN_STATUS_INPROGRESS";
+    /**
+     * Job completed successfully
+     */
+    const JOB_STATUS_COMPLETED = "SCAN_STATUS_COMPLETED";
+
+    // Index (container) types
+    /**
+     * The bin being indexed should contain scalar values such as string or integer
+     * @const INDEX_TYPE_DEFAULT
+     */
+    const INDEX_TYPE_DEFAULT = "INDEX_TYPE_DEFAULT";
+    /**
+     * The bin being indexed should contain a list
+     * @const INDEX_TYPE_LIST
+     */
+    const INDEX_TYPE_LIST = "INDEX_TYPE_LIST";
+    /**
+     * The bin being indexed should contain a map. The map keys will be indexed
+     * @const INDEX_TYPE_MAPKEYS
+     */
+    const INDEX_TYPE_MAPKEYS = "INDEX_TYPE_MAPKEYS";
+    /**
+     * The bin being indexed should contain a map. The map values will be indexed
+     * @const INDEX_TYPE_MAPKEYS
+     */
+    const INDEX_TYPE_MAPVALUES = "INDEX_TYPE_MAPVALUES";
+    // Data type
+    /**
+     * If and only if the container type matches, the value should be of type string
+     * @const INDEX_STRING
+     */
+    const INDEX_STRING = "INDEX_STRING";
+    /**
+     * If and only if the container type matches, the value should be of type integer
+     * @const INDEX_NUMERIC
+     */
+    const INDEX_NUMERIC = "INDEX_NUMERIC";
+    /**
+     * If and only if the container type matches, the value should be GeoJSON
+     * @const INDEX_GEO2DSPHERE
+     */
+    const INDEX_GEO2DSPHERE = "INDEX_GEO2DSPHERE";
+
+    /**
+     * Declare the UDF module's language to be Lua
+     * @const UDF_TYPE_LUA
+     */
+    const UDF_TYPE_LUA = "UDF_TYPE_LUA";
 
     /*
 
-    // Status values returned by scanInfo(). Deprecated in favor of jobInfo()
-    const SCAN_STATUS_UNDEF;      // scan status is undefined. deprecated.
-    const SCAN_STATUS_INPROGRESS; // scan is currently running. deprecated.
-    const SCAN_STATUS_ABORTED;    // scan was aborted due to failure or the user. deprecated.
-    const SCAN_STATUS_COMPLETED;  // scan completed successfully. deprecated.
+    // KV methods
 
-    // Status values returned by jobInfo()
-    const JOB_STATUS_UNDEF;      // the job's status is undefined.
-    const JOB_STATUS_INPROGRESS; // the job is currently running.
-    const JOB_STATUS_COMPLETED;  // the job completed successfully.
+    public int|null Aerospike::shmKey ( void )
+    public int Aerospike::truncate ( string $ns, string $set, int $nanos [, array $policy ] )
 
-    // Query Predicate Operators
-    const string OP_EQ = '=';
-    const string OP_BETWEEN = 'BETWEEN';
-    const string OP_CONTAINS = 'CONTAINS';
-    const string OP_RANGE = 'RANGE';
-
-    // UDF types
-    const UDF_TYPE_LUA;
-
-    // index types
-    const INDEX_TYPE_DEFAULT;   // index records where the bin contains an atomic (string, integer) type
-    const INDEX_TYPE_LIST;      // index records where the bin contains a list
-    const INDEX_TYPE_MAPKEYS;   // index the keys of records whose specified bin is a map
-    const INDEX_TYPE_MAPVALUES; // index the values of records whose specified bin is a map
-    // data type
-    const INDEX_STRING;  // if the index type is matched, regard values of type string
-    const INDEX_NUMERIC; // if the index type is matched, regard values of type integer
-
-    // Security role privileges
-    const PRIV_READ; // user can read data only
-    const PRIV_READ_WRITE; // user can read and write data
-    const PRIV_READ_WRITE_UDF; // can read and write data through User-Defined Functions
-    const PRIV_USER_ADMIN; // user can edit/remove other users
-    const PRIV_SYS_ADMIN; // can perform sysadmin functions that do not involve user admin
-    const PRIV_DATA_ADMIN; // can perform data admin functions that do not involve user admin
-/*
     // UDF methods
-    public int aggregate ( string $ns, string $set, array $where, string $module, string $function, array $args, mixed &$returned [, array $options ] )
-    public int scanApply ( string $ns, string $set, string $module, string $function, array $args, int &$scan_id [, array $options ] )
-    public int queryApply ( string $ns, string $set, array $where, string $module, string $function, array $args, int &$job_id [, array $options ] )
     public int jobInfo ( integer $job_id, array &$info [, array $options ] )
     public int scanInfo ( integer $scan_id, array &$info [, array $options ] ) // DEPRECATED. use jobInfo()
-
-    // query and scan methods
-    public int query ( string $ns, string $set, array $where, callback $record_cb [, array $select [, array $options ]] )
-    public int scan ( string $ns, string $set, callback $record_cb [, array $select [, array $options ]] )
-    public array predicateEquals ( string $bin, int|string $val )
-    public array predicateBetween ( string $bin, int $min, int $max )
-    public array predicateContains ( string $bin, int $index_type, int|string $val )
-    public array predicateRange ( string $bin, int $index_type, int $min, int $max )
 
     // admin methods
     public int addIndex ( string $ns, string $set, string $bin, string $name, int $index_type, int $data_type [, array $options ] )
@@ -3051,6 +3511,14 @@ class Aerospike {
     public int info ( string $request, string &$response [, array $host [, array $options ] ] )
     public array infoMany ( string $request [, array $config [, array $options ]] )
     public array getNodes ( void )
+
+    // Security role privileges
+    const PRIV_READ; // user can read data only
+    const PRIV_READ_WRITE; // user can read and write data
+    const PRIV_READ_WRITE_UDF; // can read and write data through User-Defined Functions
+    const PRIV_USER_ADMIN; // user can edit/remove other users
+    const PRIV_SYS_ADMIN; // can perform sysadmin functions that do not involve user admin
+    const PRIV_DATA_ADMIN; // can perform data admin functions that do not involve user admin
 
     // security methods
     public int createRole ( string $role, array $privileges [, array $options ] )
