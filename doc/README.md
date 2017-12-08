@@ -10,19 +10,16 @@ target="_doc">cluster</a> as its
 The <a href="http://www.aerospike.com/docs/architecture/data-model.html" target="_doc">Data Model</a>
 document gives further details on how data is organized in the cluster.
 
-## Client API
-The client API is described in the following sections:
+## Generating documentation with phpDocumentor
 
-### [Runtime Configuration](aerospike_config.md)
-### [Session Handler](aerospike_sessions.md)
-### [Aerospike Class](aerospike.md)
-### [Lifecycle and Connection Methods](apiref_connection.md)
-### [Error Handling Methods](apiref_error.md)
-### [Key-Value Methods](apiref_kv.md)
-### [Query and Scan Methods](apiref_streams.md)
-### [User Defined Methods](apiref_udf.md)
-### [Admin Methods](apiref_admin.md)
-### [Info Methods](apiref_info.md)
+The Aerospike client for PHP is written as a C module, but we have added a PHP
+stub under `docs/phpdoc`. You can import the stub into your IDE for
+auto-completion, or build the documentation using
+[phpDocumentor](https://phpdoc.org/)
+
+```
+phpdoc run -v -d phpdoc/ -t html/
+```
 
 ## Configuration in a Web Server Context
 
@@ -148,12 +145,7 @@ wrapped binary-string: string(10) "truncated"
 The binary-string that was given to put() without a wrapper: trunc
 ```
 
-## Implementation Status
-So far the *Runtime Configuration*, *Lifecycle and Connection Methods*, *Error*
-*Handling and Logging Methods*, *Query and Scan Methods*, *User Defined Methods*
-, *Admin Methods*, *Info Methods* and *Key-Value Methods* have been implemented.
-
-## Differences from the previous Aerospike PHP Client:
+## Differences from the previous Aerospike PHP 5 Client:
 - LDT Support has been removed.
 - Type checking in general is stricter for method parameters. If you are not sure whether an argument to a function is an integer or a string, we recommend casting it to the type specified by the method. Running with strict_types enabled may help to catch some issues.
 - An exception will be raised if the constructor fails to connect to the cluster.

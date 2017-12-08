@@ -14,6 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ * @category   Database
+ * @package    Aerospike
+ * @author     Robert Marks <robert@aerospike.com>
+ * @copyright  Copyright 2013-2017 Aerospike, Inc.
+ * @license    http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2
+ * @link       http://www.aerospike.com/docs/client/php/
+ * @filesource
+ */
+
+/**
+ * The Aerospike client class
+ *
  * The Aerospike config options for `php.ini`:
  * ```php
  * // The connection timeout in milliseconds.
@@ -60,18 +72,6 @@
  * aerospike.log_level = NULL;
  * aerospike.nesting_depth = 3;
  * ```
- *
- * @category   Database
- * @package    Aerospike
- * @author     Robert Marks <robert@aerospike.com>
- * @copyright  Copyright 2013-2017 Aerospike, Inc.
- * @license    http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2
- * @link       http://www.aerospike.com/docs/client/php/
- * @filesource
- */
-
-/**
- * The Aerospike client class.
  * @author Robert Marks <robert@aerospike.com>
  */
 class Aerospike {
@@ -100,7 +100,7 @@ class Aerospike {
      *   exit(1);
      * }
      * ```
-     *
+     * @see Aerospike php.ini config parameters
      * @link https://github.com/aerospike/aerospike-client-php/blob/master/doc/README.md#configuration-in-a-web-server-context Configuration in a Web Server Context
      * @param array $config holds cluster connection and client config information
      * * _hosts_ a **required** array of host pairs. One node or more (for failover)
