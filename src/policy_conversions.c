@@ -883,9 +883,9 @@ zval_to_as_policy_map(zval* z_policy, as_map_policy* map_policy) {
 	if (map_policy_val) {
 		if (Z_TYPE_P(map_policy_val) == IS_LONG) {
 			map_order = Z_LVAL_P(map_policy_val);
-			if (write_mode != AS_MAP_UNORDERED &&
-				write_mode != AS_MAP_KEY_ORDERED &&
-				write_mode != AS_MAP_KEY_VALUE_ORDERED) {
+			if (map_order != AS_MAP_UNORDERED &&
+				map_order != AS_MAP_KEY_ORDERED &&
+				map_order != AS_MAP_KEY_VALUE_ORDERED) {
 				return AEROSPIKE_ERR_PARAM;
 			}
 		} else {
