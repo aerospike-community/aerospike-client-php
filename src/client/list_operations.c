@@ -887,6 +887,12 @@ static inline bool setup_list_operation_variables(HashTable* z_key, as_key* key,
 		return false;
 	}
 
+	if (set_operations_ttl_from_operate_policy(*operations, z_operate_policy) != AEROSPIKE_OK) {
+		as_error_update(err, AEROSPIKE_ERR_PARAM, "Invalid TTL");
+		err->code = AEROSPIKE_ERR_PARAM;
+		return false;
+	}
+
 	return true;
 }
 

@@ -473,6 +473,7 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_EXISTS
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * * Aerospike::OPT_POLICY_RETRY
+     * * Aerospike::COMPRESSION_THRESHOLD
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_SERIALIZER Aerospike::OPT_SERIALIZER options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
@@ -480,6 +481,7 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_EXISTS Aerospike::OPT_POLICY_EXISTS options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
+     * @see Aerospike::COMPRESSION_THRESHOLD
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -755,11 +757,13 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * * Aerospike::OPT_POLICY_RETRY
+     * * Aerospike::COMPRESSION_THRESHOLD
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
+     * @see Aerospike::COMPRESSION_THRESHOLD
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
@@ -1077,6 +1081,190 @@ class Aerospike {
      * List Size Operation:
      *   op => Aerospike::OP_LIST_SIZE, # returns a value
      *   bin =>  "events" # gets the size of a list contained in the bin
+     *
+     *
+     * Map operations
+     *
+     * Map Policies:
+     * Many of the following operations require a map policy, the policy is an array
+     * containing any of the keys AEROSPIKE::OPT_MAP_ORDER, AEROSPIKE::OPT_MAP_WRITE_MODE
+     *
+     * the value for AEROSPIKE::OPT_MAP_ORDER should be one of AEROSPIKE::AS_MAP_UNORDERED , AEROSPIKE::AS_MAP_KEY_ORDERED , AEROSPIKE::AS_MAP_KEY_VALUE_ORDERED
+     * the default value is currently AEROSPIKE::AS_MAP_UNORDERED
+     *
+     * the value for AEROSPIKE::OPT_MAP_WRITE_MODE should be one of: AEROSPIKE::AS_MAP_UPDATE, AEROSPIKE::AS_MAP_UPDATE_ONLY , AEROSPIKE::AS_MAP_CREATE_ONLY
+     * the default value is currently AEROSPIKE::AS_MAP_UPDATE
+     *
+     * Map return types:
+     * many of the map operations require a return_type entry.
+     * this specifies the format in which the response should be returned. The options are:
+     * AEROSPIKE::AS_MAP_RETURN_NONE # Do not return a result.
+     * AEROSPIKE::AS_MAP_RETURN_INDEX # Return key index order.
+     * AEROSPIKE::AS_MAP_RETURN_REVERSE_INDEX # Return reverse key order.
+     * AEROSPIKE::AS_MAP_RETURN_RANK # Return value order.
+     * AEROSPIKE::AS_MAP_RETURN_REVERSE_RANK # Return reserve value order.
+     * AEROSPIKE::AS_MAP_RETURN_COUNT # Return count of items selected.
+     * AEROSPIKE::AS_MAP_RETURN_KEY # Return key for single key read and key list for range read.
+     * AEROSPIKE::AS_MAP_RETURN_VALUE # Return value for single key read and value list for range read.
+     * AEROSPIKE::AS_MAP_RETURN_KEY_VALUE # Return key/value items. Will be of the form ['key1', 'val1', 'key2', 'val2', 'key3', 'val3]
+     *
+     * Map policy Operation:
+     *   op => Aerospike::OP_MAP_SET_POLICY,
+     *   bin =>  "map",
+     *   map_policy =>  [ AEROSPIKE::OPT_MAP_ORDER => AEROSPIKE::AS_MAP_KEY_ORDERED]
+     *
+     * Map clear operation: (Remove all items from a map)
+     *   op => AEROSPIKE::OP_MAP_CLEAR,
+     *   bin => "bin_name"
+     *
+     *
+     * Map Size Operation: Return the number of items in a map
+     *   op => AEROSPIKE::OP_MAP_SIZE,
+     *   bin => "bin_name"
+     *
+     * Map Get by Key operation
+     *   op => AEROSPIKE::OP_MAP_GET_BY_KEY ,
+     *   bin => "bin_name",
+     *   key => "my_key",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get By Key Range operation:
+     *   op => AEROSPIKE::OP_MAP_GET_BY_KEY_RANGE ,
+     *   bin => "bin_name",
+     *   key => "aaa",
+     *   range_end => "bbb"
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get By Value operation:
+     *   op => AEROSPIKE::OP_MAP_GET_BY_VALUE ,
+     *   bin => "bin_name",
+     *   value => "my_val"
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get by Value Range operation:
+     *   op => AEROSPIKE::OP_MAP_GET_BY_VALUE_RANGE ,
+     *   bin => "bin_name",
+     *   value => "value_a",
+     *   range_end => "value_z",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get By Index operation
+     *   op => AEROSPIKE::OP_MAP_GET_BY_INDEX ,
+     *   bin => "bin_name",
+     *   index => 2,
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get by Index Range operation
+     *   op => AEROSPIKE::OP_MAP_GET_BY_INDEX_RANGE,
+     *   bin => "bin_name",
+     *   index => 2,
+     *   count => 2,
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get By Rank operation
+     *   op => AEROSPIKE::OP_MAP_GET_BY_RANK ,
+     *   bin => "bin_name",
+     *   rank => -1, # get the item with the largest value
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get by Rank Range operation
+     *   op => AEROSPIKE::OP_MAP_GET_BY_RANK_RANGE ,
+     *   rank => -2 ,
+     *   count => 2 ,
+     *   bin => "bin_name",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Put operation
+     *   op => AEROSPIKE::OP_MAP_PUT ,
+     *   bin => "bin_name",
+     *   key => "aero",
+     *   val => "spike",
+     *   map_policy => [ AEROSPIKE::OPT_MAP_ORDER => AEROSPIKE::AS_MAP_KEY_ORDERED]
+     *
+     * Map Put Items operations
+     *  op => AEROSPIKE::OP_MAP_PUT_ITEMS ,
+     *  bin => "bin_name",
+     *  val => [1, "a", 1.5],
+     *  map_policy => [ AEROSPIKE::OPT_MAP_ORDER => AEROSPIKE::AS_MAP_KEY_ORDERED]
+     *
+     * Map Increment operation
+     *   op => AEROSPIKE::OP_MAP_INCREMENT ,
+     *   bin => "bin_name",
+     *   val => 5, #increment the value by 5
+     *   key => "key_to_increment",
+     *   map_policy => [ AEROSPIKE::OPT_MAP_ORDER => AEROSPIKE::AS_MAP_KEY_ORDERED]
+     *
+     * Map Decrement operation
+     *   op => AEROSPIKE::OP_MAP_DECREMENT ,
+     *   bin => "bin_name",
+     *   key => "key_to_decrement",
+     *   val => 5, #decrement by 5
+     *   map_policy => [ AEROSPIKE::OPT_MAP_ORDER => AEROSPIKE::AS_MAP_KEY_ORDERED]
+     *
+     * Map Remove by Key operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_KEY ,
+     *   bin => "bin_name",
+     *   key => "key_to_remove",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Remove by Key list operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_KEY_LIST ,
+     *   bin => "bin_name",
+     *   key => ["key1", 2, "key3"],
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map remove by Key Range operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_KEY_RANGE ,
+     *   bin => "bin",
+     *   key => "a",
+     *   range_end => "d",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map remove by Value operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_VALUE ,
+     *   bin => "bin_name",
+     *   val => 5,
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map remove by value range operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_VALUE_RANGE ,
+     *   bin => "bin_name",
+     *   val => "a",
+     *   range_end => "d"
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map remove by value list operation
+     *  op => AEROSPIKE::OP_MAP_REMOVE_BY_VALUE_LIST ,
+     *  bin => "bin_name",
+     *  val => [1, 2, 3, 4],
+     *  return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Remove by Index operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_INDEX ,
+     *   index => 2,
+     *   bin => "bin_name",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Remove By Index Range operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_INDEX_RANGE ,
+     *   bin => "bin_name",
+     *   index => 3 ,
+     *   count => 3 ,
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Remove by Rank operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_RANK ,
+     *   rank => -1 ,
+     *   bin => "bin_name",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map remove by rank range
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_RANK_RANGE,
+     *   bin => "bin_name",
+     *   rank => -1,
+     *   count => return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     *
      *
      * ```
      *
@@ -3000,6 +3188,13 @@ class Aerospike {
      * @const POLICY_REPLICA_ANY read from any replica node  (default)
      */
     const POLICY_REPLICA_ANY = 1;
+    /**
+     *   Always try node containing master partition first. If connection fails and
+     *   `retry_on_timeout` is true, try node containing prole partition.
+     *   Currently restricted to master and one prole.
+     * @const POLICY_REPLICA_SEQUENCE attempto read from master first, then try the node containing prole partition if connection failed.
+    */
+    const POLICY_REPLICA_SEQUENCE = 2;
 
     /**
      * Accepts one of the POLICY_CONSISTENCY_* values.
@@ -3037,7 +3232,7 @@ class Aerospike {
      * If an operation fails, attempt the operation one more time.
      * @const POLICY_RETRY_ONCE allow for a single retry on an operation
      */
-    const POLICY_RETRY_ONCE = 1;
+    const POLICY_RETRY_ONCE = "POLICY_RETRY_ONCE";
 
     /**
      * Accepts one of the SCAN_PRIORITY_* values.
@@ -3049,22 +3244,22 @@ class Aerospike {
      * The cluster will auto-adjust the priority of the scan.
      * @const SCAN_PRIORITY_AUTO auto-adjust the scan priority (default)
      */
-    const SCAN_PRIORITY_AUTO = 0;
+    const SCAN_PRIORITY_AUTO = "SCAN_PRIORITY_AUTO";
     /**
      * Set the scan as having low priority.
      * @const SCAN_PRIORITY_LOW low priority scan
      */
-    const SCAN_PRIORITY_LOW = 1;
+    const SCAN_PRIORITY_LOW = "SCAN_PRIORITY_LOW";
     /**
      * Set the scan as having medium priority.
      * @const SCAN_PRIORITY_MEDIUM medium priority scan
      */
-    const SCAN_PRIORITY_MEDIUM = 2;
+    const SCAN_PRIORITY_MEDIUM = "SCAN_PRIORITY_MEDIUM";
     /**
      * Set the scan as having high priority.
      * @const SCAN_PRIORITY_HIGH high priority scan
      */
-    const SCAN_PRIORITY_HIGH = 3;
+    const SCAN_PRIORITY_HIGH = "SCAN_PRIORITY_HIGH";
 
     /**
      * Do not return the bins of the records matched by the scan.
@@ -3101,6 +3296,123 @@ class Aerospike {
      * @const OPT_POLICY_DURABLE_DELETE boolean value (default: false)
      */
     const OPT_POLICY_DURABLE_DELETE = "OPT_POLICY_DURABLE_DELETE";
+
+    /**
+     * Map policy declaring the ordering of an Aerospike map type
+     *
+     * @see Aerospike::AS_MAP_UNORDERED
+     * @see Aerospike::AS_MAP_KEY_ORDERED
+     * @see Aerospike::AS_MAP_KEY_VALUE_ORDERED
+     * @const OPT_MAP_ORDER
+     */
+    const OPT_MAP_ORDER = "OPT_MAP_ORDER";
+
+    /**
+     * The Aerospike map is unordered
+     * @const AS_MAP_UNORDERED (default)
+     */
+    const AS_MAP_UNORDERED = "AS_MAP_UNORDERED";
+
+    /**
+     * The Aerospike map is ordered by key
+     * @const AS_MAP_KEY_ORDERED
+     */
+    const AS_MAP_KEY_ORDERED = "AS_MAP_KEY_ORDERED";
+
+    /**
+     * The Aerospike map is ordered by key and value
+     * @const AS_MAP_KEY_VALUE_ORDERED
+     */
+    const AS_MAP_KEY_VALUE_ORDERED = "AS_MAP_KEY_VALUE_ORDERED";
+
+    /**
+     * Map policy declaring the behavior of map write operations
+     * @see Aerospike::AS_MAP_UPDATE
+     * @see Aerospike::AS_MAP_UPDATE_ONLY
+     * @see Aerospike::AS_MAP_CREATE_ONLY
+     * @const OPT_MAP_WRITE_MODE
+     */
+    const OPT_MAP_WRITE_MODE = "OPT_MAP_WRITE_MODE";
+
+    /**
+     * @const AS_MAP_UPDATE (default)
+     */
+    const AS_MAP_UPDATE = "AS_MAP_UPDATE";
+
+    /**
+     * @const AS_MAP_UPDATE_ONLY
+     */
+    const AS_MAP_UPDATE_ONLY = "AS_MAP_UPDATE_ONLY";
+
+    /**
+     * @const AS_MAP_CREATE_ONLY
+     */
+    const AS_MAP_CREATE_ONLY = "AS_MAP_CREATE_ONLY";
+
+    /**
+     * Do not return a result for the map operation (get and remove operations)
+     * @link https://www.aerospike.com/docs/guide/cdt-map.html#map-apis Map Result Types
+     * @const MAP_RETURN_NONE
+     */
+    const MAP_RETURN_NONE = "AS_MAP_RETURN_NONE";
+
+    /**
+     * Return in key index order
+     * @link https://www.aerospike.com/docs/guide/cdt-map.html#map-apis Map Result Types
+     * @const AS_MAP_RETURN_INDEX
+     */
+    const MAP_RETURN_INDEX = "AS_MAP_RETURN_INDEX";
+
+    /**
+     * Return in reverse key order
+     * @link https://www.aerospike.com/docs/guide/cdt-map.html#map-apis Map Result Types
+     * @const MAP_RETURN_REVERSE_INDEX
+     */
+    const MAP_RETURN_REVERSE_INDEX = "AS_MAP_RETURN_REVERSE_INDEX";
+
+    /**
+     * Return in value order
+     * @link https://www.aerospike.com/docs/guide/cdt-map.html#map-apis Map Result Types
+     * @const MAP_RETURN_RANK
+     */
+    const MAP_RETURN_RANK = "AS_MAP_RETURN_RANK";
+
+    /**
+     * Return in reverse value order
+     * @link https://www.aerospike.com/docs/guide/cdt-map.html#map-apis Map Result Types
+     * @const MAP_RETURN_REVERSE_RANK
+     */
+    const MAP_RETURN_REVERSE_RANK = "AS_MAP_RETURN_REVERSE_RANK";
+
+    /**
+     * Return count of items selected
+     * @link https://www.aerospike.com/docs/guide/cdt-map.html#map-apis Map Result Types
+     * @const MAP_RETURN_COUNT
+     */
+    const MAP_RETURN_COUNT = "AS_MAP_RETURN_COUNT";
+
+    /**
+     * Return key for single key read and key list for range read
+     * @link https://www.aerospike.com/docs/guide/cdt-map.html#map-apis Map Result Types
+     * @const MAP_RETURN_KEY
+     */
+    const MAP_RETURN_KEY = "AS_MAP_RETURN_KEY";
+
+    /**
+     * Return value for single key read and value list for range read
+     * @link https://www.aerospike.com/docs/guide/cdt-map.html#map-apis Map Result Types
+     * @const MAP_RETURN_VALUE
+     */
+    const MAP_RETURN_VALUE = "AS_MAP_RETURN_VALUE";
+
+    /**
+     * Return key/value items
+     * Will be of the form ['key1', 'val1', 'key2', 'val2', 'key3', 'val3]
+     * @link https://www.aerospike.com/docs/guide/cdt-map.html#map-apis Map Result Types
+     * @const MAP_RETURN_KEY_VALUE
+     */
+    const MAP_RETURN_KEY_VALUE = "AS_MAP_RETURN_KEY_VALUE";
+
 
     /**
      * @const LOG_LEVEL_OFF
@@ -3470,6 +3782,12 @@ class Aerospike {
     /**
      * Secondary index already exists
      * @const ERR_INDEX_FOUND
+     * Accepts one of the POLICY_KEY_* values.
+     *
+     * {@link http://www.aerospike.com/docs/client/php/usage/kvs/record-structure.html Records}
+     * are uniquely identified by their digest, and can optionally store the value of their primary key
+     * (their unique ID in the application).
+     * @const OPT_POLICY_KEY Key storage policy option (digest-only or send key)
      */
     const ERR_INDEX_FOUND = "AEROSPIKE_ERR_INDEX_FOUND";
     /**
@@ -3559,6 +3877,9 @@ class Aerospike {
      * @const OPERATOR_TOUCH
      */
     const OPERATOR_TOUCH = "OPERATOR_TOUCH";
+
+    // List operation constants
+
     /**
      * list-append operator for the operate() method
      * @const OP_LIST_APPEND
@@ -3629,6 +3950,134 @@ class Aerospike {
      * @const OP_LIST_SIZE
      */
     const OP_LIST_SIZE = "OP_LIST_SIZE";
+
+    // Map operation constants
+
+    /**
+     * map-size operator for the operate() method
+     * @const OP_MAP_SIZE
+     */
+    const OP_MAP_SIZE = "OP_MAP_SIZE";
+    /**
+     * map-size operator for the operate() method
+     * @const OP_MAP_CLEAR
+     */
+    const OP_MAP_CLEAR = "OP_MAP_CLEAR";
+    /**
+     * map-set-policy operator for the operate() method
+     * @const OP_MAP_SET_POLICY
+     */
+    const OP_MAP_SET_POLICY = "OP_MAP_SET_POLICY";
+    /**
+     * map-get-by-key operator for the operate() method
+     * @const OP_MAP_GET_BY_KEY
+     */
+    const OP_MAP_GET_BY_KEY = "OP_MAP_GET_BY_KEY";
+    /**
+     * map-get-by-key-range operator for the operate() method
+     * @const OP_MAP_GET_BY_KEY_RANGE
+     */
+    const OP_MAP_GET_BY_KEY_RANGE = "OP_MAP_GET_BY_KEY_RANGE";
+    /**
+     * map-get-by-value operator for the operate() method
+     * @const OP_MAP_GET_BY_VALUE
+     */
+    const OP_MAP_GET_BY_VALUE = "OP_MAP_GET_BY_VALUE";
+    /**
+     * map-get-by-value-range operator for the operate() method
+     * @const OP_MAP_GET_BY_VALUE_RANGE
+     */
+    const OP_MAP_GET_BY_VALUE_RANGE = "OP_MAP_GET_BY_VALUE_RANGE";
+    /**
+     * map-get-by-index operator for the operate() method
+     * @const OP_MAP_GET_BY_INDEX
+     */
+    const OP_MAP_GET_BY_INDEX = "OP_MAP_GET_BY_INDEX";
+    /**
+     * map-get-by-index-range operator for the operate() method
+     * @const OP_MAP_GET_BY_INDEX_RANGE
+     */
+    const OP_MAP_GET_BY_INDEX_RANGE = "OP_MAP_GET_BY_INDEX_RANGE";
+    /**
+     * map-get-by-rank operator for the operate() method
+     * @const OP_MAP_GET_BY_RANK
+     */
+    const OP_MAP_GET_BY_RANK = "OP_MAP_GET_BY_RANK";
+    /**
+     * map-get-by-rank-range operator for the operate() method
+     * @const OP_MAP_GET_BY_RANK_RANGE
+     */
+    const OP_MAP_GET_BY_RANK_RANGE = "OP_MAP_GET_BY_RANK_RANGE";
+    /**
+     * map-put  operator for the operate() method
+     * @const OP_MAP_PUT
+     */
+    const OP_MAP_PUT = "OP_MAP_PUT";
+    /**
+     * map-put-items operator for the operate() method
+     * @const OP_MAP_PUT_ITEMS
+     */
+    const OP_MAP_PUT_ITEMS = "OP_MAP_PUT_ITEMS";
+    /**
+     * map-increment operator for the operate() method
+     * @const OP_MAP_INCREMENT
+     */
+    const OP_MAP_INCREMENT = "OP_MAP_INCREMENT";
+    /**
+     * map-decrement operator for the operate() method
+     * @const OP_MAP_DECREMENT
+     */
+    const OP_MAP_DECREMENT = "OP_MAP_DECREMENT";
+    /**
+     * map-remove-by-key operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_KEY
+     */
+    const OP_MAP_REMOVE_BY_KEY = "OP_MAP_REMOVE_BY_KEY";
+    /**
+     * map-remove-by-key-list operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_KEY_LIST
+     */
+    const OP_MAP_REMOVE_BY_KEY_LIST = "OP_MAP_REMOVE_BY_KEY_LIST";
+    /**
+     * map-remove-by-key-range key operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_KEY_RANGE
+     */
+    const OP_MAP_REMOVE_BY_KEY_RANGE = "OP_MAP_REMOVE_BY_KEY_RANGE";
+    /**
+     * map-remove-by-value operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_VALUE
+     */
+    const OP_MAP_REMOVE_BY_VALUE = "OP_MAP_REMOVE_BY_VALUE";
+    /**
+     * map-remove-by-value operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_VALUE_RANGE
+     */
+    const OP_MAP_REMOVE_BY_VALUE_RANGE = "OP_MAP_REMOVE_BY_VALUE_RANGE";
+    /**
+     * map-remove-by-value-list operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_VALUE_LIST
+     */
+    const OP_MAP_REMOVE_BY_VALUE_LIST = "OP_MAP_REMOVE_BY_VALUE_LIST";
+    /**
+     * map-remove-by-index operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_INDEX
+     */
+    const OP_MAP_REMOVE_BY_INDEX = "OP_MAP_REMOVE_BY_INDEX";
+    /**
+     * map-remove-by-index-range operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_INDEX_RANGE
+     */
+    const OP_MAP_REMOVE_BY_INDEX_RANGE = "OP_MAP_REMOVE_BY_INDEX_RANGE";
+    /**
+     * map-remove-by-rank operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_RANK
+     */
+    const OP_MAP_REMOVE_BY_RANK = "OP_MAP_REMOVE_BY_RANK";
+    /**
+     * map-remove-by-rank-range operator for the operate() method
+     * @const OP_MAP_REMOVE_BY_RANK_RANGE
+     */
+    const OP_MAP_REMOVE_BY_RANK_RANGE = "OP_MAP_REMOVE_BY_RANK_RANGE";
 
     // Query Predicate Operators
 
@@ -3748,7 +4197,6 @@ class Aerospike {
      * @const UDF_TYPE_LUA
      */
     const UDF_TYPE_LUA = "UDF_TYPE_LUA";
-
 
     // Security role privileges
 

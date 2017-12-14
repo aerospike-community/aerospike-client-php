@@ -18,6 +18,7 @@
 #include "php.h"
 #include "c_aerospike_types.h"
 #include "aerospike/as_scan.h"
+#include "aerospike/as_map_operations.h"
 
 as_status zval_to_as_policy_apply(zval* z_info_policy, as_policy_apply* apply_policy,
 								  as_policy_apply** apply_policy_p, as_policy_apply* default_policy);
@@ -49,9 +50,13 @@ as_status zval_to_as_policy_batch(zval* z_policy, as_policy_batch* batch_policy,
 as_status zval_to_as_policy_admin(zval* z_policy, as_policy_admin* admin_policy,
 								  as_policy_admin** admin_policy_p, as_policy_admin* default_policy);
 
+as_status
+zval_to_as_policy_map(zval* z_policy, as_map_policy* map_policy);
+
 // The following functions initialize a policy object with INI entries
 as_status set_serializer_from_policy_hash(int* serializer_type, zval* z_policy);
 as_status set_deserializer_from_policy_hash(int* deserializer_type, zval* z_policy);
 as_status set_record_generation_from_write_policy(as_record* record, zval* z_write_policy);
 as_status set_operations_generation_from_operate_policy(as_operations* operations, zval* z_write_policy);
+as_status set_operations_ttl_from_operate_policy(as_operations* operations, zval* z_write_policy);
 as_status set_scan_options_from_policy_hash(as_scan* scan, zval* z_policy);

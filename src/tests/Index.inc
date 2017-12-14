@@ -522,6 +522,7 @@ class Index extends AerospikeTestCommon
      * @test_plans{1.1}
      */
     function testAddIndexListNumericPositive() {
+        $status = $this->db->dropIndex("test", "index_list_numeric");
         $status = $this->db->addIndex("test", "demo", "numeric_list",
 			"index_list_numeric", Aerospike::INDEX_TYPE_LIST,
 			Aerospike::INDEX_NUMERIC, array(Aerospike::OPT_WRITE_TIMEOUT => 12000));
