@@ -2605,6 +2605,108 @@ class Aerospike {
      */
     public function dropIndex(string $ns, string $name, array $options = []) {}
 
+    // Info Methods
+
+    /**
+     * Send an info request to a single cluster node
+     *
+     * Interface with the cluster's command and control functions.
+     * A formatted request string is sent to a cluster node, and a formatted
+     * response returned.
+     *
+     * A specific host can be optionally set, otherwise the request command is
+     * sent to the host definded for client constructor.
+     *
+     * ```php
+     * $client->info('bins/test', $response);
+     * var_dump($response);
+     * ```
+     * ```
+     * string(53) "bins/test	num-bin-names=2,bin-names-quota=32768,demo,characters"
+     * ```
+     * @link https://www.aerospike.com/docs/reference/info Info Command Reference
+     * @param string $request  a formatted info command
+     * @param string $response a formatted response from the server, filled by reference
+     * @param array  $host     an array holding the cluster node connection information cluster
+     *                         and manage its connections to them. ```[ 'addr' => $addr , 'port' =>  $port ]```
+     * @param array  $options an optional array of policy options, whose keys include
+     * * Aerospike::OPT_READ_TIMEOUT
+     * @return int The status code of the operation. Compare to the Aerospike class status constants.
+     */
+    public function info(string $request, string &$response, array $host = null, array $options = []) {}
+
+    /**
+     * Send an info request to a single cluster node
+     *
+     * Interface with the cluster's command and control functions.
+     * A formatted request string is sent to a cluster node, and a formatted
+     * response returned.
+     *
+     * A specific host can be optionally set, otherwise the request command is
+     * sent to the host definded for client constructor.
+     *
+     * ```php
+     * $response = $client->infoMany('build');
+     * var_dump($response);
+     * ```
+     * ```
+     * array(3) {
+     *   ["BB936F106CA0568"]=>
+     *   string(6) "build  3.3.19"
+     *   ["AE712F245BB9876"]=>
+     *   string(6) "build  3.3.19"
+     *   ["DCBA9AA34EE12FA"]=>
+     *   string(6) "build  3.3.19"
+     * }
+     * ```
+     * @link https://www.aerospike.com/docs/reference/info Info Command Reference
+     * @param string $request  a formatted info command
+     * @param array  $host     an array of _host_ arrays, each with ```[ 'addr' => $addr , 'port' =>  $port ]```
+     * @param array  $options an optional array of policy options, whose keys include
+     * * Aerospike::OPT_READ_TIMEOUT
+     * @return array results in the format
+     * ```
+     * Array:
+     *  NODE-ID => response string
+     * ```
+     */
+    public function infoMany(string $request, array $host = null, array $options = []) {}
+
+    /**
+     * Get the addresses of the cluster nodes
+     *
+     * ```php
+     * $nodes = $client->getNodes();
+     * var_dump($nodes);
+     * ```
+     * ```
+     * array(2) {
+     *   [0]=>
+     *   array(2) {
+     *     ["addr"]=>
+     *     string(15) "192.168.120.145"
+     *     ["port"]=>
+     *     string(4) "3000"
+     *   }
+     *   [1]=>
+     *   array(2) {
+     *     ["addr"]=>
+     *     string(15) "192.168.120.144"
+     *     ["port"]=>
+     *     string(4) "3000"
+     *   }
+     * }
+     * ```
+     * @return array results in the format
+     * ```
+     * Array:
+     *   Array:
+     *     'addr' => the IP address of the node
+     *     'port' => the port of the node
+     * ```
+     */
+    public function getNodes() {}
+
     // Logging Methods
 
     /**
@@ -3647,21 +3749,47 @@ class Aerospike {
      */
     const UDF_TYPE_LUA = "UDF_TYPE_LUA";
 
-    /*
-
-    // info methods
-    public int info ( string $request, string &$response [, array $host [, array $options ] ] )
-    public array infoMany ( string $request [, array $config [, array $options ]] )
-    public array getNodes ( void )
 
     // Security role privileges
-    const PRIV_READ; // user can read data only
-    const PRIV_READ_WRITE; // user can read and write data
-    const PRIV_READ_WRITE_UDF; // can read and write data through User-Defined Functions
-    const PRIV_USER_ADMIN; // user can edit/remove other users
-    const PRIV_SYS_ADMIN; // can perform sysadmin functions that do not involve user admin
-    const PRIV_DATA_ADMIN; // can perform data admin functions that do not involve user admin
 
+    /**
+     * Privilege to read data
+     * @const PRIV_READ
+     * @link https://www.aerospike.com/docs/guide/security/access-control.html Access Control
+     */
+    const PRIV_READ = "PRIV_READ";
+    /**
+     * Privilege to read and write data
+     * @const PRIV_READ_WRITE
+     * @link https://www.aerospike.com/docs/guide/security/access-control.html Access Control
+     */
+    const PRIV_READ_WRITE = "PRIV_READ_WRITE";
+    /**
+     * Privilege to read, write and execute user-defined functions
+     * @const PRIV_READ_WRITE_UDF
+     * @link https://www.aerospike.com/docs/guide/security/access-control.html Access Control
+     */
+    const PRIV_READ_WRITE_UDF = "PRIV_READ_WRITE_UDF";
+    /**
+     * Privilege to create and assign roles to users
+     * @const PRIV_USER_ADMIN
+     * @link https://www.aerospike.com/docs/guide/security/access-control.html Access Control
+     */
+    const PRIV_USER_ADMIN = "PRIV_USER_ADMIN";
+    /**
+     * Privilege to manage indexes and UDFs, monitor and abort scan/query jobs, get server config
+     * @const PRIV_DATA_ADMIN
+     * @link https://www.aerospike.com/docs/guide/security/access-control.html Access Control
+     */
+    const PRIV_DATA_ADMIN = "PRIV_DATA_ADMIN"; // can perform data admin functions that do not involve user admin
+    /** Privilege to modify dynamic server configs, get config and stats, and all data admin privileges
+     * @const PRIV_SYS_ADMIN
+     * @link https://www.aerospike.com/docs/guide/security/access-control.html Access Control
+     */
+    const PRIV_SYS_ADMIN = "PRIV_SYS_ADMIN"; // can perform sysadmin functions that do not involve user admin
+
+/*
+    // TODO:
     // security methods
     public int createRole ( string $role, array $privileges [, array $options ] )
     public int grantPrivileges ( string $role, array $privileges [, array $options ] )
