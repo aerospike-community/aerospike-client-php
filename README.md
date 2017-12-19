@@ -12,7 +12,7 @@ Note: This client supports PHP versions >= 7 . If you are looking for the Legacy
 - \Aerospike\Bytes will be stored to the server as type AS\_BYTES\_BLOB instead of AS\_BYTES\_PHP. This change allows better compatability with other clients.
 - Correspondingly, data stored in the server as AS\_BYTES\_BLOB will be returned as Aerospike\Bytes,  if no deserializer has been registered. The Previous version of the Aerospike PHP Client returned a string if AS_BYTES_BLOB was encountered with no registered deserializer. **Note** It is not recommended to combine the use of \Aerospike\Bytes and user specified deserializers, as this may cause errors.
 - Support for PHP versions < 7 has been removed.
-- The INI entry `aerospike.serializer` now takes an integer value. 0 for No Serializer, 1 for default PHP serialization, and 2 for user specified serializer. See [Configuration](doc/aerospike_config.md) for additional information on the code values.
+- The INI entry `aerospike.serializer` now takes an integer value. 0 for No Serializer, 1 for default PHP serialization, and 2 for user specified serializer. See [Configuration](doc/phpdoc/aerospike.php) for additional information on the code values.
 - The constructor will no longer attempt to create a unique SHM key for the user. If a key is not specified in the shm configuration array, the default value will be used. A key provided in the constructor takes precedence over a value specified by INI.
 - The layout of the shared memory used by the client when using an SHM key has changed. The default key has changed as well in order to prevent accidental sharing between new and old clients.
 - The formatting of the response from an info call may have changed. It now includes the request at the beginning of the response.
@@ -24,7 +24,6 @@ Note: This client supports PHP versions >= 7 . If you are looking for the Legacy
 ## Documentation
 
 Documentation of the Aerospike PHP Client may be found in the [doc directory](doc/README.md).
-The API described there is the [specification](doc/aerospike.md) for the PHP Client.
 Notes on the internals of the implementation are in [doc/internals.md](doc/internals.md).
 
 [Example PHP code](examples/) can be found in the `examples/` directory.

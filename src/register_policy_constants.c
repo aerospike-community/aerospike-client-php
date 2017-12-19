@@ -6,6 +6,8 @@
 #include "aerospike/as_scan.h"
 #include "aerospike/as_job.h"
 #include "aerospike/as_admin.h"
+#include "aerospike/as_operations.h"
+#include "aerospike/as_map_operations.h"
 
 #define AEROSPIKE_OPTION_CONSTANTS_ARR_SIZE (sizeof(aerospike_option_constants)/sizeof(AerospikeOptionConstant))
 
@@ -71,6 +73,7 @@ AerospikeOptionConstant aerospike_option_constants[] = {
 	{ AS_POLICY_GEN_GT                      ,   "POLICY_GEN_GT"                     },
 	{ AS_POLICY_REPLICA_MASTER              ,   "POLICY_REPLICA_MASTER"             },
 	{ AS_POLICY_REPLICA_ANY                 ,   "POLICY_REPLICA_ANY"                },
+	{ AS_POLICY_REPLICA_SEQUENCE            ,   "POLICY_REPLICA_SEQUENCE"           },
 	{ AS_POLICY_CONSISTENCY_LEVEL_ONE       ,   "POLICY_CONSISTENCY_ONE"            },
 	{ AS_POLICY_CONSISTENCY_LEVEL_ALL       ,   "POLICY_CONSISTENCY_ALL"            },
 	{ AS_POLICY_COMMIT_LEVEL_ALL            ,   "POLICY_COMMIT_LEVEL_ALL"           },
@@ -82,7 +85,24 @@ AerospikeOptionConstant aerospike_option_constants[] = {
 	{ AS_PRIVILEGE_READ_WRITE_UDF           ,   "PRIV_READ_WRITE_UDF"               },
 	{ AS_PRIVILEGE_DATA_ADMIN               ,   "PRIV_DATA_ADMIN"                   },
 	{ OPT_POLICY_DURABLE_DELETE             ,   "OPT_POLICY_DURABLE_DELETE"         },
-	{ OPT_SOCKET_TIMEOUT                    ,   "OPT_SOCKET_TIMEOUT"                }
+	{ OPT_SOCKET_TIMEOUT                    ,   "OPT_SOCKET_TIMEOUT"                },
+	{ OPT_MAP_ORDER                         ,   "OPT_MAP_ORDER"                     },
+	{ OPT_MAP_WRITE_MODE                    ,   "OPT_MAP_WRITE_MODE"                },
+	{ AS_MAP_UNORDERED                      ,   "AS_MAP_UNORDERED"                  },
+	{ AS_MAP_KEY_ORDERED                    ,   "AS_MAP_KEY_ORDERED"                },
+	{ AS_MAP_KEY_VALUE_ORDERED              ,   "AS_MAP_KEY_VALUE_ORDERED"          },
+	{ AS_MAP_UPDATE                         ,   "AS_MAP_UPDATE"                     },
+	{ AS_MAP_UPDATE_ONLY                    ,   "AS_MAP_UPDATE_ONLY"                },
+	{ AS_MAP_CREATE_ONLY                    ,   "AS_MAP_CREATE_ONLY"                },
+	{AS_MAP_RETURN_NONE                     ,   "MAP_RETURN_NONE"                   },
+	{AS_MAP_RETURN_INDEX                    ,   "MAP_RETURN_INDEX"                  },
+	{AS_MAP_RETURN_REVERSE_INDEX            ,   "MAP_RETURN_REVERSE_INDEX"          },
+	{AS_MAP_RETURN_RANK                     ,   "MAP_RETURN_RANK"                   },
+	{AS_MAP_RETURN_REVERSE_RANK             ,   "MAP_RETURN_REVERSE_RANK"           },
+	{AS_MAP_RETURN_COUNT                    ,   "MAP_RETURN_COUNT"                  },
+	{AS_MAP_RETURN_KEY                      ,   "MAP_RETURN_KEY"                    },
+	{AS_MAP_RETURN_VALUE                    ,   "MAP_RETURN_VALUE"                  },
+	{AS_MAP_RETURN_KEY_VALUE                ,   "MAP_RETURN_KEY_VALUE"              }
 };
 
 bool register_aerospike_option_constants(zend_class_entry* aerospike_ce) {

@@ -10,19 +10,34 @@ target="_doc">cluster</a> as its
 The <a href="http://www.aerospike.com/docs/architecture/data-model.html" target="_doc">Data Model</a>
 document gives further details on how data is organized in the cluster.
 
-## Client API
-The client API is described in the following sections:
+## Generating documentation with phpDocumentor
 
-### [Runtime Configuration](aerospike_config.md)
-### [Session Handler](aerospike_sessions.md)
-### [Aerospike Class](aerospike.md)
-### [Lifecycle and Connection Methods](apiref_connection.md)
-### [Error Handling Methods](apiref_error.md)
-### [Key-Value Methods](apiref_kv.md)
-### [Query and Scan Methods](apiref_streams.md)
-### [User Defined Methods](apiref_udf.md)
-### [Admin Methods](apiref_admin.md)
-### [Info Methods](apiref_info.md)
+The Aerospike client for PHP is written as a C module, but we have added a PHP
+stub under `docs/phpdoc`. You can import the stub into your IDE for
+auto-completion, or build the API documentation using
+[phpDocumentor](https://phpdoc.org/)
+
+```
+phpdoc run -v -d phpdoc/ -t html/
+```
+
+## Aerospike Session Handler
+
+The Aerospike PHP client provides a custom session handler that can be used to
+store user sessions in Aerospike. A set and namespace must be given to act as
+the container for the sessions.
+
+The session ID is used as the primary key of the record containing the
+session. The key-value pairs in the `$_SESSION` object are stored in the matching
+record. The value of `session.gc_maxlifetime` is used as the record ttl.
+
+
+`session.save_handler string`
+    Set to _aerospike_ to enable sessions support.
+
+`session.save_path string`
+    A string formatted as **ns|set|addr:port\[,addr:port\[,...\]\]**. for example "test|sess|127.0.0.1:3000"
+    As with the *$config* of the constructor, the host info of just one cluster node is necessary.
 
 ## Configuration in a Web Server Context
 
@@ -32,7 +47,7 @@ that the same PHP process will handle (as is the case for mod\_php and fastCGI).
 
 The developer can determine whether the constructor will
 use persistent connections by way of an optional boolean argument.
-After the first time Aerospike::\_\_construct() is called within the process, the
+After the first time `Aerospike::__construct__()` is called within the process, the
 client will be stored for reuse by subsequent requests, if persistent connections
 were indicated. With persistent connections, the methods _reconnect()_ and
 _close()_ do not actually close the connection.
@@ -57,8 +72,8 @@ The client keeps track of changes at the server-side through a
 [cluster tending](http://www.aerospike.com/docs/architecture/clustering.html)
 thread. In a web server context, a single client can handle cluster tending and
 share its state through a shared-memory segment. To enable shm cluster tending,
-the developer can set the [`aerospike.shm.use`](aerospike_config.md) ini config
-to `true`, or at the [constructor](aerospike_construct.md) through its config.
+the developer can set the `aerospike.shm.use` ini config
+to `true`, or at the constructor through its config.
 
 ## Halting a Stream
 
@@ -84,7 +99,7 @@ The following table shows how data is stored
 Depending on the structure of the array in PHP, the data will be either stored as an as_list, or an as_map.
 If the array has only integer keys, which are sequential and begin with 0, it will be stored as `as_list`. Otherwise
 it will be stored as `as_map`. For example ["a", "b", "c"] would be stored as a list, whereas ["a" => "1", "b", "c"=>"d"] would
-be stored as as_map.
+be stored as as\_map.
 
 Both list and map datatypes from the server will be converted into PHP arrays
 ## Handling Unsupported Types
@@ -148,19 +163,14 @@ wrapped binary-string: string(10) "truncated"
 The binary-string that was given to put() without a wrapper: trunc
 ```
 
-## Implementation Status
-So far the *Runtime Configuration*, *Lifecycle and Connection Methods*, *Error*
-*Handling and Logging Methods*, *Query and Scan Methods*, *User Defined Methods*
-, *Admin Methods*, *Info Methods* and *Key-Value Methods* have been implemented.
-
-## Differences from the previous Aerospike PHP Client:
+## Differences from the previous Aerospike PHP 5 Client:
 - LDT Support has been removed.
 - Type checking in general is stricter for method parameters. If you are not sure whether an argument to a function is an integer or a string, we recommend casting it to the type specified by the method. Running with strict_types enabled may help to catch some issues.
 - An exception will be raised if the constructor fails to connect to the cluster.
 - \Aerospike\Bytes will be stored to the server as type AS\_BYTES\_BLOB instead of AS\_BYTES\_PHP. This change allows better compatability with other clients.
 - Correspondingly, data stored in the server as AS\_BYTES\_BLOB will be returned as Aerospike\Bytes,  if no deserializer has been registered. The Previous version of the Aerospike PHP Client returned a string if AS_BYTES_BLOB was encountered with no registered deserializer.
 - Support for PHP versions < 7 has been removed.
-- The INI entry `aerospike.serializer` now takes an integer value. 0 for No Serializer, 1 for default PHP serialization, and 2 for user specified serializer. See [Configuration](aerospike_config.md) for additional information on the code values.
+- The INI entry `aerospike.serializer` now takes an integer value. 0 for No Serializer, 1 for default PHP serialization, and 2 for user specified serializer. See [Configuration](phpdoc/aerospike.php) for additional information on the code values.
 - The constructor will no longer attempt to create a unique SHM key for the user. If a key is not specified in the shm configuration array, the default value will be used. A key provided in the constructor takes precedence over a value specified by INI.
 - The layout of the shared memory used by the client when using an SHM key has changed. The default key has changed as well in order to prevent accidental sharing between new and old clients.
 - The formatting of the response from an info call may have changed. It now includes the request at the beginning of the response.
