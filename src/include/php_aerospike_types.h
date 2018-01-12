@@ -37,6 +37,10 @@
 #define PHP_PREDICATE_GEO_WITHIN "GEOWITHIN"
 #define PHP_PREDICATE_GEO_CONTAINS "GEOCONTAINS"
 
+// String policy Constants
+#define PHP_POLICY_OPT_DESERIALIZE "deserialize"
+#define PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES "sleep_between_retries"
+
 #define SERIALIZER_DEFAULT "php"
 
 typedef struct aerospike_client_z {

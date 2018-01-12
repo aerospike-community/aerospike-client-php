@@ -43,7 +43,8 @@ as_status zval_to_as_policy_read(zval* z_policy, as_policy_read* read_policy,
 	}
 
 	// deserialize policy
-	setting_val = zend_hash_str_find(z_policy_hash, "deserialize", strlen("deserialize"));
+	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_DESERIALIZE,
+			strlen(PHP_POLICY_OPT_DESERIALIZE));
 	if (setting_val && ((Z_TYPE_P(setting_val) == IS_TRUE) || (Z_TYPE_P(setting_val) == IS_FALSE ))) {
 		read_policy->deserialize = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
 		setting_val = NULL;
@@ -73,7 +74,8 @@ as_status zval_to_as_policy_read(zval* z_policy, as_policy_read* read_policy,
 		setting_val = NULL;
 	}
 
-	setting_val = zend_hash_str_find(z_policy_hash, "sleep_between_retries", strlen("sleep_between_retries"));
+	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES,
+			strlen(PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES));
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
 		read_policy->sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
@@ -218,7 +220,8 @@ as_status zval_to_as_policy_write(zval* z_policy, as_policy_write* write_policy,
 		setting_val = NULL;
 	}
 
-	setting_val = zend_hash_str_find(z_policy_hash, "sleep_between_retries", strlen("sleep_between_retries"));
+	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES,
+			strlen(PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES));
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
 		write_policy->sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
@@ -324,7 +327,8 @@ as_status zval_to_as_policy_operate(zval* z_policy, as_policy_operate* operate_p
 		setting_val = NULL;
 	}
 
-	setting_val = zend_hash_str_find(z_policy_hash, "deserialize", strlen("deserialize"));
+	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_DESERIALIZE,
+			strlen(PHP_POLICY_OPT_DESERIALIZE));
 	if (setting_val && (Z_TYPE_P(setting_val) == IS_TRUE || Z_TYPE_P(setting_val) == IS_FALSE )) {
 		operate_policy->deserialize = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
 		setting_val = NULL;
@@ -370,7 +374,8 @@ as_status zval_to_as_policy_operate(zval* z_policy, as_policy_operate* operate_p
 		setting_val = NULL;
 	}
 
-	setting_val = zend_hash_str_find(z_policy_hash, "sleep_between_retries", strlen("sleep_between_retries"));
+	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES,
+			strlen(PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES));
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
 		operate_policy->sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;

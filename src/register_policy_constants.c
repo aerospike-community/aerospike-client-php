@@ -10,7 +10,7 @@
 #include "aerospike/as_map_operations.h"
 
 #define AEROSPIKE_OPTION_CONSTANTS_ARR_SIZE (sizeof(aerospike_option_constants)/sizeof(AerospikeOptionConstant))
-
+#define AEROSPIKE_OPTION_STRCONSTANTS_ARR_SIZE (sizeof(aerospike_str_option_constants)/sizeof(AerospikeStrOptionConstant))
 
 #define MAX_CONSTANT_STR_SIZE 512
 
@@ -19,6 +19,12 @@ typedef struct _AerospikeOptionConstant {
 	char constant_str[MAX_CONSTANT_STR_SIZE];
 } AerospikeOptionConstant;
 
+typedef struct _AerospikeStrOptionConstant {
+	/* Value of the constant */
+	const char constant_str_value[MAX_CONSTANT_STR_SIZE];
+	/* name of the constant Aerospike::policy_str */
+	char constant_name[MAX_CONSTANT_STR_SIZE];
+}AerospikeStrOptionConstant;
 
 /**
  ** Function which takes the aerospike class entry, and adds all of the status codes to it*/
@@ -105,6 +111,11 @@ AerospikeOptionConstant aerospike_option_constants[] = {
 	{AS_MAP_RETURN_KEY_VALUE                ,   "MAP_RETURN_KEY_VALUE"              }
 };
 
+static AerospikeStrOptionConstant aerospike_str_option_constants[] = {
+	{PHP_POLICY_OPT_DESERIALIZE, "OPT_DESERIALIZE"},
+	{PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES, "OPT_SLEEP_BETWEEN_RETRIES"}
+};
+
 bool register_aerospike_option_constants(zend_class_entry* aerospike_ce) {
 	AerospikeOptionConstant current_constant;
 
@@ -117,5 +128,16 @@ bool register_aerospike_option_constants(zend_class_entry* aerospike_ce) {
 			current_constant.constant_value
 		);
 	}
+
+	for(int i = 0; i < AEROSPIKE_OPTION_STRCONSTANTS_ARR_SIZE; i++) {
+		AerospikeStrOptionConstant current_string_constant = aerospike_str_option_constants[i];
+		zend_declare_class_constant_string(
+			aerospike_ce,
+			current_string_constant.constant_name,
+			strlen(current_string_constant.constant_name),
+			current_string_constant.constant_str_value
+		);
+	}
+
 	return true;
 }
