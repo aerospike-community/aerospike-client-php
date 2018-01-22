@@ -14,7 +14,6 @@
 // uint32_t 	sleep_between_retries
 // uint32_t 	timeout
 
-/* fix to actually load ini vals */
 as_status zval_to_as_policy_read(zval* z_policy, as_policy_read* read_policy,
 		as_policy_read** read_policy_p, as_policy_read* default_policy) {
 	as_policy_read_init(read_policy);

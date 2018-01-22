@@ -479,6 +479,7 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * * Aerospike::OPT_POLICY_RETRY
      * * Aerospike::COMPRESSION_THRESHOLD
+     * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_SERIALIZER Aerospike::OPT_SERIALIZER options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
@@ -487,6 +488,7 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::COMPRESSION_THRESHOLD
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -605,10 +607,14 @@ class Aerospike {
      * @param array $options an optional array of read policy options, whose keys include
      * * Aerospike::OPT_READ_TIMEOUT
      * * Aerospike::OPT_POLICY_KEY
+     * * Aerospike::OPT_DESERIALIZE
+     * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
      * * Aerospike::OPT_POLICY_REPLICA
      * * Aerospike::OPT_POLICY_CONSISTENCY
      * @see Aerospike::OPT_READ_TIMEOUT Aerospike::OPT_READ_TIMEOUT options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
+     * @see Aerospike::OPT_DESERIALIZE Aerospike::OPT_DESERIALIZE option
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
      * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
      * @see Aerospike::OK Aerospike::OK and error status codes
@@ -649,10 +655,14 @@ class Aerospike {
      * @param array $metadata a pass-by-reference array of `['ttl', 'generation']` values
      * @param array $options an optional array of read policy options, whose keys include
      * * Aerospike::OPT_READ_TIMEOUT
+     * * Aerospike::OPT_DESERIALIZE
+     * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_REPLICA
      * * Aerospike::OPT_POLICY_CONSISTENCY
      * @see Aerospike::OPT_READ_TIMEOUT Aerospike::OPT_READ_TIMEOUT options
+     * @see Aerospike::OPT_DESERIALIZE Aerospike::OPT_DESERIALIZE option
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
      * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
@@ -695,11 +705,15 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * * Aerospike::OPT_POLICY_RETRY
+     * * Aerospike::OPT_DESERIALIZE
+     * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
+     * @see Aerospike::OPT_DESERIALIZE Aerospike::OPT_DESERIALIZE option
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
@@ -839,12 +853,14 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * * Aerospike::OPT_POLICY_RETRY
+     * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
@@ -873,12 +889,16 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * * Aerospike::OPT_POLICY_RETRY
+     * * Aerospike::OPT_DESERIALIZE
+     * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
+     * @see Aerospike::OPT_DESERIALIZE Aerospike::OPT_DESERIALIZE option
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
@@ -907,12 +927,16 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * * Aerospike::OPT_POLICY_RETRY
+     * * Aerospike::OPT_DESERIALIZE
+     * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
+     * @see Aerospike::OPT_DESERIALIZE Aerospike::OPT_DESERIALIZE option
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
@@ -1284,6 +1308,8 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_REPLICA
      * * Aerospike::OPT_POLICY_CONSISTENCY
      * * Aerospike::OPT_POLICY_DURABLE_DELETE
+     * * Aerospike::OPT_DESERIALIZE
+     * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
@@ -1293,6 +1319,8 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
      * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
+     * @see Aerospike::OPT_DESERIALIZE Aerospike::OPT_DESERIALIZE option
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -2118,7 +2146,7 @@ class Aerospike {
      * @param array    $options an optional array of policy options, whose keys include
      * * Aerospike::OPT_READ_TIMEOUT
      * * Aerospike::OPT_SOCKET_TIMEOUT maximum socket idle time in milliseconds (0 means do not apply a socket idle timeout)
-     *
+     * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
      * @see Aerospike::predicateEquals()
      * @see Aerospike::predicateBetween()
      * @see Aerospike::predicateContains()
@@ -3231,6 +3259,21 @@ class Aerospike {
      * Determines if an operation should be retried.
      * @const OPT_POLICY_RETRY retry policy option
      */
+
+    /*
+      * Should raw bytes representing a list or map be deserialized to an array.
+      * Set to false for backup programs that just need access to raw bytes.
+      * Default: true
+      @const OPT_DESERIALIZE
+    */
+    const OPT_DESERIALIZE = "deserialize"
+
+     /*
+       * Milliseconds to sleep between retries.  Enter zero to skip sleep.
+       * const OPT_SLEEP_BETWEEN_RETRIES
+     */
+    const OPT_SLEEP_BETWEEN_RETRIES = "sleep_between_retries"
+
     const OPT_POLICY_RETRY = "OPT_POLICY_RETRY";
     /**
      * Only attempt an operation once.
