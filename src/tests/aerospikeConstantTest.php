@@ -3,7 +3,7 @@
 require_once 'Util.inc';
 use PHPUnit\Framework\TestCase;
 
-final class OperateTTLTest extends TestCase {
+final class constantRegistrationTest extends TestCase {
     private $constantNames = [
         "OPT_CONNECT_TIMEOUT",
         "OPT_READ_TIMEOUT",
