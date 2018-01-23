@@ -19,7 +19,7 @@
  * @author     Robert Marks <robert@aerospike.com>
  * @copyright  Copyright 2013-2017 Aerospike, Inc.
  * @license    http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2
- * @link       http://www.aerospike.com/docs/client/php/
+ * @link       https://www.aerospike.com/docs/client/php/
  * @filesource
  */
 
@@ -71,6 +71,11 @@
  * aerospike.log_path = NULL;
  * aerospike.log_level = NULL;
  * aerospike.nesting_depth = 3;
+ *
+ * // session handler
+ * session.save_handler = aerospike; // to use the Aerospike session handler
+ * session.gc_maxlifetime = 1440; // the TTL of the record used to store the session in seconds
+ * session.save_path = NULL; // should follow the format ns|set|addr:port[,addr:port[,...]]. Ex: "test|sess|127.0.0.1:3000". The host info of just one cluster node is necessary
  * ```
  * @author Robert Marks <robert@aerospike.com>
  */
@@ -457,11 +462,11 @@ class Aerospike {
      * wrapped binary-string: string(10) "truncated"
      * The binary-string that was given to put() without a wrapper: trunc
      * ```
-     * @link http://www.aerospike.com/docs/architecture/data-model.html Aerospike Data Model
-     * @link http://www.aerospike.com/docs/guide/kvs.html Key-Value Store
+     * @link https://www.aerospike.com/docs/architecture/data-model.html Aerospike Data Model
+     * @link https://www.aerospike.com/docs/guide/kvs.html Key-Value Store
      * @link https://github.com/aerospike/aerospike-client-php/blob/master/doc/README.md#handling-unsupported-types Handling Unsupported Types
-     * @link http://www.aerospike.com/docs/client/c/usage/kvs/write.html#change-record-time-to-live-ttl Time-to-live
-     * @link http://www.aerospike.com/docs/guide/glossary.html Glossary
+     * @link https://www.aerospike.com/docs/client/c/usage/kvs/write.html#change-record-time-to-live-ttl Time-to-live
+     * @link https://www.aerospike.com/docs/guide/glossary.html Glossary
      * @param array $key The key identifying the record. An array with keys `['ns','set','key']` or `['ns','set','digest']`
      * @param array $bins The array of bin names and values to write. **Bin names cannot be longer than 14 characters.** Binary data containing the null byte (**\0**) may get truncated. See 'Handling Unsupported Types' for more details and a workaround
      * @param int $ttl The record's time-to-live in seconds
@@ -579,9 +584,9 @@ class Aerospike {
      *   }
      * }
      * ```
-     * @link http://www.aerospike.com/docs/architecture/data-model.html Aerospike Data Model
-     * @link http://www.aerospike.com/docs/guide/kvs.html Key-Value Store
-     * @link http://www.aerospike.com/docs/guide/glossary.html Glossary
+     * @link https://www.aerospike.com/docs/architecture/data-model.html Aerospike Data Model
+     * @link https://www.aerospike.com/docs/guide/kvs.html Key-Value Store
+     * @link https://www.aerospike.com/docs/guide/glossary.html Glossary
      * @param array $key The key identifying the record. An array with keys `['ns','set','key']` or `['ns','set','digest']`
      * @param array $record a pass-by-reference array of `['key', metadata', 'bins]` with the structure:
      * ```
@@ -639,7 +644,7 @@ class Aerospike {
      * ```
      * A user with key 1234 does not exist in the database.
      * ```
-     * @link http://www.aerospike.com/docs/guide/glossary.html Glossary
+     * @link https://www.aerospike.com/docs/guide/glossary.html Glossary
      * @param array $key The key identifying the record. An array with keys `['ns','set','key']` or `['ns','set','digest']`
      * @param array $metadata a pass-by-reference array of `['ttl', 'generation']` values
      * @param array $options an optional array of read policy options, whose keys include
@@ -679,7 +684,7 @@ class Aerospike {
      * ```
      * A user with key 1234 does not exist in the database.
      * ```
-     * @link http://www.aerospike.com/docs/client/c/usage/kvs/write.html#change-record-time-to-live-ttl Time-to-live
+     * @link https://www.aerospike.com/docs/client/c/usage/kvs/write.html#change-record-time-to-live-ttl Time-to-live
      * @link https://www.aerospike.com/docs/guide/FAQ.html FAQ
      * @link https://discuss.aerospike.com/t/records-ttl-and-evictions/737 Record TTL and Evictions
      * @param array $key The key identifying the record. An array with keys `['ns','set','key']` or `['ns','set','digest']`
@@ -970,10 +975,10 @@ class Aerospike {
      *   ["op" => Aerospike::OPERATOR_TOUCH, "ttl" => 20]
      * ]
      * ```
-     * @link http://www.aerospike.com/docs/guide/kvs.html Key-Value Store
+     * @link https://www.aerospike.com/docs/guide/kvs.html Key-Value Store
      * @link https://github.com/aerospike/aerospike-client-php/blob/master/doc/README.md#handling-unsupported-types Handling Unsupported Types
-     * @link http://www.aerospike.com/docs/client/c/usage/kvs/write.html#change-record-time-to-live-ttl Time-to-live
-     * @link http://www.aerospike.com/docs/guide/glossary.html Glossary
+     * @link https://www.aerospike.com/docs/client/c/usage/kvs/write.html#change-record-time-to-live-ttl Time-to-live
+     * @link https://www.aerospike.com/docs/guide/glossary.html Glossary
      * @param array $key The key identifying the record. An array with keys `['ns','set','key']` or `['ns','set','digest']`
      * @param array $operations The array of of one or more per-bin operations conforming to the following structure:
      * ```
@@ -1278,6 +1283,7 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * * Aerospike::OPT_POLICY_REPLICA
      * * Aerospike::OPT_POLICY_CONSISTENCY
+     * * Aerospike::OPT_POLICY_DURABLE_DELETE
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
@@ -1286,6 +1292,7 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
      * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
+     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1302,19 +1309,14 @@ class Aerospike {
      * @param string $bin
      * @param int    $count pass-by-reference param
      * @param array  $options an optional array of policy options, whose keys include
-     * * Aerospike::OPT_WRITE_TIMEOUT
+     * * Aerospike::OPT_READ_TIMEOUT
      * * Aerospike::OPT_POLICY_RETRY
      * * Aerospike::OPT_POLICY_KEY
-     * * Aerospike::OPT_POLICY_GEN
-     * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * * Aerospike::OPT_POLICY_REPLICA
      * * Aerospike::OPT_POLICY_CONSISTENCY
-     * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
-     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
+     * @see Aerospike::OPT_READ_TIMEOUT Aerospike::OPT_READ_TIMEOUT options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
-     * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
-     * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
      * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
      * @see Aerospike::OK Aerospike::OK and error status codes
@@ -1340,7 +1342,6 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
-     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
@@ -1368,7 +1369,6 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
-     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
@@ -1397,7 +1397,6 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
-     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
@@ -1426,7 +1425,6 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
-     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
@@ -1454,6 +1452,7 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
+     * * Aerospike::OPT_POLICY_DURABLE_DELETE
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
@@ -1485,13 +1484,14 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
+     * * Aerospike::OPT_POLICY_DURABLE_DELETE
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
-     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
+     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1513,13 +1513,14 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
+     * * Aerospike::OPT_POLICY_DURABLE_DELETE
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
-     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
+     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1542,12 +1543,13 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
+     * * Aerospike::OPT_POLICY_DURABLE_DELETE
      * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
-     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
+     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1570,13 +1572,14 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
+     * * Aerospike::OPT_POLICY_DURABLE_DELETE
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
-     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
+     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1597,13 +1600,14 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
+     * * Aerospike::OPT_POLICY_DURABLE_DELETE
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
-     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
+     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1628,7 +1632,6 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
-     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_POLICY_RETRY Aerospike::OPT_POLICY_RETRY options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
@@ -2042,8 +2045,8 @@ class Aerospike {
      * I think a sample of 20 records is enough
      * ```
      * @link https://www.aerospike.com/docs/architecture/data-model.html Aerospike Data Model
-     * @link http://www.aerospike.com/docs/guide/scan.html Scans
-     * @link http://www.aerospike.com/docs/operations/manage/scans/ Managing Scans
+     * @link https://www.aerospike.com/docs/guide/scan.html Scans
+     * @link https://www.aerospike.com/docs/operations/manage/scans/ Managing Scans
      * @param string   $ns the namespace
      * @param string   $set the set within the given namespace
      * @param callable $record_cb A callback function invoked for each record streaming back from the cluster
@@ -2088,8 +2091,8 @@ class Aerospike {
      * I think a sample of 20 records is enough
      * ```
      * @link https://www.aerospike.com/docs/architecture/data-model.html Aerospike Data Model
-     * @link http://www.aerospike.com/docs/guide/query.html Query
-     * @link http://www.aerospike.com/docs/operations/manage/queries/index.html Managing Queries
+     * @link https://www.aerospike.com/docs/guide/query.html Query
+     * @link https://www.aerospike.com/docs/operations/manage/queries/index.html Managing Queries
      * @param string   $ns the namespace
      * @param string   $set the set within the given namespace
      * @param array $where the predicate for the query, usually created by the
@@ -2335,7 +2338,7 @@ class Aerospike {
      *     echo "[{$client->errorno()}] ".$client->error();
      * }
      * ```
-     * @link http://www.aerospike.com/docs/udf/udf_guide.html UDF Development Guide
+     * @link https://www.aerospike.com/docs/udf/udf_guide.html UDF Development Guide
      * @param string $path the path to the Lua file on the client-side machine
      * @param string $module the name of the UDF module to register with the cluster
      * @param int    $language
@@ -2485,9 +2488,9 @@ class Aerospike {
      * ```
      * The email of the user with key 1234 starts with 'hey@'.
      * ```
-     * @link http://www.aerospike.com/docs/udf/udf_guide.html UDF Development Guide
-     * @link http://www.aerospike.com/docs/udf/developing_record_udfs.html Developing Record UDFs
-     * @link http://www.aerospike.com/docs/udf/api_reference.html Lua UDF - API Reference
+     * @link https://www.aerospike.com/docs/udf/udf_guide.html UDF Development Guide
+     * @link https://www.aerospike.com/docs/udf/developing_record_udfs.html Developing Record UDFs
+     * @link https://www.aerospike.com/docs/udf/api_reference.html Lua UDF - API Reference
      * @param array $key The key identifying the record. An array with keys `['ns','set','key']` or `['ns','set','digest']`
      * @param string $module the name of the UDF module registered with the cluster
      * @param string $function the name of the UDF
@@ -2497,9 +2500,11 @@ class Aerospike {
      * * Aerospike::OPT_WRITE_TIMEOUT
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_SERIALIZER
+     * * Aerospike::OPT_POLICY_DURABLE_DELETE
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_SERIALIZER Aerospike::OPT_SERIALIZER options
+     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::ERR_LUA UDF error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
@@ -2525,9 +2530,9 @@ class Aerospike {
      * ```
      * string(12) "Job ID is 1"
      * ```
-     * @link http://www.aerospike.com/docs/udf/udf_guide.html UDF Development Guide
-     * @link http://www.aerospike.com/docs/udf/developing_record_udfs.html Developing Record UDFs
-     * @link http://www.aerospike.com/docs/udf/api_reference.html Lua UDF - API Reference
+     * @link https://www.aerospike.com/docs/udf/udf_guide.html UDF Development Guide
+     * @link https://www.aerospike.com/docs/udf/developing_record_udfs.html Developing Record UDFs
+     * @link https://www.aerospike.com/docs/udf/api_reference.html Lua UDF - API Reference
      * @param string $ns the namespace
      * @param string $set the set within the given namespace
      * @param string $module the name of the UDF module registered with the cluster
@@ -2536,7 +2541,9 @@ class Aerospike {
      * @param int    $job_id pass-by-reference filled by the job ID of the scan
      * @param array  $options an optional array of policy options, whose keys include
      * * Aerospike::OPT_WRITE_TIMEOUT
+     * * Aerospike::OPT_POLICY_DURABLE_DELETE
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
+     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::ERR_LUA UDF error status codes
      * @see Aerospike::jobInfo()
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
@@ -2565,9 +2572,9 @@ class Aerospike {
      * ```
      * string(12) "Job ID is 1"
      * ```
-     * @link http://www.aerospike.com/docs/udf/udf_guide.html UDF Development Guide
-     * @link http://www.aerospike.com/docs/udf/developing_record_udfs.html Developing Record UDFs
-     * @link http://www.aerospike.com/docs/udf/api_reference.html Lua UDF - API Reference
+     * @link https://www.aerospike.com/docs/udf/udf_guide.html UDF Development Guide
+     * @link https://www.aerospike.com/docs/udf/developing_record_udfs.html Developing Record UDFs
+     * @link https://www.aerospike.com/docs/udf/api_reference.html Lua UDF - API Reference
      * @param string $ns the namespace
      * @param string $set the set within the given namespace
      * @param array $where the predicate for the query, usually created by the
@@ -2594,7 +2601,9 @@ class Aerospike {
      * @param int    $job_id pass-by-reference filled by the job ID of the scan
      * @param array  $options an optional array of policy options, whose keys include
      * * Aerospike::OPT_WRITE_TIMEOUT
+     * * Aerospike::OPT_POLICY_DURABLE_DELETE
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
+     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::ERR_LUA UDF error status codes
      * @see Aerospike::jobInfo()
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
@@ -2692,9 +2701,9 @@ class Aerospike {
      *   int(3)
      * }
      * ```
-     * @link http://www.aerospike.com/docs/udf/udf_guide.html UDF Development Guide
-     * @link http://www.aerospike.com/docs/udf/developing_stream_udfs.html Developing Stream UDFs
-     * @link http://www.aerospike.com/docs/guide/aggregation.html Aggregation
+     * @link https://www.aerospike.com/docs/udf/udf_guide.html UDF Development Guide
+     * @link https://www.aerospike.com/docs/udf/developing_stream_udfs.html Developing Stream UDFs
+     * @link https://www.aerospike.com/docs/guide/aggregation.html Aggregation
      * @param string $ns the namespace
      * @param string $set the set within the given namespace
      * @param array $where the predicate for the query, usually created by the
@@ -3046,7 +3055,7 @@ class Aerospike {
     /**
      * Accepts one of the POLICY_KEY_* values.
      *
-     * {@link http://www.aerospike.com/docs/client/php/usage/kvs/record-structure.html Records}
+     * {@link https://www.aerospike.com/docs/client/php/usage/kvs/record-structure.html Records}
      * are uniquely identified by their digest, and can optionally store the value of their primary key
      * (their unique ID in the application).
      * @const OPT_POLICY_KEY Key storage policy option (digest-only or send key)
@@ -3152,56 +3161,56 @@ class Aerospike {
     /**
      * Accepts one of the POLICY_COMMIT_LEVEL_* values.
      *
-     * One of the {@link http://www.aerospike.com/docs/client/php/usage/kvs/record-structure.html per-transaction consistency guarantees}.
+     * One of the {@link https://www.aerospike.com/docs/architecture/consistency.html per-transaction consistency levels}.
      * Specifies the number of replicas required to be successfully committed
      * before returning success in a write operation to provide the desired
-     * consistency guarantee.
+     * consistency level.
      * @const OPT_POLICY_COMMIT_LEVEL commit level policy option
      */
     const OPT_POLICY_COMMIT_LEVEL = "OPT_POLICY_COMMIT_LEVEL";
     /**
      * Return succcess only after successfully committing all replicas.
-     * @const POLICY_COMMIT_LEVEL_ALL write to the master and all prole replicas (default)
+     * @const POLICY_COMMIT_LEVEL_ALL write to the master and all replicas (default)
      */
     const POLICY_COMMIT_LEVEL_ALL = 0;
     /**
      * Return succcess after successfully committing the master replica.
-     * @const POLICY_COMMIT_LEVEL_MASTER master will asynchronously write to prole replicas (default)
+     * @const POLICY_COMMIT_LEVEL_MASTER master will asynchronously write to replicas (default)
      */
     const POLICY_COMMIT_LEVEL_MASTER = 1;
 
     /**
      * Accepts one of the POLICY_REPLICA_* values.
      *
-     * One of the {@link http://www.aerospike.com/docs/client/php/usage/kvs/record-structure.html per-transaction consistency guarantees}.
+     * One of the {@link https://www.aerospike.com/docs/architecture/consistency.html per-transaction consistency levels}.
      * Specifies which partition replica to read from.
      * @const OPT_POLICY_REPLICA replica policy option
      */
     const OPT_POLICY_REPLICA = "OPT_POLICY_REPLICA";
     /**
-     * Read from the partition master replica node (default).
-     * @const POLICY_REPLICA_MASTER read from master (default)
+     * Read from the partition master replica node.
+     * @const POLICY_REPLICA_MASTER read from master
      */
     const POLICY_REPLICA_MASTER = 0;
     /**
      * Read from an unspecified replica node.
-     * @const POLICY_REPLICA_ANY read from any replica node  (default)
+     * @const POLICY_REPLICA_ANY read from any replica node
      */
     const POLICY_REPLICA_ANY = 1;
     /**
      *   Always try node containing master partition first. If connection fails and
-     *   `retry_on_timeout` is true, try node containing prole partition.
-     *   Currently restricted to master and one prole.
-     * @const POLICY_REPLICA_SEQUENCE attempto read from master first, then try the node containing prole partition if connection failed.
+     *   `retry_on_timeout` is true, try node containing replica partition.
+     *   Currently restricted to master and one replica. (default)
+     * @const POLICY_REPLICA_SEQUENCE attemp to read from master first, then try the node containing replica partition if connection failed. (default)
     */
     const POLICY_REPLICA_SEQUENCE = 2;
 
     /**
      * Accepts one of the POLICY_CONSISTENCY_* values.
      *
-     * One of the {@link http://www.aerospike.com/docs/client/php/usage/kvs/record-structure.html per-transaction consistency guarantees}.
+     * One of the {@link https://www.aerospike.com/docs/architecture/consistency.html per-transaction consistency levels}.
      * Specifies the number of replicas to be consulted in a read operation to
-     * provide the desired consistency guarantee.
+     * provide the desired consistency level.
      * @const OPT_POLICY_CONSISTENCY commit level policy option
      */
     const OPT_POLICY_CONSISTENCY = "OPT_POLICY_CONSISTENCY";
@@ -3212,7 +3221,7 @@ class Aerospike {
     const POLICY_CONSISTENCY_ONE = 0;
     /**
      * Involve all replicas in the operation.
-     * @const POLICY_CONSISTENCY_ALL (default)
+     * @const POLICY_CONSISTENCY_ALL
      */
     const POLICY_CONSISTENCY_ALL = 1;
 
@@ -3784,7 +3793,7 @@ class Aerospike {
      * @const ERR_INDEX_FOUND
      * Accepts one of the POLICY_KEY_* values.
      *
-     * {@link http://www.aerospike.com/docs/client/php/usage/kvs/record-structure.html Records}
+     * {@link https://www.aerospike.com/docs/client/php/usage/kvs/record-structure.html Records}
      * are uniquely identified by their digest, and can optionally store the value of their primary key
      * (their unique ID in the application).
      * @const OPT_POLICY_KEY Key storage policy option (digest-only or send key)
