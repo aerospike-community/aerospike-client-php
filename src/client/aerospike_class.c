@@ -779,9 +779,9 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.read.timeout = int_ini_value;
+		config->policies.read.base.total_timeout = int_ini_value;
 		config->policies.info.timeout = int_ini_value;
-		config->policies.batch.timeout = int_ini_value;
+		config->policies.batch.base.total_timeout = int_ini_value;
 	}
 
 	policy_zval = zend_hash_index_find(policy_hash, OPT_WRITE_TIMEOUT);
@@ -790,10 +790,40 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.write.timeout = int_ini_value;
-		config->policies.operate.timeout = int_ini_value;
-		config->policies.remove.timeout = int_ini_value;
-		config->policies.apply.timeout = int_ini_value;
+		config->policies.write.base.total_timeout = int_ini_value;
+		config->policies.operate.base.total_timeout = int_ini_value;
+		config->policies.remove.base.total_timeout = int_ini_value;
+		config->policies.apply.base.total_timeout = int_ini_value;
+	}
+
+
+	policy_zval = zend_hash_index_find(policy_hash, OPT_TOTAL_TIMEOUT);
+	if (policy_zval) {
+		if (Z_TYPE_P(policy_zval) != IS_LONG) {
+			return AEROSPIKE_ERR_PARAM;
+		}
+		int_ini_value = Z_LVAL_P(policy_zval);
+		config->policies.read.base.total_timeout = int_ini_value;
+		config->policies.info.timeout = int_ini_value;
+		config->policies.batch.base.total_timeout = int_ini_value;
+		config->policies.write.base.total_timeout = int_ini_value;
+		config->policies.operate.base.total_timeout = int_ini_value;
+		config->policies.remove.base.total_timeout = int_ini_value;
+		config->policies.apply.base.total_timeout = int_ini_value;
+	}
+
+	policy_zval = zend_hash_index_find(policy_hash, OPT_SOCKET_TIMEOUT);
+	if (policy_zval) {
+		if (Z_TYPE_P(policy_zval) != IS_LONG) {
+			return AEROSPIKE_ERR_PARAM;
+		}
+		int_ini_value = Z_LVAL_P(policy_zval);
+		config->policies.read.base.socket_timeout = int_ini_value;
+		config->policies.batch.base.socket_timeout = int_ini_value;
+		config->policies.write.base.socket_timeout = int_ini_value;
+		config->policies.operate.base.socket_timeout = int_ini_value;
+		config->policies.remove.base.socket_timeout = int_ini_value;
+		config->policies.apply.base.socket_timeout = int_ini_value;
 	}
 
 	policy_zval = zend_hash_index_find(policy_hash, OPT_POLICY_KEY);
@@ -802,7 +832,6 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.key = (as_policy_key)int_ini_value;
 		config->policies.read.key = (as_policy_key)int_ini_value;
 		config->policies.write.key = (as_policy_key)int_ini_value;
 		config->policies.operate.key = (as_policy_key)int_ini_value;
@@ -815,20 +844,18 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.exists = (as_policy_exists)int_ini_value;
 		config->policies.write.exists = (as_policy_exists)int_ini_value;
 	}
 
-	policy_zval = zend_hash_index_find(policy_hash, OPT_POLICY_RETRY);
+	policy_zval = zend_hash_index_find(policy_hash, OPT_MAX_RETRIES);
 	if (policy_zval) {
 		if (Z_TYPE_P(policy_zval) != IS_LONG) {
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.retry = (as_policy_retry)int_ini_value;
-		config->policies.write.retry = (as_policy_retry)int_ini_value;
-		config->policies.operate.retry = (as_policy_retry)int_ini_value;
-		config->policies.remove.retry = (as_policy_retry)int_ini_value;
+		config->policies.write.base.max_retries = (as_policy_retry)int_ini_value;
+		config->policies.operate.base.max_retries = (as_policy_retry)int_ini_value;
+		config->policies.remove.base.max_retries = (as_policy_retry)int_ini_value;
 	}
 
 	policy_zval = zend_hash_index_find(policy_hash, OPT_POLICY_COMMIT_LEVEL);
@@ -837,7 +864,6 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.commit_level = (as_policy_commit_level)int_ini_value;
 		config->policies.write.commit_level = (as_policy_commit_level)int_ini_value;
 		config->policies.remove.commit_level = (as_policy_commit_level)int_ini_value;
 		config->policies.operate.commit_level = (as_policy_commit_level)int_ini_value;
@@ -850,7 +876,6 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.consistency_level = (as_policy_consistency_level)int_ini_value;
 		config->policies.read.consistency_level = (as_policy_consistency_level)int_ini_value;
 		config->policies.operate.consistency_level = (as_policy_consistency_level)int_ini_value;
 		config->policies.batch.consistency_level = (as_policy_consistency_level)int_ini_value;
@@ -862,7 +887,6 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.replica = (as_policy_replica)int_ini_value;
 		config->policies.read.replica = (as_policy_replica)int_ini_value;
 		config->policies.operate.replica = (as_policy_replica)int_ini_value;
 	}

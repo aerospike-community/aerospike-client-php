@@ -133,7 +133,9 @@ enum Aerospike_opt_keys {
 	OPT_POLICY_DURABLE_DELETE, /* set to true to enable durable delete for the operation                       */
 	OPT_SOCKET_TIMEOUT,       /* Socket timeout to be applied to server as well as client */
 	OPT_MAP_ORDER,            /* Ordering for an as_map */
-	OPT_MAP_WRITE_MODE        /* Write mode for as_maps*/
+	OPT_MAP_WRITE_MODE,        /* Write mode for as_maps*/
+	OPT_TOTAL_TIMEOUT,
+	OPT_MAX_RETRIES
 };
 
 #endif

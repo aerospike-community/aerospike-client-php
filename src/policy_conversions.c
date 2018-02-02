@@ -61,28 +61,15 @@ as_status zval_to_as_policy_read(zval* z_policy, as_policy_read* read_policy,
 		setting_val = NULL;
 	}
 
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_RETRY);
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_MAX_RETRIES);
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		read_policy->retry = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_str_find(z_policy_hash, "retry_on_timeout", strlen("retry_on_timeout"));
-	if (setting_val && ((Z_TYPE_P(setting_val) == IS_TRUE) || (Z_TYPE_P(setting_val) == IS_FALSE ))) {
-		read_policy->retry_on_timeout = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES,
-			strlen(PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES));
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		read_policy->sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
+		read_policy->base.max_retries = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
 	}
 
 	setting_val = zend_hash_index_find(z_policy_hash, OPT_READ_TIMEOUT);
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		read_policy->timeout = (uint32_t)Z_LVAL_P(setting_val);
+		read_policy->base.total_timeout = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
 	}
 
@@ -151,16 +138,16 @@ as_status zval_to_as_policy_remove(zval* z_policy, as_policy_remove* remove_poli
 		setting_val = NULL;
 	}
 
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_RETRY);
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_MAX_RETRIES);
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		remove_policy->retry = (uint32_t)Z_LVAL_P(setting_val);
+		remove_policy->base.max_retries = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
 	}
 
 
 	setting_val = zend_hash_index_find(z_policy_hash, OPT_WRITE_TIMEOUT);
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		remove_policy->timeout = (uint32_t)Z_LVAL_P(setting_val);
+		remove_policy->base.total_timeout = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
 	}
 
@@ -209,20 +196,20 @@ as_status zval_to_as_policy_write(zval* z_policy, as_policy_write* write_policy,
 
 	setting_val = zend_hash_index_find(z_policy_hash, OPT_WRITE_TIMEOUT);
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		write_policy->timeout = (uint32_t)Z_LVAL_P(setting_val);
+		write_policy->base.total_timeout = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
 	}
 
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_RETRY);
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_MAX_RETRIES);
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		write_policy->retry = (uint32_t)Z_LVAL_P(setting_val);
+		write_policy->base.max_retries = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
 	}
 
 	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES,
 			strlen(PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES));
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		write_policy->sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
+		write_policy->base.sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
 	}
 
@@ -256,12 +243,6 @@ as_status zval_to_as_policy_write(zval* z_policy, as_policy_write* write_policy,
 	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_COMMIT_LEVEL);
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
 		write_policy->commit_level = (as_policy_commit_level)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_str_find(z_policy_hash, "retry_on_timeout", strlen("retry_on_timeout"));
-	if (setting_val && (Z_TYPE_P(setting_val) == IS_TRUE || Z_TYPE_P(setting_val) == IS_FALSE )) {
-		write_policy->retry_on_timeout = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
 		setting_val = NULL;
 	}
 
@@ -361,28 +342,22 @@ as_status zval_to_as_policy_operate(zval* z_policy, as_policy_operate* operate_p
 		setting_val = NULL;
 	}
 
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_RETRY);
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_MAX_RETRIES);
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		operate_policy->retry = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_str_find(z_policy_hash, "retry_on_timeout", strlen("retry_on_timeout"));
-	if (setting_val && (Z_TYPE_P(setting_val) == IS_TRUE || Z_TYPE_P(setting_val) == IS_FALSE )) {
-		operate_policy->retry_on_timeout = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
+		operate_policy->base.max_retries = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
 	}
 
 	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES,
 			strlen(PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES));
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		operate_policy->sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
+		operate_policy->base.sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
 	}
 
 	setting_val = zend_hash_index_find(z_policy_hash, OPT_WRITE_TIMEOUT);
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		operate_policy->timeout = (uint32_t)Z_LVAL_P(setting_val);
+		operate_policy->base.total_timeout = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
 	}
 
@@ -438,7 +413,7 @@ as_status zval_to_as_policy_apply(zval* z_apply_policy, as_policy_apply* apply_p
 	z_policy_hash = Z_ARRVAL_P(z_apply_policy);
 	setting_val = zend_hash_index_find(z_policy_hash, OPT_WRITE_TIMEOUT);
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		apply_policy->timeout = (uint32_t)Z_LVAL_P(setting_val);
+		apply_policy->base.total_timeout = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
 	}
 
@@ -487,7 +462,7 @@ as_status zval_to_as_policy_scan(zval* z_policy, as_policy_scan* scan_policy,
 	setting_val = zend_hash_index_find(z_policy_hash, OPT_READ_TIMEOUT);
 	if (setting_val) {
 		if (Z_TYPE_P(setting_val) == IS_LONG) {
-			scan_policy->timeout = Z_LVAL_P(setting_val);
+			scan_policy->base.total_timeout = Z_LVAL_P(setting_val);
 		} else {
 			return AEROSPIKE_ERR_PARAM;
 		}
@@ -497,7 +472,7 @@ as_status zval_to_as_policy_scan(zval* z_policy, as_policy_scan* scan_policy,
 		setting_val = zend_hash_index_find(z_policy_hash, OPT_WRITE_TIMEOUT);
 		if (setting_val) {
 			if (Z_TYPE_P(setting_val) == IS_LONG) {
-				scan_policy->timeout = Z_LVAL_P(setting_val);
+				scan_policy->base.total_timeout = Z_LVAL_P(setting_val);
 			} else {
 				return AEROSPIKE_ERR_PARAM;
 			}
@@ -507,7 +482,7 @@ as_status zval_to_as_policy_scan(zval* z_policy, as_policy_scan* scan_policy,
 	setting_val = zend_hash_index_find(z_policy_hash, OPT_SOCKET_TIMEOUT);
 	if (setting_val) {
 		if (Z_TYPE_P(setting_val) == IS_LONG) {
-			scan_policy->socket_timeout = Z_LVAL_P(setting_val);
+			scan_policy->base.socket_timeout = Z_LVAL_P(setting_val);
 		} else {
 			return AEROSPIKE_ERR_PARAM;
 		}
@@ -548,7 +523,7 @@ as_status zval_to_as_policy_query(zval* z_policy, as_policy_query* query_policy,
 	setting_val = zend_hash_index_find(z_policy_hash, OPT_READ_TIMEOUT);
 	if (setting_val) {
 		if (Z_TYPE_P(setting_val) == IS_LONG) {
-			query_policy->timeout = Z_LVAL_P(setting_val);
+			query_policy->base.total_timeout = Z_LVAL_P(setting_val);
 		} else {
 			return AEROSPIKE_ERR_PARAM;
 		}
@@ -558,7 +533,7 @@ as_status zval_to_as_policy_query(zval* z_policy, as_policy_query* query_policy,
 	setting_val = zend_hash_index_find(z_policy_hash, OPT_SOCKET_TIMEOUT);
 	if (setting_val) {
 		if (Z_TYPE_P(setting_val) == IS_LONG) {
-			query_policy->socket_timeout = Z_LVAL_P(setting_val);
+			query_policy->base.socket_timeout = Z_LVAL_P(setting_val);
 		} else {
 			return AEROSPIKE_ERR_PARAM;
 		}
@@ -592,7 +567,7 @@ as_status zval_to_as_policy_batch(zval* z_policy, as_policy_batch* batch_policy,
 	setting_val = zend_hash_index_find(z_policy_hash, OPT_READ_TIMEOUT);
 	if (setting_val) {
 		if (Z_TYPE_P(setting_val) == IS_LONG) {
-			batch_policy->timeout = Z_LVAL_P(setting_val);
+			batch_policy->base.total_timeout = Z_LVAL_P(setting_val);
 		} else {
 			return AEROSPIKE_ERR_PARAM;
 		}
