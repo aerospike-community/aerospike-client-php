@@ -731,7 +731,7 @@ class Operate  extends AerospikeTestCommon
         if ($status == Aerospike::OK && strcmp($returned["Athlete"], "Dan Millman") == 0) {
             sleep(3);
             $status = $this->db->get($key, $get_record);
-            if (strcmp($this->db->error(), "AEROSPIKE_ERR_RECORD_NOT_FOUND") == 0) {
+            if ($status === Aerospike::ERR_RECORD_NOT_FOUND) {
                 return Aerospike::OK;
             }
         }

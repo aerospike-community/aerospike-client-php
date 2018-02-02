@@ -6,5 +6,5 @@ addIndex() and dropIndex() - index with same name on different string bin recrea
 include dirname(__FILE__)."/../../astestframework/astest-phpt-loader.inc";
 aerospike_phpt_runtest("Index", "testCreateAndDropIndexDifferentStringBinWithSameNamePositive");
 --EXPECT--
-OK
+ERR_INDEX_FOUND
 

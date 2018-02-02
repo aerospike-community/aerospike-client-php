@@ -6,4 +6,4 @@ Put - Check NameSpace Value not exist in Database
 include dirname(__FILE__)."/../../astestframework/astest-phpt-loader.inc";
 aerospike_phpt_runtest("Put", "testCheckNameSpaceValueNotExistInDB");
 --EXPECT--
-ERR_NAMESPACE_NOT_FOUND
+ERR_CLIENT

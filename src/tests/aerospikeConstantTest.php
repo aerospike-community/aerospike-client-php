@@ -156,7 +156,7 @@ final class constantRegistrationTest extends TestCase {
         "ERR_CLUSTER_CHANGE",
         "ERR_SERVER_FULL",
         "ERR_TIMEOUT",
-        "ERR_NO_XDR",
+        "ERR_ALWAYS_FORBIDDEN",
         "ERR_CLUSTER",
         "ERR_BIN_INCOMPATIBLE_TYPE",
         "ERR_RECORD_TOO_BIG",

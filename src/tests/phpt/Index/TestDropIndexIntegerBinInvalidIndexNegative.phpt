@@ -6,5 +6,5 @@ dropIndex - Non-existing index
 include dirname(__FILE__)."/../../astestframework/astest-phpt-loader.inc";
 aerospike_phpt_runtest("Index", "testDropIndexIntegerBinInvalidIndexNegative");
 --EXPECT--
-OK
+ERR_INDEX_NOT_FOUND
 
