@@ -215,8 +215,10 @@ final class constantRegistrationTest extends TestCase {
         "OP_GEOWITHINREGION",
         "OP_GEOCONTAINSPOINT",
         "JOB_QUERY",
-        "JOB_SCAN"
-
+        "JOB_SCAN",
+        "OPT_TOTAL_TIMEOUT",
+        "OPT_MAX_RETRIES",
+        "OPT_LINEARIZE_READ"
     ];
 
     public function testConstantDefinition() {

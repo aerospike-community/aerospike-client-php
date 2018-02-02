@@ -108,7 +108,10 @@ AerospikeOptionConstant aerospike_option_constants[] = {
 	{AS_MAP_RETURN_COUNT                    ,   "MAP_RETURN_COUNT"                  },
 	{AS_MAP_RETURN_KEY                      ,   "MAP_RETURN_KEY"                    },
 	{AS_MAP_RETURN_VALUE                    ,   "MAP_RETURN_VALUE"                  },
-	{AS_MAP_RETURN_KEY_VALUE                ,   "MAP_RETURN_KEY_VALUE"              }
+	{AS_MAP_RETURN_KEY_VALUE                ,   "MAP_RETURN_KEY_VALUE"              },
+	{ OPT_TOTAL_TIMEOUT                     ,   "OPT_TOTAL_TIMEOUT"                 },
+	{ OPT_MAX_RETRIES                       ,   "OPT_MAX_RETRIES"                   },
+	{ OPT_LINEARIZE_READ                    ,   "OPT_LINEARIZE_READ"                }
 };
 
 static AerospikeStrOptionConstant aerospike_str_option_constants[] = {
