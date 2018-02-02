@@ -135,7 +135,8 @@ enum Aerospike_opt_keys {
 	OPT_MAP_ORDER,            /* Ordering for an as_map */
 	OPT_MAP_WRITE_MODE,        /* Write mode for as_maps*/
 	OPT_TOTAL_TIMEOUT,
-	OPT_MAX_RETRIES
+	OPT_MAX_RETRIES,
+	OPT_LINEARIZE_READ
 };
 
 #endif
