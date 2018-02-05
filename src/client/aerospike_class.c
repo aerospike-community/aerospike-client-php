@@ -853,9 +853,14 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.write.base.max_retries = (as_policy_retry)int_ini_value;
-		config->policies.operate.base.max_retries = (as_policy_retry)int_ini_value;
-		config->policies.remove.base.max_retries = (as_policy_retry)int_ini_value;
+		config->policies.write.base.max_retries = int_ini_value;
+		config->policies.operate.base.max_retries = int_ini_value;
+		config->policies.remove.base.max_retries = int_ini_value;
+		config->policies.read.base.max_retries = int_ini_value;
+		config->policies.apply.base.max_retries = int_ini_value;
+		config->policies.query.base.max_retries = int_ini_value;
+		config->policies.scan.base.max_retries = int_ini_value;
+		config->policies.batch.base.max_retries = int_ini_value;
 	}
 
 	policy_zval = zend_hash_index_find(policy_hash, OPT_POLICY_COMMIT_LEVEL);
