@@ -29,6 +29,7 @@
 #include "register_constants.h"
 #include "logging.h"
 #include "persistent_list.h"
+#include "tls_config.h"
 #include "zend_exceptions.h"
 #include <stdbool.h>
 #include "aerospike_session.h"
@@ -659,6 +660,11 @@ static as_status set_as_config(as_config* config, HashTable* z_conf_hash) {
 				config->shm_takeover_threshold_sec = Z_LVAL_P(setting_value);
 			}
 		}
+	}
+
+	setting_value = zend_hash_index_find(z_conf_hash, OPT_TLS_CONFIG);
+	if (setting_value && Z_TYPE_P(setting_value) == IS_ARRAY) {
+		setTLSConfig(config, Z_ARRVAL_P(setting_value));
 	}
 
 	/* Authentication information */

@@ -14,6 +14,7 @@ if test "$PHP_AEROSPIKE" != "no"; then
                     policy_conversions.c\
                     register_policy_constants.c\
                     serializers.c\
+                    tls_config.c\
                     user_callbacks.c\
                     client/aerospike_class.c\
                     client/aerospike_session.c\

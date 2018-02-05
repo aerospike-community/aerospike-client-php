@@ -222,7 +222,19 @@ final class constantRegistrationTest extends TestCase {
         "OPT_FAIL_ON_CLUSTER_CHANGE",
         "OPT_BATCH_CONCURRENT",
         "OPT_ALLOW_INLINE",
-        "OPT_SEND_SET_NAME"
+        "OPT_SEND_SET_NAME",
+        "OPT_TLS_CONFIG",
+        "OPT_TLS_ENABLE",
+        "OPT_TLS_CAFILE",
+        "OPT_TLS_CAPATH",
+        "OPT_TLS_PROTOCOLS",
+        "OPT_TLS_CIPHER_SUITE",
+        "OPT_TLS_CRL_CHECK",
+        "OPT_TLS_CRL_CHECK_ALL",
+        "OPT_TLS_CERT_BLACKLIST",
+        "OPT_TLS_LOG_SESSION_INFO",
+        "OPT_TLS_KEYFILE",
+        "OPT_TLS_CERTFILE"
     ];
 
     public function testConstantDefinition() {
