@@ -111,7 +111,11 @@ AerospikeOptionConstant aerospike_option_constants[] = {
 	{AS_MAP_RETURN_KEY_VALUE                ,   "MAP_RETURN_KEY_VALUE"              },
 	{ OPT_TOTAL_TIMEOUT                     ,   "OPT_TOTAL_TIMEOUT"                 },
 	{ OPT_MAX_RETRIES                       ,   "OPT_MAX_RETRIES"                   },
-	{ OPT_LINEARIZE_READ                    ,   "OPT_LINEARIZE_READ"                }
+	{ OPT_LINEARIZE_READ                    ,   "OPT_LINEARIZE_READ"                },
+	{ OPT_FAIL_ON_CLUSTER_CHANGE            ,   "OPT_FAIL_ON_CLUSTER_CHANGE"        },
+	{ OPT_BATCH_CONCURRENT                  ,   "OPT_BATCH_CONCURRENT"              },
+	{ OPT_ALLOW_INLINE                      ,   "OPT_ALLOW_INLINE"                  },
+	{ OPT_SEND_SET_NAME                     ,   "OPT_SEND_SET_NAME"                 }
 };
 
 static AerospikeStrOptionConstant aerospike_str_option_constants[] = {

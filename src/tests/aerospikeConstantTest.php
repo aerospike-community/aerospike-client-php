@@ -218,7 +218,11 @@ final class constantRegistrationTest extends TestCase {
         "JOB_SCAN",
         "OPT_TOTAL_TIMEOUT",
         "OPT_MAX_RETRIES",
-        "OPT_LINEARIZE_READ"
+        "OPT_LINEARIZE_READ",
+        "OPT_FAIL_ON_CLUSTER_CHANGE",
+        "OPT_BATCH_CONCURRENT",
+        "OPT_ALLOW_INLINE",
+        "OPT_SEND_SET_NAME"
     ];
 
     public function testConstantDefinition() {

@@ -203,6 +203,11 @@ as_status zval_to_as_policy_remove(zval* z_policy, as_policy_remove* remove_poli
 		setting_val = NULL;
 	}
 
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_REPLICA);
+	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
+		remove_policy->replica = (as_policy_replica)Z_LVAL_P(setting_val);
+		setting_val = NULL;
+	}
 	return AEROSPIKE_OK;
 
 }
@@ -286,9 +291,13 @@ as_status zval_to_as_policy_write(zval* z_policy, as_policy_write* write_policy,
 	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_GEN);
 	if (setting_val && Z_TYPE_P(setting_val) == IS_ARRAY) {
 		HashTable * gen_ary = Z_ARRVAL_P(setting_val);
-		zval* value_code = NULL;
-		value_code = zend_hash_index_find(gen_ary, 0);
-		write_policy->gen = (as_policy_gen)Z_LVAL_P(value_code);
+		if (zend_hash_num_elements(gen_ary) > 0) {
+			zval* value_code = NULL;
+			value_code = zend_hash_index_find(gen_ary, 0);
+			if (value_code && Z_TYPE_P(value_code) == IS_LONG) {
+				write_policy->gen = (as_policy_gen)Z_LVAL_P(value_code);
+			}
+		}
 		setting_val = NULL;
 	}
 
@@ -390,7 +399,9 @@ as_status zval_to_as_policy_operate(zval* z_policy, as_policy_operate* operate_p
 		zval* value_code = NULL;
 		// Take the first element of the ary
 		value_code = zend_hash_index_find(gen_ary, 0);
-		operate_policy->gen = (as_policy_gen)Z_LVAL_P(value_code);
+		if (value_code) {
+			operate_policy->gen = (as_policy_gen)Z_LVAL_P(value_code);
+		}
 		setting_val = NULL;
 	}
 
@@ -536,6 +547,35 @@ as_status zval_to_as_policy_apply(zval* z_apply_policy, as_policy_apply* apply_p
 		setting_val = NULL;
 	}
 
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_REPLICA);
+	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
+		apply_policy->replica = (as_policy_replica)Z_LVAL_P(setting_val);
+		setting_val = NULL;
+	}
+
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_COMMIT_LEVEL);
+	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
+		apply_policy->commit_level = (as_policy_commit_level)Z_LVAL_P(setting_val);
+		setting_val = NULL;
+	}
+
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_GEN);
+	if (setting_val && Z_TYPE_P(setting_val) == IS_ARRAY) {
+		HashTable * gen_ary = Z_ARRVAL_P(setting_val);
+		if (zend_hash_num_elements(gen_ary) > 1) {
+			zval* value_code = NULL;
+			value_code = zend_hash_index_find(gen_ary, 0);
+			if (value_code && Z_TYPE_P(value_code) == IS_LONG) {
+				apply_policy->gen = (as_policy_gen)Z_LVAL_P(value_code);
+			}
+			value_code = zend_hash_index_find(gen_ary, 1);
+			if (value_code && Z_TYPE_P(value_code) == IS_LONG) {
+				apply_policy->gen_value = (uint16_t)Z_LVAL_P(value_code);
+			}
+		}
+		setting_val = NULL;
+	}
+
 	return AEROSPIKE_OK;
 }
 
@@ -620,6 +660,12 @@ as_status zval_to_as_policy_scan(zval* z_policy, as_policy_scan* scan_policy,
 			strlen(PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES));
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
 		scan_policy->base.sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
+		setting_val = NULL;
+	}
+
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_FAIL_ON_CLUSTER_CHANGE);
+	if (setting_val && (Z_TYPE_P(setting_val) == IS_TRUE || Z_TYPE_P(setting_val) == IS_FALSE )) {
+		scan_policy->fail_on_cluster_change = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
 		setting_val = NULL;
 	}
 
@@ -767,6 +813,25 @@ as_status zval_to_as_policy_batch(zval* z_policy, as_policy_batch* batch_policy,
 		batch_policy->base.sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
 	}
+
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_BATCH_CONCURRENT);
+	if (setting_val && ((Z_TYPE_P(setting_val) == IS_TRUE) || (Z_TYPE_P(setting_val) == IS_FALSE ))) {
+		batch_policy->concurrent = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
+		setting_val = NULL;
+	}
+
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_ALLOW_INLINE);
+	if (setting_val && ((Z_TYPE_P(setting_val) == IS_TRUE) || (Z_TYPE_P(setting_val) == IS_FALSE ))) {
+		batch_policy->allow_inline = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
+		setting_val = NULL;
+	}
+
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_SEND_SET_NAME);
+	if (setting_val && ((Z_TYPE_P(setting_val) == IS_TRUE) || (Z_TYPE_P(setting_val) == IS_FALSE ))) {
+		batch_policy->send_set_name = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
+		setting_val = NULL;
+	}
+
 
 	return AEROSPIKE_OK;
 }
