@@ -28,7 +28,7 @@ function ensure_dropped_index($client, $ns, $index_name) {
 class Index extends AerospikeTestCommon
 {
     function setUp() {
-        $config = array("hosts"=>array(array("addr"=>AEROSPIKE_CONFIG_NAME, "port"=>AEROSPIKE_CONFIG_PORT)));
+        $config = get_as_config();
         $this->db = new Aerospike($config);
         $key = $this->db->initKey("test", "demo", "key1");
         $this->db->put($key, array("bin1"=>"1", "bin2"=>2, "bin3"=>3, "numeric_list"=>array(1,2,3)));

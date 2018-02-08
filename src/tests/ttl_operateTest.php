@@ -9,7 +9,7 @@ final class OperateTTLTest extends TestCase {
 
     protected function setUp() 
     {
-        $config = array("hosts"=>array(array("addr"=>AEROSPIKE_CONFIG_NAME, "port"=>AEROSPIKE_CONFIG_PORT)));
+        $config = get_as_config();
         $this->db = new Aerospike($config);
         $this->key = $this->db->initKey("test", "demo", 1);
         $this->db->put($this->key, ["Aero" => "spike", "INCR"=>5, "LST"=>[1,2,3]], 15000);

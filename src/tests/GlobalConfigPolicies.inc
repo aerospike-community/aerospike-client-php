@@ -8,7 +8,7 @@ require_once 'Common.inc';
 class GlobalConfigPolicies extends AerospikeTestCommon
 {
     protected function setUp() {
-        $config = array("hosts"=>array(array("addr"=>AEROSPIKE_CONFIG_NAME, "port"=>AEROSPIKE_CONFIG_PORT)));
+        $config = get_as_config();
         $this->db = new Aerospike($config, true, array(Aerospike::OPT_POLICY_KEY => Aerospike::POLICY_KEY_SEND,
             Aerospike::OPT_POLICY_EXISTS=>Aerospike::POLICY_EXISTS_CREATE,
             Aerospike::OPT_WRITE_TIMEOUT=>8900));

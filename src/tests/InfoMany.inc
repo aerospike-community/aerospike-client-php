@@ -4,7 +4,7 @@ class InfoMany extends AerospikeTestCommon
     private $config;
 
     protected function setUp() {
-        $this->config = array("hosts"=>array(array("addr"=>AEROSPIKE_CONFIG_NAME, "port"=>AEROSPIKE_CONFIG_PORT)));
+        $this->config = get_as_config();
         $this->db = new Aerospike($this->config);
         if (!$this->db->isConnected()) {
             return $this->db->errorno();

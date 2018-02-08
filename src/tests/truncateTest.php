@@ -10,7 +10,7 @@ final class TruncateTest extends TestCase {
 
     protected function setUp() 
     {
-        $config = array("hosts"=>array(array("addr"=>AEROSPIKE_CONFIG_NAME, "port"=>AEROSPIKE_CONFIG_PORT)));
+        $config = get_as_config();
         $this->db = new Aerospike($config);
         $this->keys = [];
         for($i = 0; $i < 20; $i++) {

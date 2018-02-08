@@ -10,7 +10,7 @@ final class MapOperationsTest extends TestCase {
 
     protected function setUp()
     {
-        $config = array("hosts"=>array(array("addr"=>AEROSPIKE_CONFIG_NAME, "port"=>AEROSPIKE_CONFIG_PORT)));
+        $config = get_as_config();
         $this->db = new Aerospike($config);
         $this->keys = [];
         $this->map_policy = [ AEROSPIKE::OPT_MAP_ORDER => AEROSPIKE::AS_MAP_KEY_ORDERED];
