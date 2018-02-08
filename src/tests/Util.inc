@@ -48,8 +48,8 @@ function get_as_config() {
     $use_tls = false;
     if (defined('AEROSPIKE_USE_TLS') && constant('AEROSPIKE_USE_TLS')) {
         if (getenv("TLS_ENABLE") != "") {
-            $tls_config[Aerospike::OPT_TLS_ENABLE] = getenv("TLS_ENABLE");
-            $use_tls = true;
+            $tls_config[Aerospike::OPT_TLS_ENABLE] = (int)getenv("TLS_ENABLE");
+            $use_tls = (int)getenv("TLS_ENABLE");
         }
         if (getenv("TLS_CIPHERSUITE") != "") {
             $tls_config[Aerospike::OPT_TLS_CIPHER_SUITE] = getenv("TLS_CIPHERSUITE");
