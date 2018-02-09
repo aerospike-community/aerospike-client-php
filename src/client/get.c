@@ -48,13 +48,13 @@ PHP_METHOD(Aerospike, get)
 	AerospikeClient* client = get_aerospike_from_zobj(Z_OBJ_P(getThis()));
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	aerospike* as_ptr = client->as_client;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "hz/|z!z",
 		&z_key_hash, &get_record, &z_filter, &z_read_policy) != SUCCESS) {
-			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to Aerospike::get");
+			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to Aerospike::get", false);
 			RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	zval_dtor(get_record);
@@ -63,13 +63,13 @@ PHP_METHOD(Aerospike, get)
 	/* Load the default policies and merge them with any passed to the function */
 	as_status converted = zval_to_as_policy_read(z_read_policy, &read_policy, &read_policy_p, &as_ptr->config.policies.read);
 	if (converted != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid read read_policy");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid read read_policy", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 
 	}
 
 	if (z_hashtable_to_as_key(z_key_hash, &key, &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid key");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid key", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	key_initialized = true;
@@ -80,7 +80,7 @@ PHP_METHOD(Aerospike, get)
 	if (z_filter) {
 
 		if (Z_TYPE_P(z_filter) != IS_ARRAY) {
-			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Filter bins must be an array if provided");
+			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Filter bins must be an array if provided", false);
 			RETURN_LONG(AEROSPIKE_ERR_PARAM);		
 		}
 		z_filter_bins = Z_ARRVAL_P(z_filter);
@@ -113,7 +113,7 @@ CLEANUP:
 		as_record_destroy(record);
 	}
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		zval_dtor(get_record);
 		array_init(get_record);
 	}

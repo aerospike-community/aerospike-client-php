@@ -111,7 +111,7 @@ PHP_METHOD(Aerospike, setLogLevel) {
 	reset_client_error(getThis());
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "l", &log_level) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to setLogLevel");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to setLogLevel", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	as_log_set_level(log_level);
@@ -139,7 +139,7 @@ PHP_METHOD(Aerospike, setLogHandler) {
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "f",
 			&log_handler, &log_handler_cache) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid argument to setLogHandler");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid argument to setLogHandler", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 

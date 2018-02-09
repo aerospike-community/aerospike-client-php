@@ -23,6 +23,7 @@
 		as_key key;\
 		bool key_initialized = false;\
 		as_error err;\
+		as_error_init(&err);\
 		as_operations* operations = NULL;\
 		bool operations_initialized = false;\
 		as_policy_operate operate_policy;\
@@ -38,11 +39,11 @@
 #define VALIDATE_CLIENT_AND_CONNECTION() \
 	do {\
 		if (!php_client || !php_client->is_valid || !php_client->as_client) { \
-			update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Invalid Aerospike object");\
+			update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Invalid Aerospike object", false);\
 			RETURN_LONG(AEROSPIKE_ERR_CLIENT);\
 		}\
 		if (!php_client->is_connected) {\
-			update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Not connected to Aerospike server");\
+			update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Not connected to Aerospike server", false);\
 			RETURN_LONG(AEROSPIKE_ERR_CLIENT);\
 		}\
 	}while(0)
@@ -50,7 +51,7 @@
 #define CHECK_BIN_NAME() \
 	do {\
 		if (bin_name_size > AS_BIN_NAME_MAX_LEN) {\
-			update_client_error(getThis(),AEROSPIKE_ERR_PARAM, "Bin name is too long");\
+			update_client_error(getThis(),AEROSPIKE_ERR_PARAM, "Bin name is too long", false);\
 			RETURN_LONG(AEROSPIKE_ERR_PARAM);\
 		}\
 	}while(0)
@@ -78,7 +79,7 @@ PHP_METHOD(Aerospike, listSize) {
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hsz/|z",
 			&z_key, &bin_name, &bin_name_size, &return_count, &z_operate_policy) == FAILURE) {
 
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to listSize");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to listSize", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	zval_dtor(return_count);
@@ -96,7 +97,7 @@ PHP_METHOD(Aerospike, listSize) {
 
 	as_status status = aerospike_key_operate(as_client, &err, operate_policy_p, &key, operations, &rec);
 	if (status != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		goto CLEANUP;
 	}
 	ZVAL_LONG(return_count, as_record_get_int64(rec, bin_name, -1));
@@ -104,7 +105,7 @@ PHP_METHOD(Aerospike, listSize) {
 CLEANUP:
 	cleanup_list_operation(&key, key_initialized, operations, operations_initialized, rec);
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 }
@@ -128,7 +129,7 @@ PHP_METHOD(Aerospike, listAppend) {
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hsz|z", &z_key, &bin_name, &bin_name_size, &z_append_value, &z_operate_policy)
 			!= SUCCESS) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to listAppend");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to listAppend", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -140,14 +141,14 @@ PHP_METHOD(Aerospike, listAppend) {
 	}
 
 	if (set_serializer_from_policy_hash(&serializer_type, z_operate_policy) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid serializer value");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid serializer value", false);
 		err.code = AEROSPIKE_ERR_PARAM;
 		goto CLEANUP;
 	}
 
 	zval_to_as_val(z_append_value, &val_to_add, &err, serializer_type);
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		goto CLEANUP;
 	}
 
@@ -155,14 +156,14 @@ PHP_METHOD(Aerospike, listAppend) {
 
 	as_status status = aerospike_key_operate(as_client, &err, operate_policy_p, &key, operations, &rec);
 	if (status != AEROSPIKE_OK) {
-		update_client_error(getThis(),err.code, err.message);
+		update_client_error(getThis(),err.code, err.message, err.in_doubt);
 		goto CLEANUP;
 	}
 
 CLEANUP:
 	cleanup_list_operation(&key, key_initialized, operations, operations_initialized, rec);
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 }
@@ -186,7 +187,7 @@ PHP_METHOD(Aerospike, listMerge) {
 	as_client = php_client->as_client;
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hsh|z", &z_key, &bin_name, &bin_name_size,
 			&items, & z_operate_policy) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to listSize");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to listSize", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -199,19 +200,19 @@ PHP_METHOD(Aerospike, listMerge) {
 	}
 
 	if (set_serializer_from_policy_hash(&serializer_type, z_operate_policy) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid serializer value");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid serializer value", false);
 		err.code = AEROSPIKE_ERR_PARAM;
 		goto CLEANUP;
 	}
 
 	if (!hashtable_is_list(items)) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Items to merge must be a list");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Items to merge must be a list", false);
 		err.code = AEROSPIKE_ERR_PARAM;
 		goto CLEANUP;
 	}
 
 	if(z_hashtable_to_as_list(items, &list_items, &err, serializer_type) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, "Failed to create a list in listMerge");
+		update_client_error(getThis(), err.code, "Failed to create a list in listMerge", false);
 		goto CLEANUP;
 	}
 
@@ -219,7 +220,7 @@ PHP_METHOD(Aerospike, listMerge) {
 		if (list_items) {
 			as_list_destroy(list_items);
 		}
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Failed to add operations");
+		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Failed to add operations", false);
 		err.code = AEROSPIKE_ERR_CLIENT;
 		goto CLEANUP;
 	}
@@ -229,7 +230,7 @@ PHP_METHOD(Aerospike, listMerge) {
 CLEANUP:
 	cleanup_list_operation(&key, key_initialized, operations, operations_initialized, rec);
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 
@@ -241,6 +242,7 @@ CLEANUP:
     Insert an element at the specified index of a list value in the bin */
 PHP_METHOD(Aerospike, listInsert) {
 	DECLARE_LIST_OPERATION_VARS;
+	as_error_init(&err);
 	zval* zval_to_add = NULL;
 	as_val* val_to_add = NULL;
 	zend_long index = 0;
@@ -252,7 +254,7 @@ PHP_METHOD(Aerospike, listInsert) {
 
 	if(zend_parse_parameters(ZEND_NUM_ARGS(), "hslz|z",
 			&z_key, &bin_name, &bin_name_size, &index, &zval_to_add, &z_operate_policy) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to listInsert");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to listInsert", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -265,7 +267,7 @@ PHP_METHOD(Aerospike, listInsert) {
 	}
 
 	if (set_serializer_from_policy_hash(&serializer_type, z_operate_policy) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid serializer value");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid serializer value", false);
 		err.code = AEROSPIKE_ERR_PARAM;
 		goto CLEANUP;
 	}
@@ -273,14 +275,14 @@ PHP_METHOD(Aerospike, listInsert) {
 	zval_to_as_val(zval_to_add, &val_to_add, &err, serializer_type);
 
 	if(!val_to_add ||err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Failed to convert value to add to list");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Failed to convert value to add to list", false);
 		err.code = AEROSPIKE_ERR_PARAM;
 		goto CLEANUP;
 	}
 
 	if	(!as_operations_add_list_insert(operations, bin_name, (int64_t)index, val_to_add)) {
 		err.code = AEROSPIKE_ERR_CLIENT;
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Failed to add operations");
+		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Failed to add operations", false);
 		as_val_destroy(val_to_add);
 		goto CLEANUP;
 	}
@@ -290,7 +292,7 @@ PHP_METHOD(Aerospike, listInsert) {
 CLEANUP:
 	cleanup_list_operation(&key, key_initialized, operations, operations_initialized, rec);
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 
@@ -302,6 +304,7 @@ CLEANUP:
     Insert items at the specified index of a list value in the bin */
 PHP_METHOD(Aerospike, listInsertItems) {
 	DECLARE_LIST_OPERATION_VARS;
+	as_error_init(&err);
 	as_list* values_to_add = NULL;
 	HashTable* z_values_to_add = NULL;
 	zend_long index = 0;
@@ -313,7 +316,7 @@ PHP_METHOD(Aerospike, listInsertItems) {
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hslh|z",
 			&z_key, &bin_name, &bin_name_size, &index, &z_values_to_add, &z_operate_policy) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters for listInsertItems");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters for listInsertItems", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -326,13 +329,13 @@ PHP_METHOD(Aerospike, listInsertItems) {
 	}
 
 	if (set_serializer_from_policy_hash(&serializer_type, z_operate_policy) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid serializer value");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid serializer value", false);
 		err.code = AEROSPIKE_ERR_PARAM;
 		goto CLEANUP;
 	}
 
 	if (!hashtable_is_list(z_values_to_add)) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Values to add must be a list");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Values to add must be a list", false);
 		err.code = AEROSPIKE_ERR_PARAM;
 		goto CLEANUP;
 	}
@@ -346,7 +349,7 @@ PHP_METHOD(Aerospike, listInsertItems) {
 			as_list_destroy(values_to_add);
 		}
 		err.code = AEROSPIKE_ERR_CLIENT;
-		update_client_error(getThis(), err.code, "Failed to add operations");
+		update_client_error(getThis(), err.code, "Failed to add operations", false);
 		goto CLEANUP;
 	}
 
@@ -356,7 +359,7 @@ CLEANUP:
 	cleanup_list_operation(&key, key_initialized, operations, operations_initialized, rec);
 
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 }
@@ -367,6 +370,7 @@ CLEANUP:
     Remove and get back the list element at a given index of a list value in the bin */
 PHP_METHOD(Aerospike, listPop) {
 	DECLARE_LIST_OPERATION_VARS;
+	as_error_init(&err);
 	zval* retval = NULL;
 	zend_long index = 0;
 	int serializer_type = INI_INT("aerospike.serializer");
@@ -377,7 +381,7 @@ PHP_METHOD(Aerospike, listPop) {
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hslz/|z",
 			&z_key, &bin_name, &bin_name_size, &index, &retval, &z_operate_policy) == FAILURE) {
-			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to listPop");
+			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to listPop", false);
 			RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -393,14 +397,14 @@ PHP_METHOD(Aerospike, listPop) {
 	}
 
 	if (set_serializer_from_policy_hash(&serializer_type, z_operate_policy) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid serializer value");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid serializer value", false);
 		err.code = AEROSPIKE_ERR_PARAM;
 		goto CLEANUP;
 	}
 
 	if (!as_operations_add_list_pop(operations, bin_name, (int64_t)index)) {
 		err.code = AEROSPIKE_ERR_CLIENT;
-		update_client_error(getThis(), err.code, "Failed to add operations");
+		update_client_error(getThis(), err.code, "Failed to add operations", false);
 		goto CLEANUP;
 	}
 
@@ -416,14 +420,14 @@ PHP_METHOD(Aerospike, listPop) {
 		goto CLEANUP;
 	}
 	if (as_val_to_zval(popped_value, retval, &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Failed to deserialize returned value");
+		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Failed to deserialize returned value", err.in_doubt);
 	}
 
 CLEANUP:
 	cleanup_list_operation(&key, key_initialized, operations, operations_initialized, rec);
 
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 
 	RETURN_LONG(err.code);
@@ -449,7 +453,7 @@ PHP_METHOD(Aerospike, listPopRange) {
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hsllz/|z",
 			&z_key, &bin_name, &bin_name_size, &start_index, &count,
 			&retval, &z_operate_policy) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments for listPopRange");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments for listPopRange", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	zval_dtor(retval);
@@ -464,7 +468,7 @@ PHP_METHOD(Aerospike, listPopRange) {
 
 	if	(!as_operations_add_list_pop_range(operations, bin_name, (int64_t)start_index, (uint64_t)count)) {
 		err.code = AEROSPIKE_ERR_CLIENT;
-		update_client_error(getThis(), err.code, "Failed to add operations");
+		update_client_error(getThis(), err.code, "Failed to add operations", false);
 		goto CLEANUP;
 	}
 
@@ -481,13 +485,13 @@ PHP_METHOD(Aerospike, listPopRange) {
 	}
 
 	if (as_val_to_zval(popped_value, retval, &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Failed to deserialize returned value");
+		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Failed to deserialize returned value", err.in_doubt);
 	}
 
 CLEANUP:
 	cleanup_list_operation(&key, key_initialized, operations, operations_initialized, rec);
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 
@@ -509,7 +513,7 @@ PHP_METHOD(Aerospike, listRemove) {
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hsl|z",
 			&z_key, &bin_name, &bin_name_size, &index, &z_operate_policy) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments for listRemove");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments for listRemove", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -522,7 +526,7 @@ PHP_METHOD(Aerospike, listRemove) {
 
 	if(!as_operations_add_list_remove(operations, bin_name, (int64_t)index)) {
 		err.code = AEROSPIKE_ERR_CLIENT;
-		update_client_error(getThis(), err.code, "Failed to add operations");
+		update_client_error(getThis(), err.code, "Failed to add operations", false);
 		goto CLEANUP;
 	}
 
@@ -532,7 +536,7 @@ CLEANUP:
 	cleanup_list_operation(&key, key_initialized, operations, operations_initialized, rec);
 
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 }
@@ -554,7 +558,7 @@ PHP_METHOD(Aerospike, listRemoveRange) {
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hsll|z",
 			&z_key, &bin_name, &bin_name_size, &index, &count, &z_operate_policy) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments for listRemoveRange");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments for listRemoveRange", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -567,7 +571,7 @@ PHP_METHOD(Aerospike, listRemoveRange) {
 
 	if(!as_operations_add_list_remove_range(operations, bin_name, (int64_t)index, (uint64_t)count)) {
 		err.code = AEROSPIKE_ERR_CLIENT;
-		update_client_error(getThis(), err.code, "Failed to add operations");
+		update_client_error(getThis(), err.code, "Failed to add operations", err.in_doubt);
 		goto CLEANUP;
 	}
 
@@ -577,7 +581,7 @@ CLEANUP:
 	cleanup_list_operation(&key, key_initialized, operations, operations_initialized, rec);
 
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 }
@@ -599,7 +603,7 @@ PHP_METHOD(Aerospike, listTrim) {
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hsll|z",
 			&z_key, &bin_name, &bin_name_size, &index, &count, &z_operate_policy) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments for listTrim");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments for listTrim", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -612,7 +616,7 @@ PHP_METHOD(Aerospike, listTrim) {
 
 	if(!as_operations_add_list_trim(operations, bin_name, (int64_t)index, (uint64_t)count)) {
 		err.code = AEROSPIKE_ERR_CLIENT;
-		update_client_error(getThis(), err.code, "Failed to add operations");
+		update_client_error(getThis(), err.code, "Failed to add operations", err.in_doubt);
 		goto CLEANUP;
 	}
 
@@ -622,7 +626,7 @@ CLEANUP:
 	cleanup_list_operation(&key, key_initialized, operations, operations_initialized, rec);
 
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 }
@@ -642,7 +646,7 @@ PHP_METHOD(Aerospike, listClear) {
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hs|z",
 			&z_key, &bin_name, &bin_name_size, &z_operate_policy) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments for listClear");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments for listClear", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -655,7 +659,7 @@ PHP_METHOD(Aerospike, listClear) {
 
 	if(!as_operations_add_list_clear(operations, bin_name)) {
 		err.code = AEROSPIKE_ERR_CLIENT;
-		update_client_error(getThis(), err.code, "Failed to add operations");
+		update_client_error(getThis(), err.code, "Failed to add operations", err.in_doubt);
 		goto CLEANUP;
 	}
 
@@ -665,7 +669,7 @@ CLEANUP:
 	cleanup_list_operation(&key, key_initialized, operations, operations_initialized, rec);
 
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 }
@@ -688,7 +692,7 @@ PHP_METHOD(Aerospike, listSet) {
 
 	if(zend_parse_parameters(ZEND_NUM_ARGS(), "hslz|z",
 			&z_key, &bin_name, &bin_name_size, &index, &zval_to_add, &z_operate_policy) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to listSet");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to listSet", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -700,7 +704,7 @@ PHP_METHOD(Aerospike, listSet) {
 	}
 
 	if (set_serializer_from_policy_hash(&serializer_type, z_operate_policy) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid serializer value");
+		as_error_update(&err, AEROSPIKE_ERR_PARAM, "Invalid serializer value");
 		err.code = AEROSPIKE_ERR_PARAM;
 		goto CLEANUP;
 	}
@@ -708,14 +712,14 @@ PHP_METHOD(Aerospike, listSet) {
 	zval_to_as_val(zval_to_add, &val_to_add, &err, serializer_type);
 
 	if(!val_to_add || err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Failed to convert value to add to list");
+		as_error_update(&err, AEROSPIKE_ERR_PARAM, "Failed to convert value to add to list");
 		err.code = AEROSPIKE_ERR_PARAM;
 		goto CLEANUP;
 	}
 
 	if	(!as_operations_add_list_set(operations, bin_name, (int64_t)index, val_to_add)) {
 		err.code = AEROSPIKE_ERR_CLIENT;
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Failed to add operations");
+		as_error_update(&err, AEROSPIKE_ERR_CLIENT, "Failed to add operations");
 		as_val_destroy(val_to_add);
 		goto CLEANUP;
 	}
@@ -725,7 +729,7 @@ PHP_METHOD(Aerospike, listSet) {
 CLEANUP:
 	cleanup_list_operation(&key, key_initialized, operations, operations_initialized, rec);
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 
@@ -746,7 +750,7 @@ PHP_METHOD(Aerospike, listGet) {
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hslz/|z",
 			&z_key, &bin_name, &bin_name_size, &index, &retval, &z_operate_policy) == FAILURE) {
-			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to listGet");
+			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to listGet", false);
 			RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -760,7 +764,7 @@ PHP_METHOD(Aerospike, listGet) {
 	ZVAL_NULL(retval);
 
 	if (!as_operations_add_list_get(operations, bin_name, (int64_t)index)) {
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Failed to add operations");
+		as_error_update(&err, AEROSPIKE_ERR_CLIENT, "Failed to add operations");
 		goto CLEANUP;
 	}
 
@@ -775,13 +779,13 @@ PHP_METHOD(Aerospike, listGet) {
 		goto CLEANUP;
 	}
 	if (as_val_to_zval(returned_value, retval, &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Failed to deserialize returned value");
+		as_error_update(&err, AEROSPIKE_ERR_CLIENT, "Failed to deserialize returned value");
 	}
 
 CLEANUP:
 	cleanup_list_operation(&key, key_initialized, operations, operations_initialized, rec);
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 
@@ -806,7 +810,7 @@ PHP_METHOD(Aerospike, listGetRange) {
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hsllz/|z",
 			&z_key, &bin_name, &bin_name_size, &start_index, &count,
 			&retval, &z_operate_policy) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments for listGetRange");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments for listGetRange", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	zval_dtor(retval);
@@ -821,7 +825,7 @@ PHP_METHOD(Aerospike, listGetRange) {
 
 	if	(!as_operations_add_list_get_range(operations, bin_name, (int64_t)start_index, (uint64_t)count)) {
 		err.code = AEROSPIKE_ERR_CLIENT;
-		update_client_error(getThis(), err.code, "Failed to add operations");
+		as_error_update(&err, err.code, "Failed to add operations");
 		goto CLEANUP;
 	}
 
@@ -840,13 +844,13 @@ PHP_METHOD(Aerospike, listGetRange) {
 	}
 
 	if (as_val_to_zval(returned_value, retval, &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Failed to deserialize returned value");
+		as_error_update(&err, AEROSPIKE_ERR_CLIENT, "Failed to deserialize returned value");
 	}
 
 CLEANUP:
 	cleanup_list_operation(&key, key_initialized, operations, operations_initialized, rec);
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 

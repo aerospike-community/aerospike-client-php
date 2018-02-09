@@ -52,7 +52,7 @@ PHP_METHOD(Aerospike, append)
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hss|z", &z_key, &bin_str,
 							  &bin_len, &append_str, &append_str_len,
 							  &z_op_policy) != SUCCESS) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to append");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to append", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -92,7 +92,7 @@ PHP_METHOD(Aerospike, append)
 CLEANUP:
 
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 
 	if (operations_initialized) {

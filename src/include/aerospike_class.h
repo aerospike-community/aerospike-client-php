@@ -74,6 +74,10 @@ PHP_METHOD(Aerospike, errorno);
 ZEND_BEGIN_ARG_INFO_EX(errorno_arg_info, 0, 0, 0)
 ZEND_END_ARG_INFO();
 
+PHP_METHOD(Aerospike, errorInDoubt);
+ZEND_BEGIN_ARG_INFO_EX(error_in_doubt_arg_info, 0, 0, 0)
+ZEND_END_ARG_INFO();
+
 PHP_METHOD(Aerospike, exists);
 ZEND_BEGIN_ARG_INFO_EX(exists_arg_info, 0, 0, 2)
 ZEND_ARG_PASS_INFO(0)

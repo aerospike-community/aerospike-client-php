@@ -24,6 +24,7 @@
 PHP_METHOD(Aerospike, remove)
 {
 	as_error err;
+	as_error_init(&err);
 	as_key key;
 	bool key_initialized = false;
 
@@ -40,26 +41,26 @@ PHP_METHOD(Aerospike, remove)
 	client = get_aerospike_from_zobj(Z_OBJ_P(getThis()));
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, false);
 		RETURN_LONG(err.code);
 	}
 	as_ptr = client->as_client;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "h|z", &z_key, &z_remove_options) != SUCCESS) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid Parameters for remove");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid Parameters for remove", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (zval_to_as_policy_remove(z_remove_options, &remove_policy,
 			&remove_policy_p, &as_ptr->config.policies.remove) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid remove policy");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid remove policy", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	as_error_init(&err);
 
 	if (z_hashtable_to_as_key(z_key, &key, &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, "Failed to create key");
+		update_client_error(getThis(), err.code, "Failed to create key", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	key_initialized = true;
@@ -70,7 +71,7 @@ PHP_METHOD(Aerospike, remove)
 		as_key_destroy(&key);
 	}
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(status);
 

@@ -168,7 +168,7 @@ CLEANUP:
 		as_batch_destroy(&batch);
 	}
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 
 		/* If this was created, and is an array, we need to clear it */
 		if (z_metadata && Z_TYPE_P(z_metadata) == IS_ARRAY) {

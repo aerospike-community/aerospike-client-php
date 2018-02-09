@@ -54,7 +54,7 @@ PHP_METHOD(Aerospike, scanApply) {
 	reset_client_error(getThis());
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, false);
 		RETURN_LONG(err.code);
 	}
 
@@ -66,7 +66,7 @@ PHP_METHOD(Aerospike, scanApply) {
 			&module, &module_len,
 			&function, &function_len,
 			&args_list, &job_id, &z_policy) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to scanApply");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to scanApply", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	// Free the old value of the parameter by reference
@@ -74,17 +74,17 @@ PHP_METHOD(Aerospike, scanApply) {
 	ZVAL_NULL(job_id);
 
 	if (ns_len == 0) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Empty Namespace");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Empty Namespace", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	if (module_len == 0 || function_len == 0) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Module and function must not be empty");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Module and function must not be empty", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (zval_to_as_policy_scan(z_policy, &scan_policy,
 			&scan_policy_p, &as_client->config.policies.scan) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid scan policy");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid scan policy", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -127,7 +127,7 @@ CLEANUP:
 		as_scan_destroy(&user_scan);
 	}
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 }

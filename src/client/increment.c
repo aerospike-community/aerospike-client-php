@@ -48,12 +48,12 @@ PHP_METHOD(Aerospike, increment)
 	AerospikeClient* client = get_aerospike_from_zobj(Z_OBJ_P(getThis()));
 
 	if (!client || !client->is_valid || !client->as_client) {
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Invalid Aerospike object");
+		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Invalid Aerospike object", false);
 		RETURN_LONG(AEROSPIKE_ERR_CLIENT);
 	}
 
 	if (!client->is_connected) {
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Not connected to Aerospike server");
+		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Not connected to Aerospike server", false);
 		RETURN_LONG(AEROSPIKE_ERR_CLIENT);
 	}
 	aerospike* as_ptr = client->as_client;
@@ -61,7 +61,7 @@ PHP_METHOD(Aerospike, increment)
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hsz|z", &z_key, &bin_str,
 							  &bin_len, &z_increment,
 							  &z_op_policy) != SUCCESS) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to increment");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to increment", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -82,28 +82,28 @@ PHP_METHOD(Aerospike, increment)
 				is_double = false;
 				break;
 			default:
-				update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Non numeric increment amount");
+				update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Non numeric increment amount", false);
 				RETURN_LONG(AEROSPIKE_ERR_PARAM);
 		}
 	} else {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid increment value type");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid increment value type", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (bin_len > AS_BIN_NAME_MAX_LEN) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Bin name is too long");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Bin name is too long", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);	
 	}
 
 	if (z_hashtable_to_as_key(z_key, &key, &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid key");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid key", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	key_initialized = true;
 
 	if (zval_to_as_policy_operate(z_op_policy, &operate_policy,
 			&operate_policy_p, &as_ptr->config.policies.operate) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid operate policy");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid operate policy", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	operate_policy_p = &operate_policy;
@@ -119,21 +119,21 @@ PHP_METHOD(Aerospike, increment)
 
 	if (set_operations_generation_from_operate_policy(&operations, z_op_policy) !=
 		AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid generation policy");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid generation policy", false);
 		err.code = AEROSPIKE_ERR_PARAM;
 		goto CLEANUP;
 	}
 
 	if (set_operations_ttl_from_operate_policy(&operations, z_op_policy) !=
 		AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid TTL");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid TTL", false);
 		err.code = AEROSPIKE_ERR_PARAM;
 		goto CLEANUP;
 	}
 
 	as_status status = aerospike_key_operate(as_ptr, &err, operate_policy_p, &key, &operations, &rec);
 	if (status != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		goto CLEANUP;
 	}
 

@@ -64,6 +64,7 @@ static zend_function_entry Aerospike_class_functions[] =
 	PHP_ME(Aerospike, dropIndex, drop_index_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, error, error_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, errorno, errorno_arg_info, ZEND_ACC_PUBLIC)
+	PHP_ME(Aerospike, errorInDoubt, error_in_doubt_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, exists, exists_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, get, get_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, getKeyDigest, getKeyDigest_arg_info, ZEND_ACC_PUBLIC)
@@ -340,7 +341,7 @@ PHP_METHOD(Aerospike, initKey)
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ssz|b",
 		&namespace, &namespace_len, &set, &set_len, &primary_key, &is_digest) != SUCCESS
 		) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments for initKey");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments for initKey", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	reset_client_error(getThis());
@@ -353,7 +354,7 @@ PHP_METHOD(Aerospike, initKey)
 		case(IS_STRING):
 			if (is_digest) {
 				if (Z_STRLEN_P(primary_key) != AS_DIGEST_VALUE_SIZE) {
-					update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Digest Must be 20 bytes");
+					update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Digest Must be 20 bytes", false);
 					zval_dtor(return_value);
 					RETURN_NULL();
 				}
@@ -373,7 +374,7 @@ PHP_METHOD(Aerospike, initKey)
 			break;
 		// case bytes
 		default:
-			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid type for primary key");
+			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid type for primary key", false);
 			zval_dtor(return_value);
 			RETURN_NULL();
 	}
@@ -402,6 +403,17 @@ PHP_METHOD(Aerospike, errorno)
 	AerospikeClient* client = get_aerospike_from_zobj(Z_OBJ_P(getThis()));
 	if (client) {
 		RETURN_LONG(client->client_error.code);
+	}
+}
+/* }}} */
+
+/* {{{ proto bool Aerospike::errorInDoubt ( void )
+   Displays the in doubt status associated with the last operation */
+PHP_METHOD(Aerospike, errorInDoubt)
+{
+	AerospikeClient* client = get_aerospike_from_zobj(Z_OBJ_P(getThis()));
+	if (client) {
+		RETURN_BOOL(client->client_error.in_doubt);
 	}
 }
 /* }}} */
@@ -443,18 +455,18 @@ PHP_METHOD(Aerospike, reconnect) {
 	if (client && client->as_client) {
 		as_ptr = client->as_client;
 	} else {
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Client object is invalid");
+		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Client object is invalid", false);
 		RETURN_LONG(AEROSPIKE_ERR_CLIENT);
 	}
 
 	if (client->is_connected) {
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Client already connected");
+		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Client already connected", false);
 		RETURN_LONG(AEROSPIKE_ERR_CLIENT);
 	}
 
 	aerospike_connect(as_ptr, &err);
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		RETURN_LONG(err.code);
 	} else {
 		client->is_connected = true;

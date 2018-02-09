@@ -23,7 +23,7 @@ AerospikeClient* get_aerospike_from_zobj(zend_object* zval_wrapper) {
 	return (AerospikeClient*)((char *)zval_wrapper - XtOffsetOf(AerospikeClient, zobj));
 }
 
-void update_client_error(zval* client_obj, int code, const char* msg) {
+void update_client_error(zval* client_obj, int code, const char* msg, bool in_doubt) {
 	if (!client_obj || Z_TYPE_P(client_obj) != IS_OBJECT) {
 		return;
 	}
@@ -31,6 +31,7 @@ void update_client_error(zval* client_obj, int code, const char* msg) {
 	AerospikeClient* php_client = get_aerospike_from_zobj(Z_OBJ_P(client_obj));
 	if (php_client) {
 		as_error_set_message(&(php_client->client_error), code, msg);
+		php_client->client_error.in_doubt = in_doubt;
 	}
 }
 

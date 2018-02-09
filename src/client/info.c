@@ -62,7 +62,7 @@ PHP_METHOD(Aerospike, info)
 	aerospike* as_client = NULL;
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		RETURN_LONG(err.code);
 	}
 	php_client = get_aerospike_from_zobj(Z_OBJ_P(getThis()));
@@ -76,7 +76,7 @@ PHP_METHOD(Aerospike, info)
 			&request, &request_len,
 			&response_zval, &destination_host,
 			&z_policy) == FAILURE) {
-		update_client_error(getThis(),AEROSPIKE_ERR_PARAM, "Invalid arguments to info");
+		update_client_error(getThis(),AEROSPIKE_ERR_PARAM, "Invalid arguments to info", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	/* Cleanup any thing held by the return parameter */
@@ -86,7 +86,7 @@ PHP_METHOD(Aerospike, info)
 	if (z_policy){
 		if (zval_to_as_policy_info(z_policy, &info_policy,
 				&info_policy_p, &as_client->config.policies.info) != AEROSPIKE_OK) {
-			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid policy.");
+			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid policy.", false);
 			RETURN_LONG(AEROSPIKE_ERR_PARAM);
 		}
 		info_policy_p = &info_policy;
@@ -132,7 +132,7 @@ PHP_METHOD(Aerospike, info)
 
 CLEANUP:
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	if (response_str) {
 		free(response_str);
@@ -165,7 +165,7 @@ PHP_METHOD(Aerospike, infoMany) {
 	info_each_cb_data cb_data;
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		RETURN_NULL();
 	}
 	php_client = get_aerospike_from_zobj(Z_OBJ_P(getThis()));
@@ -174,18 +174,18 @@ PHP_METHOD(Aerospike, infoMany) {
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|h!z", &request,
 			&request_len, &filter_hosts, &z_policy ) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters for infoMany.");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters for infoMany.", false);
 		RETURN_NULL();
 	}
 
 	if (filter_hosts) {
 		if (!is_valid_hosts_list(filter_hosts)) {
-			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid list of hosts.");
+			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid list of hosts.", false);
 			RETURN_NULL();
 		}
 		cb_filter_zval = zend_hash_str_find(filter_hosts, "hosts", strlen("hosts"));
 		if (!cb_filter_zval || Z_TYPE_P(cb_filter_zval) != IS_ARRAY) {
-			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid list of hosts.");
+			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid list of hosts.", false);
 			RETURN_NULL();
 		}
 		cb_filter_hosts = Z_ARRVAL_P(cb_filter_zval);
@@ -194,7 +194,7 @@ PHP_METHOD(Aerospike, infoMany) {
 	if (z_policy){
 		if (zval_to_as_policy_info(z_policy, &info_policy,
 				&info_policy_p, &as_client->config.policies.info) != AEROSPIKE_OK) {
-			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid policy for infoMany.");
+			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid policy for infoMany.", false);
 			RETURN_NULL();
 		}
 		info_policy_p = &info_policy;
@@ -209,7 +209,7 @@ PHP_METHOD(Aerospike, infoMany) {
 			(aerospike_info_foreach_callback)AerospikeClient_Info_each, (void*)&cb_data);
 
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		zval_dtor(return_value);
 		RETURN_NULL();
 	}

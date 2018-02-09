@@ -60,7 +60,7 @@ enum Aerospike_serializer_values {
 };
 
 AerospikeClient* get_aerospike_from_zobj(zend_object* zval_wrapper);
-void update_client_error(zval* client_obj, int code, const char* msg);
+void update_client_error(zval* client_obj, int code, const char* msg, bool in_doubt);
 void reset_client_error(zval* client_obj);
 as_status check_object_and_connection(zval* aerospike_container, as_error* err);
 void set_policy_defaults_from_ini(as_config* config, AerospikeClient* client);

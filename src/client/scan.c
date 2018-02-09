@@ -47,7 +47,7 @@ PHP_METHOD(Aerospike, scan) {
 	reset_client_error(getThis());
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, false);
 		RETURN_LONG(err.code);
 	}
 
@@ -57,19 +57,19 @@ PHP_METHOD(Aerospike, scan) {
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ssf|h!z",
 			&ns, &ns_len, &set, &set_len, &callback_info, &callback_cache,
 			&select_bins, &z_policy) != SUCCESS) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to scan");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to scan", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 
 	if (!ns_len) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid namespace");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid namespace", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (zval_to_as_policy_scan(z_policy, &scan_policy,
 			&scan_policy_p, &as_client->config.policies.scan) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid scan policy");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid scan policy", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	scan_policy_p = &scan_policy;
@@ -118,7 +118,7 @@ CLEANUP:
 		as_scan_destroy(&user_scan);
 	}
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 }

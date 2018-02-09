@@ -45,7 +45,7 @@ PHP_METHOD(Aerospike, scanInfo) {
 	reset_client_error(getThis());
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, false);
 		RETURN_LONG(err.code);
 	}
 
@@ -54,7 +54,7 @@ PHP_METHOD(Aerospike, scanInfo) {
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "lz/|z",
 			&scan_id, &z_scan_info, &z_policy) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to scan apply.");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to scan apply.", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -63,13 +63,13 @@ PHP_METHOD(Aerospike, scanInfo) {
 
 	if (zval_to_as_policy_info(z_policy, &info_policy, &info_policy_p,
 			&as_client->config.policies.info) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid policy.");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid policy.", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	info_policy_p = &info_policy;
 
 	if(aerospike_scan_info(as_client, &err, info_policy_p, (uint64_t)scan_id, &ret_scan_info) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		RETURN_LONG(err.code);
 	}
 

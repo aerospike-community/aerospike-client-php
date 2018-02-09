@@ -65,6 +65,7 @@ PHP_METHOD(Aerospike, query) {
 	HashTable* select_bins = NULL;
 	uint32_t select_count = 0;
 	user_callback_function callback_function_data;
+
 	zval* z_policy = NULL;
 	as_policy_query query_policy;
 	as_policy_query* query_policy_p = NULL;
@@ -74,7 +75,7 @@ PHP_METHOD(Aerospike, query) {
 	reset_client_error(getThis());
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, false);
 		RETURN_LONG(err.code);
 	}
 
@@ -85,20 +86,20 @@ PHP_METHOD(Aerospike, query) {
 			&ns, &ns_len, &set, &set_len, &predicate_array,
 			&callback_info, &callback_cache,
 			&select_bins, &z_policy) != SUCCESS) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to query");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to query", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 
 	if (!ns_len) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid namespace");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid namespace", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (z_policy && Z_TYPE_P(z_policy) != IS_NULL) {
 		if (zval_to_as_policy_query(z_policy, &query_policy,
 				&query_policy_p, &as_client->config.policies.query) != AEROSPIKE_OK) {
-			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid query policy");
+			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid query policy", false);
 			RETURN_LONG(AEROSPIKE_ERR_PARAM);
 		}
 		query_policy_p = &query_policy;
@@ -148,7 +149,7 @@ CLEANUP:
 	}
 
 	if ((err.code) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 
 
@@ -195,7 +196,7 @@ PHP_METHOD(Aerospike, queryApply) {
 	reset_client_error(getThis());
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, false);
 		RETURN_LONG(err.code);
 	}
 
@@ -208,20 +209,20 @@ PHP_METHOD(Aerospike, queryApply) {
 			&predicate_array, &module, &module_len,
 			&function, &function_len, &z_udf_args,
 			&z_job_id, &z_policy) != SUCCESS) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to queryApply");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to queryApply", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	zval_dtor(z_job_id);
 	ZVAL_NULL(z_job_id);
 
 	if (!ns_len) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid namespace");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid namespace", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (zval_to_as_policy_write(z_policy, &write_policy,
 			&write_policy_p, &as_client->config.policies.write) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid policy");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid policy", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	write_policy_p = &write_policy;
@@ -259,7 +260,7 @@ PHP_METHOD(Aerospike, queryApply) {
 CLEANUP:
 
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	// Since the query owns the args lists, it will destroy them
 	if (query_initialized) {
@@ -333,12 +334,12 @@ PHP_METHOD(Aerospike, aggregate) {
 	reset_client_error(getThis());
 
 #ifdef ZTS
-	update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "aggregate is not supported in ZTS environments");
+	update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "aggregate is not supported in ZTS environments", false);
 	RETURN_LONG(AEROSPIKE_ERR_CLIENT);
 #endif
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, false);
 		RETURN_LONG(err.code);
 	}
 
@@ -352,7 +353,7 @@ PHP_METHOD(Aerospike, aggregate) {
 			&function, &function_len,
 			&z_udf_args, &z_aggregate_result,
 			&z_policy) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid Parameters to aggregate");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid Parameters to aggregate", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	// Remove old value of the result reference
@@ -360,24 +361,24 @@ PHP_METHOD(Aerospike, aggregate) {
 	ZVAL_NULL(z_aggregate_result);
 
 	if (!ns_len) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid namespace");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid namespace", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (!module_len) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid module name");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid module name", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (!function_len) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid function name");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid function name", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (z_policy && Z_TYPE_P(z_policy) != IS_NULL) {
 		if (zval_to_as_policy_query(z_policy, &query_policy,
 				&query_policy_p, &as_client->config.policies.query) != AEROSPIKE_OK) {
-			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid query policy");
+			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid query policy", false);
 			RETURN_LONG(AEROSPIKE_ERR_PARAM);
 		}
 		query_policy_p = &query_policy;
@@ -420,7 +421,7 @@ CLEANUP:
 		as_query_destroy(&query);
 	}
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 }

@@ -54,7 +54,7 @@ PHP_METHOD(Aerospike, getRegistered) {
 	reset_client_error(getThis());
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		RETURN_LONG(err.code);
 	}
 
@@ -63,7 +63,7 @@ PHP_METHOD(Aerospike, getRegistered) {
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "sz/|lz",
 			&module, &module_len, &returned_code, &language, &z_info_policy) != SUCCESS) {
-				update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid Parameters for getRegistered");
+				update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid Parameters for getRegistered", false);
 				RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	// Cleanup any old value held by the reference
@@ -72,7 +72,7 @@ PHP_METHOD(Aerospike, getRegistered) {
 
 	if (zval_to_as_policy_info(z_info_policy, &info_policy,
 			&info_policy_p, &as_client->config.policies.info) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid information policy");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid information policy", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	info_policy_p = &info_policy;
@@ -97,7 +97,7 @@ CLEANUP:
 		as_udf_file_destroy(&file);
 	}
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 
 	RETURN_LONG(err.code);
@@ -135,7 +135,7 @@ PHP_METHOD(Aerospike, register) {
 	reset_client_error(getThis());
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, false);
 		RETURN_LONG(err.code);
 	}
 
@@ -144,19 +144,19 @@ PHP_METHOD(Aerospike, register) {
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss|lz",
 			&file_path, &path_len, &module, &module_len, &udf_language, &z_info_policy) != SUCCESS) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid Parameters for register");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid Parameters for register", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (module_len == 0) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Empty filename for udf");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Empty filename for udf", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 
 	if (zval_to_as_policy_info(z_info_policy, &info_policy, &info_policy_p,
 			&as_client->config.policies.info) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid information policy");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid information policy", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	info_policy_p = &info_policy;
@@ -166,7 +166,7 @@ PHP_METHOD(Aerospike, register) {
 	read_file = fopen(file_path, "r");
 
 	if (!read_file) {
-		update_client_error(getThis(), AEROSPIKE_ERR_UDF_NOT_FOUND, "Unable to open UDF file");
+		as_error_update(&err, AEROSPIKE_ERR_UDF_NOT_FOUND, "Unable to open UDF file");
 		err.code = AEROSPIKE_ERR_UDF_NOT_FOUND;
 		goto CLEANUP;
 	}
@@ -176,13 +176,13 @@ PHP_METHOD(Aerospike, register) {
 	fseek(read_file, 0L, SEEK_SET);
 
 	if (file_size <= 0) {
-		update_client_error(getThis(), AEROSPIKE_ERR_UDF, "UDF file is empty");
+		as_error_update(&err, AEROSPIKE_ERR_UDF, "UDF file is empty");
 		err.code = AEROSPIKE_ERR_UDF;
 		goto CLEANUP;
 	}
 
 	if (file_size >= SCRIPT_LEN_MAX) {
-		update_client_error(getThis(), AEROSPIKE_ERR_UDF, "UDF file is too large");
+		as_error_update(&err, AEROSPIKE_ERR_UDF, "UDF file is too large");
 		err.code = AEROSPIKE_ERR_UDF;
 		goto CLEANUP;
 	}
@@ -190,7 +190,7 @@ PHP_METHOD(Aerospike, register) {
 	/* Construct the copy path for the local version of the item to be written */
 	user_base_path = INI_STR("aerospike.udf.lua_user_path");
 	if (!user_base_path) {
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Base path not found");
+		as_error_update(&err, AEROSPIKE_ERR_CLIENT, "Base path not found");
 		err.code = AEROSPIKE_ERR_CLIENT;
 		goto CLEANUP;
 	}
@@ -210,7 +210,7 @@ PHP_METHOD(Aerospike, register) {
 	} else {
 		// If the file ended in a / this is an error
 		if (udf_file_name - file_path == path_len - 1) {
-			update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Base path not found");
+			as_error_update(&err, AEROSPIKE_ERR_CLIENT, "Base path not found");
 			err.code = AEROSPIKE_ERR_CLIENT;
 			goto CLEANUP;
 		}
@@ -220,7 +220,7 @@ PHP_METHOD(Aerospike, register) {
 	//if (user_base_path_len + )
 	path_len = strlen(udf_file_name);
 	if (user_base_path_len + path_len > COPY_FILEPATH_MAXLEN) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Path name too long");
+		as_error_update(&err, AEROSPIKE_ERR_PARAM, "Path name too long");
 		err.code = AEROSPIKE_ERR_PARAM;
 		goto CLEANUP;
 	}
@@ -231,7 +231,7 @@ PHP_METHOD(Aerospike, register) {
 	write_file = fopen(copy_file_path, "w");
 
 	if (!write_file) {
-		update_client_error(getThis(), AEROSPIKE_ERR_LUA_FILE_NOT_FOUND, "Unable to open the destination UDF file");
+		as_error_update(&err, AEROSPIKE_ERR_LUA_FILE_NOT_FOUND, "Unable to open the destination UDF file");
 		err.code = AEROSPIKE_ERR_LUA_FILE_NOT_FOUND;
 		goto CLEANUP;
 	}
@@ -239,7 +239,7 @@ PHP_METHOD(Aerospike, register) {
 
 	bytes = (uint8_t*)malloc(SCRIPT_LEN_MAX);
 	if (!bytes) {
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Failed to allocate buffer for UDF file");
+		as_error_update(&err, AEROSPIKE_ERR_CLIENT, "Failed to allocate buffer for UDF file");
 		err.code = AEROSPIKE_ERR_CLIENT;
 		goto CLEANUP;
 	}
@@ -257,7 +257,7 @@ PHP_METHOD(Aerospike, register) {
 			}
 		}
 	} else {
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Unable to write to user path");
+		as_error_update(&err, AEROSPIKE_ERR_CLIENT, "Unable to write to user path");
 		err.code = AEROSPIKE_ERR_CLIENT;
 		goto CLEANUP;
 	}
@@ -267,7 +267,7 @@ PHP_METHOD(Aerospike, register) {
 	aerospike_udf_put(as_client, &err, info_policy_p, module, udf_language, &contents);
 
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		goto CLEANUP;
 	}
 
@@ -284,6 +284,10 @@ CLEANUP:
 	if (bytes) {
 		free(bytes);
 	}
+	if (err.code != AEROSPIKE_OK) {
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
+	}
+
 	RETURN_LONG(err.code);
 
 }
@@ -308,7 +312,7 @@ PHP_METHOD(Aerospike, deregister) {
 	reset_client_error(getThis());
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, false);
 		RETURN_LONG(err.code);
 	}
 
@@ -317,13 +321,13 @@ PHP_METHOD(Aerospike, deregister) {
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|z",
 			&module, &module_len, &z_info_policy) != SUCCESS) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters for deregister");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters for deregister", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (zval_to_as_policy_info(z_info_policy, &info_policy,
 			&info_policy_p, &as_client->config.policies.info) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid information policy");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid information policy", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	info_policy_p = &info_policy;
@@ -331,7 +335,7 @@ PHP_METHOD(Aerospike, deregister) {
 
 	aerospike_udf_remove(as_client, &err, info_policy_p, module);
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 
@@ -359,7 +363,7 @@ PHP_METHOD(Aerospike, listRegistered) {
 	reset_client_error(getThis());
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		RETURN_LONG(err.code);
 	}
 
@@ -368,7 +372,7 @@ PHP_METHOD(Aerospike, listRegistered) {
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "z/|lz",
 			&modules, &language, &z_info_policy) != SUCCESS) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters for deRegister");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters for deRegister", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -377,7 +381,7 @@ PHP_METHOD(Aerospike, listRegistered) {
 
 	if (zval_to_as_policy_info(z_info_policy, &info_policy,
 			&info_policy_p, &as_client->config.policies.info) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid information policy");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid information policy", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	info_policy_p = &info_policy;
@@ -387,7 +391,7 @@ PHP_METHOD(Aerospike, listRegistered) {
 
 	aerospike_udf_list(as_client, &err, info_policy_p, &files);
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		goto CLEANUP;
 	}
 

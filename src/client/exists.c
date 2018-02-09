@@ -37,7 +37,7 @@ PHP_METHOD(Aerospike, exists)
 	as_policy_read* read_policy_p = NULL;
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		RETURN_LONG(err.code);
 	}
 
@@ -46,14 +46,14 @@ PHP_METHOD(Aerospike, exists)
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hz/|z",
 		&z_key_hash, &metadata, &z_read_policy) != SUCCESS) {
-		update_client_error(getThis(),AEROSPIKE_ERR_PARAM, "Invalid parameters to exists");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to exists", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	as_error_init(&err);
 
 	if (z_hashtable_to_as_key(z_key_hash, &key, &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Failed to convert key");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Failed to convert key", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -64,7 +64,7 @@ PHP_METHOD(Aerospike, exists)
 
 	if (zval_to_as_policy_read(z_read_policy, &read_policy,
 			&read_policy_p, &as_ptr->config.policies.read) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid read policy");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid read policy", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	read_policy_p = &read_policy;
@@ -78,7 +78,7 @@ PHP_METHOD(Aerospike, exists)
 		as_record_destroy(record);
 	}
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		zval_dtor(metadata);
 		ZVAL_NULL(metadata);
 	}
