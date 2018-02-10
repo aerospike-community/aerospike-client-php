@@ -127,7 +127,15 @@ AerospikeOptionConstant aerospike_option_constants[] = {
 	{OPT_TLS_CERT_BLACKLIST                 ,   "OPT_TLS_CERT_BLACKLIST"            },
 	{OPT_TLS_LOG_SESSION_INFO               ,   "OPT_TLS_LOG_SESSION_INFO"          },
 	{OPT_TLS_KEYFILE                        ,   "OPT_TLS_KEYFILE"                   },
-	{OPT_TLS_CERTFILE                       ,   "OPT_TLS_CERTFILE"                  }
+	{OPT_TLS_CERTFILE                       ,   "OPT_TLS_CERTFILE"                  },
+	{OPT_READ_DEFAULT_POL                   ,   "OPT_READ_DEFAULT_POL"              },
+	{OPT_WRITE_DEFAULT_POL                  ,   "OPT_WRITE_DEFAULT_POL"             },
+	{OPT_REMOVE_DEFAULT_POL                 ,   "OPT_REMOVE_DEFAULT_POL"            },
+	{OPT_BATCH_DEFAULT_POL                  ,   "OPT_BATCH_DEFAULT_POL"             },
+	{OPT_OPERATE_DEFAULT_POL                ,   "OPT_OPERATE_DEFAULT_POL"           },
+	{OPT_QUERY_DEFAULT_POL                  ,   "OPT_QUERY_DEFAULT_POL"             },
+	{OPT_SCAN_DEFAULT_POL                   ,   "OPT_SCAN_DEFAULT_POL"              },
+	{OPT_APPLY_DEFAULT_POL                  ,   "OPT_APPLY_DEFAULT_POL"             }
 };
 
 static AerospikeStrOptionConstant aerospike_str_option_constants[] = {

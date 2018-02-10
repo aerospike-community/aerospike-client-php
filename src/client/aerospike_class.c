@@ -27,6 +27,7 @@
 #include "php_aerospike_types.h"
 #include "register_policy_constants.h"
 #include "register_constants.h"
+#include "policy_conversions.h"
 #include "logging.h"
 #include "persistent_list.h"
 #include "tls_config.h"
@@ -40,6 +41,7 @@
 static void set_as_config_from_ini(as_config* config);
 static as_status set_as_config(as_config* config, HashTable* z_conf_hash);
 static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClient* client, HashTable* policy_hash);
+static as_status set_subpolicies_from_hash(as_config* config, HashTable* policy_hash);
 static as_status add_hosts_from_zhash(as_config* config, HashTable* z_hosts);
 
 static void aerospike_object_destructor(zend_object *object);
@@ -921,5 +923,84 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 		}
 		client->serializer_type = Z_LVAL_P(policy_zval);
 	}
+
+	return set_subpolicies_from_hash(config, policy_hash);
+}
+
+static as_status set_subpolicies_from_hash(as_config* config, HashTable* policy_hash) {
+	zval* z_subpolicy = NULL;
+
+	z_subpolicy = zend_hash_index_find(policy_hash, OPT_READ_DEFAULT_POL);
+	if (z_subpolicy) {
+		if (Z_TYPE_P(z_subpolicy) == IS_ARRAY) {
+			set_read_policy_from_hash(Z_ARRVAL_P(z_subpolicy), &config->policies.read);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	z_subpolicy = zend_hash_index_find(policy_hash, OPT_WRITE_DEFAULT_POL);
+	if (z_subpolicy) {
+		if (Z_TYPE_P(z_subpolicy) == IS_ARRAY) {
+			set_write_policy_from_hash(Z_ARRVAL_P(z_subpolicy), &config->policies.write);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	z_subpolicy = zend_hash_index_find(policy_hash, OPT_REMOVE_DEFAULT_POL);
+	if (z_subpolicy) {
+		if (Z_TYPE_P(z_subpolicy) == IS_ARRAY) {
+			set_remove_policy_from_hash(Z_ARRVAL_P(z_subpolicy), &config->policies.remove);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	z_subpolicy = zend_hash_index_find(policy_hash, OPT_BATCH_DEFAULT_POL);
+	if (z_subpolicy) {
+		if (Z_TYPE_P(z_subpolicy) == IS_ARRAY) {
+			set_batch_policy_from_hash(Z_ARRVAL_P(z_subpolicy), &config->policies.batch);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	z_subpolicy = zend_hash_index_find(policy_hash, OPT_OPERATE_DEFAULT_POL);
+	if (z_subpolicy) {
+		if (Z_TYPE_P(z_subpolicy) == IS_ARRAY) {
+			set_operate_policy_from_hash(Z_ARRVAL_P(z_subpolicy), &config->policies.operate);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	z_subpolicy = zend_hash_index_find(policy_hash, OPT_QUERY_DEFAULT_POL);
+	if (z_subpolicy) {
+		if (Z_TYPE_P(z_subpolicy) == IS_ARRAY) {
+			set_query_policy_from_hash(Z_ARRVAL_P(z_subpolicy), &config->policies.query);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	z_subpolicy = zend_hash_index_find(policy_hash, OPT_SCAN_DEFAULT_POL);
+	if (z_subpolicy) {
+		if (Z_TYPE_P(z_subpolicy) == IS_ARRAY) {
+			set_scan_policy_from_hash(Z_ARRVAL_P(z_subpolicy), &config->policies.scan);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	z_subpolicy = zend_hash_index_find(policy_hash, OPT_APPLY_DEFAULT_POL);
+	if (z_subpolicy) {
+		if (Z_TYPE_P(z_subpolicy) == IS_ARRAY) {
+			set_apply_policy_from_hash(Z_ARRVAL_P(z_subpolicy), &config->policies.apply);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
 	return AEROSPIKE_OK;
 }
