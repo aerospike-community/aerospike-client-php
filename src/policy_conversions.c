@@ -50,71 +50,12 @@ as_status zval_to_as_policy_read(zval* z_policy, as_policy_read* read_policy,
 
 	z_policy_hash = Z_ARRVAL_P(z_policy);
 
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_CONSISTENCY);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		read_policy->consistency_level = (as_policy_consistency_level)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	// deserialize policy
-	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_DESERIALIZE,
-			strlen(PHP_POLICY_OPT_DESERIALIZE));
-	if (setting_val && ((Z_TYPE_P(setting_val) == IS_TRUE) || (Z_TYPE_P(setting_val) == IS_FALSE ))) {
-		read_policy->deserialize = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_LINEARIZE_READ);
-	if (setting_val && ((Z_TYPE_P(setting_val) == IS_TRUE) || (Z_TYPE_P(setting_val) == IS_FALSE ))) {
-		read_policy->linearize_read = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
-		setting_val = NULL;
-	}
-
-	// SLEEP_BETWEEN_RETRIES
-	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES,
-			strlen(PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES));
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		read_policy->base.sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	// key_policy
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_KEY);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		read_policy->key = (as_policy_key)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-	// replica _policy
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_REPLICA);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		read_policy->replica = (as_policy_replica)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_MAX_RETRIES);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		read_policy->base.max_retries = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
 	setting_val = zend_hash_index_find(z_policy_hash, OPT_READ_TIMEOUT);
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
 		read_policy->base.total_timeout = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
 	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_TOTAL_TIMEOUT);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		read_policy->base.total_timeout = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_SOCKET_TIMEOUT);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		read_policy->base.socket_timeout = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
+	set_read_policy_from_hash(z_policy_hash, read_policy);
 	return AEROSPIKE_OK;
 }
 
@@ -150,9 +91,10 @@ as_status zval_to_as_policy_remove(zval* z_policy, as_policy_remove* remove_poli
 	z_policy_hash = Z_ARRVAL_P(z_policy);
 	zval* setting_val = NULL;
 
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_COMMIT_LEVEL);
+
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_WRITE_TIMEOUT);
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		remove_policy->commit_level = (as_policy_commit_level)Z_LVAL_P(setting_val);
+		remove_policy->base.total_timeout = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
 	}
 
@@ -174,55 +116,7 @@ as_status zval_to_as_policy_remove(zval* z_policy, as_policy_remove* remove_poli
 
 	}
 
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_KEY);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		remove_policy->key = (as_policy_key)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_MAX_RETRIES);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		remove_policy->base.max_retries = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES,
-			strlen(PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES));
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		remove_policy->base.sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_WRITE_TIMEOUT);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		remove_policy->base.total_timeout = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_TOTAL_TIMEOUT);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		remove_policy->base.total_timeout = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_SOCKET_TIMEOUT);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		remove_policy->base.socket_timeout = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_DURABLE_DELETE);
-	if (setting_val && (Z_TYPE_P(setting_val) == IS_TRUE || Z_TYPE_P(setting_val) == IS_FALSE )) {
-		remove_policy->durable_delete = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_REPLICA);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		remove_policy->replica = (as_policy_replica)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
+	set_remove_policy_from_hash(z_policy_hash, remove_policy);
 	return AEROSPIKE_OK;
 
 }
@@ -266,43 +160,6 @@ as_status zval_to_as_policy_write(zval* z_policy, as_policy_write* write_policy,
 		setting_val = NULL;
 	}
 
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_TOTAL_TIMEOUT);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		write_policy->base.total_timeout = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_SOCKET_TIMEOUT);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		write_policy->base.socket_timeout = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_MAX_RETRIES);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		write_policy->base.max_retries = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES,
-			strlen(PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES));
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		write_policy->base.sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, COMPRESSION_THRESHOLD);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		write_policy->compression_threshold = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_KEY);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		write_policy->key = (as_policy_key)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
 	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_GEN);
 	if (setting_val && Z_TYPE_P(setting_val) == IS_ARRAY) {
 		HashTable * gen_ary = Z_ARRVAL_P(setting_val);
@@ -316,23 +173,7 @@ as_status zval_to_as_policy_write(zval* z_policy, as_policy_write* write_policy,
 		setting_val = NULL;
 	}
 
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_EXISTS);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		write_policy->exists = (as_policy_exists)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_COMMIT_LEVEL);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		write_policy->commit_level = (as_policy_commit_level)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_DURABLE_DELETE);
-	if (setting_val && (Z_TYPE_P(setting_val) == IS_TRUE || Z_TYPE_P(setting_val) == IS_FALSE )) {
-		write_policy->durable_delete = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
-		setting_val = NULL;
-	}
+	set_write_policy_from_hash(z_policy_hash, write_policy);
 
 	return AEROSPIKE_OK;
 }
@@ -377,37 +218,6 @@ as_status zval_to_as_policy_operate(zval* z_policy, as_policy_operate* operate_p
 	z_policy_hash = Z_ARRVAL_P(z_policy);
 	zval* setting_val = NULL;
 
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_COMMIT_LEVEL);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		operate_policy->commit_level = (as_policy_commit_level)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_CONSISTENCY);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		operate_policy->consistency_level = (as_policy_consistency_level)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_DESERIALIZE,
-			strlen(PHP_POLICY_OPT_DESERIALIZE));
-	if (setting_val && (Z_TYPE_P(setting_val) == IS_TRUE || Z_TYPE_P(setting_val) == IS_FALSE )) {
-		operate_policy->deserialize = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_LINEARIZE_READ);
-	if (setting_val && ((Z_TYPE_P(setting_val) == IS_TRUE) || (Z_TYPE_P(setting_val) == IS_FALSE ))) {
-		operate_policy->linearize_read = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_DURABLE_DELETE);
-	if (setting_val && (Z_TYPE_P(setting_val) == IS_TRUE || Z_TYPE_P(setting_val) == IS_FALSE )) {
-		operate_policy->durable_delete = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
-		setting_val = NULL;
-	}
-
 	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_GEN);
 	if (setting_val && Z_TYPE_P(setting_val) == IS_ARRAY) {
 		HashTable * gen_ary = Z_ARRVAL_P(setting_val);
@@ -420,49 +230,13 @@ as_status zval_to_as_policy_operate(zval* z_policy, as_policy_operate* operate_p
 		setting_val = NULL;
 	}
 
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_KEY);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		operate_policy->key = (as_policy_key)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_REPLICA);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		operate_policy->replica = (as_policy_replica)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_MAX_RETRIES);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		operate_policy->base.max_retries = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES,
-			strlen(PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES));
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		operate_policy->base.sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
 	setting_val = zend_hash_index_find(z_policy_hash, OPT_WRITE_TIMEOUT);
 	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
 		operate_policy->base.total_timeout = (uint32_t)Z_LVAL_P(setting_val);
 		setting_val = NULL;
 	}
 
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_TOTAL_TIMEOUT);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		operate_policy->base.total_timeout = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_SOCKET_TIMEOUT);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		operate_policy->base.socket_timeout = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
+	set_operate_policy_from_hash(z_policy_hash, operate_policy);
 	return AEROSPIKE_OK;
 }
 
@@ -519,78 +293,7 @@ as_status zval_to_as_policy_apply(zval* z_apply_policy, as_policy_apply* apply_p
 		setting_val = NULL;
 	}
 
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_TOTAL_TIMEOUT);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		apply_policy->base.total_timeout = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_SOCKET_TIMEOUT);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		apply_policy->base.socket_timeout = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_MAX_RETRIES);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		apply_policy->base.max_retries = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_KEY);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		apply_policy->key = (as_policy_key)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES,
-			strlen(PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES));
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		apply_policy->base.sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_DURABLE_DELETE);
-	if (setting_val && (Z_TYPE_P(setting_val) == IS_TRUE || Z_TYPE_P(setting_val) == IS_FALSE )) {
-		apply_policy->durable_delete = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_LINEARIZE_READ);
-	if (setting_val && ((Z_TYPE_P(setting_val) == IS_TRUE) || (Z_TYPE_P(setting_val) == IS_FALSE ))) {
-		apply_policy->linearize_read = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_REPLICA);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		apply_policy->replica = (as_policy_replica)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_COMMIT_LEVEL);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		apply_policy->commit_level = (as_policy_commit_level)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_GEN);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_ARRAY) {
-		HashTable * gen_ary = Z_ARRVAL_P(setting_val);
-		if (zend_hash_num_elements(gen_ary) > 1) {
-			zval* value_code = NULL;
-			value_code = zend_hash_index_find(gen_ary, 0);
-			if (value_code && Z_TYPE_P(value_code) == IS_LONG) {
-				apply_policy->gen = (as_policy_gen)Z_LVAL_P(value_code);
-			}
-			value_code = zend_hash_index_find(gen_ary, 1);
-			if (value_code && Z_TYPE_P(value_code) == IS_LONG) {
-				apply_policy->gen_value = (uint16_t)Z_LVAL_P(value_code);
-			}
-		}
-		setting_val = NULL;
-	}
-
+	set_apply_policy_from_hash(z_policy_hash, apply_policy);
 	return AEROSPIKE_OK;
 }
 
@@ -641,48 +344,7 @@ as_status zval_to_as_policy_scan(zval* z_policy, as_policy_scan* scan_policy,
 		}
 	}
 
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_TOTAL_TIMEOUT);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		scan_policy->base.total_timeout = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_SOCKET_TIMEOUT);
-	if (setting_val) {
-		if (Z_TYPE_P(setting_val) == IS_LONG) {
-			scan_policy->base.socket_timeout = Z_LVAL_P(setting_val);
-		} else {
-			return AEROSPIKE_ERR_PARAM;
-		}
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_MAX_RETRIES);
-	if (setting_val) {
-		if (Z_TYPE_P(setting_val) == IS_LONG) {
-			scan_policy->base.max_retries = Z_LVAL_P(setting_val);
-		} else {
-			return AEROSPIKE_ERR_PARAM;
-		}
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_POLICY_DURABLE_DELETE);
-	if (setting_val && (Z_TYPE_P(setting_val) == IS_TRUE || Z_TYPE_P(setting_val) == IS_FALSE )) {
-		scan_policy->durable_delete = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES,
-			strlen(PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES));
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		scan_policy->base.sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_FAIL_ON_CLUSTER_CHANGE);
-	if (setting_val && (Z_TYPE_P(setting_val) == IS_TRUE || Z_TYPE_P(setting_val) == IS_FALSE )) {
-		scan_policy->fail_on_cluster_change = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
-		setting_val = NULL;
-	}
+	set_scan_policy_from_hash(z_policy_hash, scan_policy);
 
 	return AEROSPIKE_OK;
 }
@@ -720,36 +382,7 @@ as_status zval_to_as_policy_query(zval* z_policy, as_policy_query* query_policy,
 		setting_val = NULL;
 	}
 
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_TOTAL_TIMEOUT);
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		query_policy->base.total_timeout = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_SOCKET_TIMEOUT);
-	if (setting_val) {
-		if (Z_TYPE_P(setting_val) == IS_LONG) {
-			query_policy->base.socket_timeout = Z_LVAL_P(setting_val);
-		} else {
-			return AEROSPIKE_ERR_PARAM;
-		}
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_MAX_RETRIES);
-	if (setting_val) {
-		if (Z_TYPE_P(setting_val) == IS_LONG) {
-			query_policy->base.max_retries = Z_LVAL_P(setting_val);
-		} else {
-			return AEROSPIKE_ERR_PARAM;
-		}
-	}
-
-	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES,
-			strlen(PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES));
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		query_policy->base.sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
+	set_query_policy_from_hash(z_policy_hash, query_policy);
 
 	return AEROSPIKE_OK;
 }
@@ -775,13 +408,6 @@ as_status zval_to_as_policy_batch(zval* z_policy, as_policy_batch* batch_policy,
 	z_policy_hash = Z_ARRVAL_P(z_policy);
 	zval* setting_val = NULL;
 
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_LINEARIZE_READ);
-	if (setting_val && ((Z_TYPE_P(setting_val) == IS_TRUE) || (Z_TYPE_P(setting_val) == IS_FALSE ))) {
-		batch_policy->linearize_read = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
-		setting_val = NULL;
-	}
-
 	setting_val = zend_hash_index_find(z_policy_hash, OPT_READ_TIMEOUT);
 	if (setting_val) {
 		if (Z_TYPE_P(setting_val) == IS_LONG) {
@@ -792,61 +418,7 @@ as_status zval_to_as_policy_batch(zval* z_policy, as_policy_batch* batch_policy,
 		setting_val = NULL;
 	}
 
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_TOTAL_TIMEOUT);
-	if (setting_val) {
-		if (Z_TYPE_P(setting_val) == IS_LONG) {
-			batch_policy->base.total_timeout = Z_LVAL_P(setting_val);
-		} else {
-			return AEROSPIKE_ERR_PARAM;
-		}
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_SOCKET_TIMEOUT);
-	if (setting_val) {
-		if (Z_TYPE_P(setting_val) == IS_LONG) {
-			batch_policy->base.socket_timeout = Z_LVAL_P(setting_val);
-		} else {
-			return AEROSPIKE_ERR_PARAM;
-		}
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_MAX_RETRIES);
-	if (setting_val) {
-		if (Z_TYPE_P(setting_val) == IS_LONG) {
-			batch_policy->base.max_retries = Z_LVAL_P(setting_val);
-		} else {
-			return AEROSPIKE_ERR_PARAM;
-		}
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_str_find(z_policy_hash, PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES,
-			strlen(PHP_POLICY_OPT_SLEEP_BETWEEN_RETRIES));
-	if (setting_val && Z_TYPE_P(setting_val) == IS_LONG) {
-		batch_policy->base.sleep_between_retries = (uint32_t)Z_LVAL_P(setting_val);
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_BATCH_CONCURRENT);
-	if (setting_val && ((Z_TYPE_P(setting_val) == IS_TRUE) || (Z_TYPE_P(setting_val) == IS_FALSE ))) {
-		batch_policy->concurrent = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_ALLOW_INLINE);
-	if (setting_val && ((Z_TYPE_P(setting_val) == IS_TRUE) || (Z_TYPE_P(setting_val) == IS_FALSE ))) {
-		batch_policy->allow_inline = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
-		setting_val = NULL;
-	}
-
-	setting_val = zend_hash_index_find(z_policy_hash, OPT_SEND_SET_NAME);
-	if (setting_val && ((Z_TYPE_P(setting_val) == IS_TRUE) || (Z_TYPE_P(setting_val) == IS_FALSE ))) {
-		batch_policy->send_set_name = Z_TYPE_P(setting_val) == IS_TRUE ? true : false;
-		setting_val = NULL;
-	}
-
+	set_batch_policy_from_hash(z_policy_hash, batch_policy);
 
 	return AEROSPIKE_OK;
 }
@@ -1167,8 +739,6 @@ zval_to_as_policy_map(zval* z_policy, as_map_policy* map_policy) {
 
 as_status set_read_policy_from_hash(HashTable* z_policy_hash, as_policy_read* read_policy) {
 
-	as_policy_read_init(read_policy);
-
 	if (!z_policy_hash) {
 		return AEROSPIKE_OK;
 	}
@@ -1184,8 +754,6 @@ as_status set_read_policy_from_hash(HashTable* z_policy_hash, as_policy_read* re
 }
 
 as_status set_write_policy_from_hash(HashTable* z_policy_hash, as_policy_write* write_policy) {
-
-	as_policy_write_init(write_policy);
 
 	if (!z_policy_hash) {
 		return AEROSPIKE_OK;
@@ -1204,8 +772,6 @@ as_status set_write_policy_from_hash(HashTable* z_policy_hash, as_policy_write* 
 
 as_status set_remove_policy_from_hash(HashTable* z_policy_hash, as_policy_remove* remove_policy) {
 
-	as_policy_remove_init(remove_policy);
-
 	if (!z_policy_hash) {
 		return AEROSPIKE_OK;
 	}
@@ -1221,7 +787,6 @@ as_status set_remove_policy_from_hash(HashTable* z_policy_hash, as_policy_remove
 
 as_status set_batch_policy_from_hash(HashTable* z_policy_hash, as_policy_batch* batch_policy) {
 
-	as_policy_batch_init(batch_policy);
 
 	if (!z_policy_hash) {
 		return AEROSPIKE_OK;
@@ -1239,8 +804,6 @@ as_status set_batch_policy_from_hash(HashTable* z_policy_hash, as_policy_batch* 
 }
 
 as_status set_operate_policy_from_hash(HashTable* z_policy_hash, as_policy_operate* operate_policy) {
-
-	as_policy_operate_init(operate_policy);
 
 	if (!z_policy_hash) {
 		return AEROSPIKE_OK;
@@ -1261,8 +824,6 @@ as_status set_operate_policy_from_hash(HashTable* z_policy_hash, as_policy_opera
 
 as_status set_query_policy_from_hash(HashTable* z_policy_hash, as_policy_query* query_policy) {
 
-	as_policy_query_init(query_policy);
-
 	if (!z_policy_hash) {
 		return AEROSPIKE_OK;
 	}
@@ -1273,8 +834,6 @@ as_status set_query_policy_from_hash(HashTable* z_policy_hash, as_policy_query* 
 }
 
 as_status set_scan_policy_from_hash(HashTable* z_policy_hash, as_policy_scan* scan_policy) {
-
-	as_policy_scan_init(scan_policy);
 
 	if (!z_policy_hash) {
 		return AEROSPIKE_OK;
@@ -1287,8 +846,6 @@ as_status set_scan_policy_from_hash(HashTable* z_policy_hash, as_policy_scan* sc
 }
 
 as_status set_apply_policy_from_hash(HashTable* z_policy_hash, as_policy_apply* apply_policy) {
-
-	as_policy_apply_init(apply_policy);
 
 	if (!z_policy_hash) {
 		return AEROSPIKE_OK;
