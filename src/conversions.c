@@ -1373,7 +1373,6 @@ as_status unserialize_as_bytes(const as_bytes* bytes, zval* retval, as_error* er
 		if (!AEROSPIKE_G(is_global_user_deserializer_registered)) {
 			return as_bytes_to_zval_bytes(bytes, retval, err);
 		} else {
-			// NOT QUITE RIGHT HERE// BUT MAYBE IT IS?
 			return unserialize_with_user_function(bytes, retval, err);
 		}
 	}

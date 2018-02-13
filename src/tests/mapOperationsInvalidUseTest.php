@@ -78,6 +78,7 @@ final class MapOperationsInvalidUseTest extends TestCase {
     }
 
     public function testMapClearNonExistentBin() {
+        /* For server greater than 3.15.2 this is OK */
         $key = $this->key;
         $ops = [["op" => AEROSPIKE::OP_MAP_CLEAR, "bin" => "nonrealbin"]];
         $status = $this->db->operate($key, $ops, $rec);

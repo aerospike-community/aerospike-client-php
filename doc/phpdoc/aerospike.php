@@ -3157,7 +3157,7 @@ class Aerospike {
     const POLICY_COMMIT_LEVEL_ALL = 0;
     /**
      * Return succcess after successfully committing the master replica.
-     * @const POLICY_COMMIT_LEVEL_MASTER master will asynchronously write to replicas (default)
+     * @const POLICY_COMMIT_LEVEL_MASTER master will asynchronously write to replicas
      */
     const POLICY_COMMIT_LEVEL_MASTER = 1;
 
