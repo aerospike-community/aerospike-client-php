@@ -488,6 +488,9 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::COMPRESSION_THRESHOLD
      * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -617,6 +620,9 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_DESERIALIZE Aerospike::OPT_DESERIALIZE option
      * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
      * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
      * @see Aerospike::OK Aerospike::OK and error status codes
@@ -668,6 +674,9 @@ class Aerospike {
      * @see Aerospike::OPT_READ_TIMEOUT Aerospike::OPT_READ_TIMEOUT options
      * @see Aerospike::OPT_DESERIALIZE Aerospike::OPT_DESERIALIZE option
      * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
      * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
@@ -720,6 +729,9 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_DESERIALIZE Aerospike::OPT_DESERIALIZE option
      * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
@@ -756,6 +768,10 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
@@ -793,6 +809,10 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::COMPRESSION_THRESHOLD
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
@@ -872,6 +892,10 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
@@ -911,6 +935,9 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_DESERIALIZE Aerospike::OPT_DESERIALIZE option
      * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
@@ -950,6 +977,9 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_DESERIALIZE Aerospike::OPT_DESERIALIZE option
      * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
@@ -1335,6 +1365,9 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_DESERIALIZE Aerospike::OPT_DESERIALIZE option
      * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1363,6 +1396,10 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
      * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1392,6 +1429,10 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1421,6 +1462,10 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1451,6 +1496,10 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1481,6 +1530,10 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1514,6 +1567,10 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1548,6 +1605,10 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1579,6 +1640,10 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1610,6 +1675,10 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1642,6 +1711,10 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1672,6 +1745,10 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1702,6 +1779,10 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1730,6 +1811,10 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
      * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1759,6 +1844,10 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
      * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1969,7 +2058,14 @@ class Aerospike {
      * * Aerospike::OPT_TOTAL_TIMEOUT
      * * Aerospike::OPT_MAX_RETRIES
      * * Aerospike::OPT_SOCKET_TIMEOUT
+     * * Aerospike::OPT_BATCH_CONCURRENT
+     * * Aerospike::OPT_SEND_SET_NAME
+     * * Aerospike::OPT_ALLOW_INLINE
      * @see Aerospike::USE_BATCH_DIRECT Aerospike::USE_BATCH_DIRECT options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -2086,7 +2182,14 @@ class Aerospike {
      * * Aerospike::OPT_TOTAL_TIMEOUT
      * * Aerospike::OPT_MAX_RETRIES
      * * Aerospike::OPT_SOCKET_TIMEOUT
+     * * Aerospike::OPT_BATCH_CONCURRENT
+     * * Aerospike::OPT_SEND_SET_NAME
+     * * Aerospike::OPT_ALLOW_INLINE
      * @see Aerospike::USE_BATCH_DIRECT Aerospike::USE_BATCH_DIRECT options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -2581,10 +2684,18 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_SERIALIZER
      * * Aerospike::OPT_POLICY_DURABLE_DELETE
+     * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
+     * * Aerospike::OPT_TOTAL_TIMEOUT
+     * * Aerospike::OPT_MAX_RETRIES
+     * * Aerospike::OPT_SOCKET_TIMEOUT
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_SERIALIZER Aerospike::OPT_SERIALIZER options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::ERR_LUA UDF error status codes
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
@@ -2622,6 +2733,12 @@ class Aerospike {
      * @param array  $options an optional array of policy options, whose keys include
      * * Aerospike::OPT_WRITE_TIMEOUT
      * * Aerospike::OPT_POLICY_DURABLE_DELETE
+     * * Aerospike::OPT_READ_TIMEOUT
+     * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
+     * * Aerospike::OPT_TOTAL_TIMEOUT
+     * * Aerospike::OPT_MAX_RETRIES
+     * * Aerospike::OPT_SOCKET_TIMEOUT
+     * * Aerospike::OPT_FAIL_ON_CLUSTER_CHANGE
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::ERR_LUA UDF error status codes
@@ -2682,8 +2799,17 @@ class Aerospike {
      * @param array  $options an optional array of policy options, whose keys include
      * * Aerospike::OPT_WRITE_TIMEOUT
      * * Aerospike::OPT_POLICY_DURABLE_DELETE
+     * * Aerospike::OPT_READ_TIMEOUT
+     * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
+     * * Aerospike::OPT_TOTAL_TIMEOUT
+     * * Aerospike::OPT_MAX_RETRIES
+     * * Aerospike::OPT_SOCKET_TIMEOUT
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::ERR_LUA UDF error status codes
      * @see Aerospike::jobInfo()
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
@@ -2810,6 +2936,11 @@ class Aerospike {
      * @param mixed $returned pass-by-reference param
      * @param array  $options an optional array of policy options, whose keys include
      * * Aerospike::OPT_READ_TIMEOUT
+     * * Aerospike::OPT_READ_TIMEOUT
+     * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
+     * * Aerospike::OPT_TOTAL_TIMEOUT
+     * * Aerospike::OPT_MAX_RETRIES
+     * * Aerospike::OPT_SOCKET_TIMEOUT
      * @see Aerospike::OPT_READ_TIMEOUT Aerospike::OPT_READ_TIMEOUT options
      * @see Aerospike::ERR_LUA UDF error status codes
      * @see Aerospike::predicateEquals()
@@ -3314,12 +3445,86 @@ class Aerospike {
     */
     const OPT_DESERIALIZE = "deserialize"
 
-     /*
-       * Milliseconds to sleep between retries.  Enter zero to skip sleep.
-       * const OPT_SLEEP_BETWEEN_RETRIES
-     */
+     /**
+      * Milliseconds to sleep between retries.  Enter zero to skip sleep.
+      * const OPT_SLEEP_BETWEEN_RETRIES
+      */
     const OPT_SLEEP_BETWEEN_RETRIES = "sleep_between_retries"
 
+    /**
+     * Maximum number of retries before aborting the current transaction.
+     * The initial attempt is not counted as a retry.
+     * If OPT_MAX_RETRIES is exceeded, the transaction will return error ERR_TIMEOUT.
+     * WARNING: Database writes that are not idempotent (such as "add")
+     * should not be retried because the write operation may be performed
+     * multiple times if the client timed out previous transaction attempts.
+     * It's important to use a distinct write policy for non-idempotent
+     * writes which sets OPT_MAX_RETRIES = 0;
+    **/
+    const OPT_MAX_RETRIES = "OPT_MAX_RETRIES"
+     /**
+      * Total transaction timeout in milliseconds.
+      * The OPT_TOTAL_TIMEOUT is tracked on the client and sent to the server along with
+      * the transaction in the wire protocol.  The client will most likely timeout
+      * first, but the server also has the capability to timeout the transaction.
+
+      * If OPT_TOTAL_TIMEOUT is not zero and OPT_TOTAL_TIMEOUT is reached before the transaction
+      * completes, the transaction will return error ERR_TIMEOUT.
+      * If OPT_TOTAL_TIMEOUT is zero, there will be no total time limit.
+      */
+    const OPT_TOTAL_TIMEOUT = "OPT_TOTAL_TIMEOUT"
+
+     /**
+      * Socket idle timeout in milliseconds when processing a database command.
+
+     * If OPT_SOCKET_TIMEOUT is not zero and the socket has been idle for at least OPT_SOCKET_TIMEOUT,
+     * both OPT_MAX_RETRIES and OPT_TOTAL_TIMEOUT are checked.  If OPT_MAX_RETRIES and OPT_TOTAL_TIMEOUT are not
+     * exceeded, the transaction is retried.
+
+     * If both OPT_SOCKET_TIMEOUT and OPT_TOTAL_TIMEOUT are non-zero and OPT_SOCKET_TIMEOUT > OPT_TOTAL_TIMEOUT,
+     * then OPT_SOCKET_TIMEOUT will be set to OPT_TOTAL_TIMEOUT.  If OPT_SOCKET_TIMEOUT is zero, there will be
+     * no socket idle limit.
+     */
+    const OPT_SOCKET_TIMEOUT = "OPT_SOCKET_TIMEOUT"
+
+
+    /**
+     * Determine if batch commands to each server are run in parallel threads.
+     */
+    const OPT_BATCH_CONCURRENT = "OPT_BATCH_CONCURRENT"
+     /**
+      * Allow batch to be processed immediately in the server's receiving thread when the server
+      * deems it to be appropriate.  If false, the batch will always be processed in separate
+      * transaction threads.  This field is only relevant for the new batch index protocol.
+      *
+      * For batch exists or batch reads of smaller sized records (<= 1K per record), inline
+      * processing will be significantly faster on "in memory" namespaces.  The server disables
+      * inline processing on disk based namespaces regardless of this policy field.
+      *
+      * Inline processing can introduce the possibility of unfairness because the server
+      * can process the entire batch before moving onto the next command.
+      * Default: true
+      */
+    const OPT_ALLOW_INLINE = "OPT_ALLOW_INLINE"
+
+     /**
+      * Send set name field to server for every key in the batch for batch index protocol.
+      * This is only necessary when authentication is enabled and security roles are defined
+      * on a per set basis.
+      * Default: false
+      */
+    const OPT_SEND_SET_NAME = "OPT_SEND_SET_NAME"
+
+    /**
+     * Bool
+     * Force reads to be linearized for server namespaces that support CP mode. Requires enterprise server >= 4.0.0
+    */
+    const OPT_LINEARIZE_READ = "OPT_LINEARIZE_READ"
+
+    /**
+     * Abort the scan if the cluster is not in a stable state. Default false
+     */
+    const OPT_FAIL_ON_CLUSTER_CHANGE = "OPT_FAIL_ON_CLUSTER_CHANGE"
     /**
      * Accepts one of the SCAN_PRIORITY_* values.
      *
