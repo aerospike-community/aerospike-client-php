@@ -145,7 +145,7 @@ PHP_METHOD(Aerospike, setLogHandler) {
 
 /* Since non ZE threads can call the callback, TLS will cause issues, so disallow this */
 #ifdef ZTS
-	update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "User log callback not currently supported in ZTS environments");
+	update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "User log callback not currently supported in ZTS environments", false);
 	RETURN_LONG(AEROSPIKE_ERR_CLIENT);
 #endif
 

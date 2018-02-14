@@ -3,7 +3,7 @@
 require_once 'Util.inc';
 use PHPUnit\Framework\TestCase;
 
-final class MapOperationsTest extends TestCase {
+final class ErrorInDoubtTest extends TestCase {
     protected $db;
 
     protected function setUp()
