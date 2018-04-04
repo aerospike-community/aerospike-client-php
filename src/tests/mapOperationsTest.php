@@ -22,6 +22,8 @@ final class MapOperationsTest extends TestCase {
             $bin[$alpha[$i]] = $alpha[($i + 1) % 26];
         }
         $this->db->put($key, ["map" => $bin]);
+        $ops = [["op" => AEROSPIKE::OP_MAP_SET_POLICY, "bin" => "map", "map_policy" => $this->map_policy]];
+        $status = $this->db->operate($key, $ops);
         $this->test_rec = $bin;
     }
 
@@ -254,7 +256,7 @@ final class MapOperationsTest extends TestCase {
 
     public function testMapRemoveByKeyList() {
         $key = $this->key;
-        $rem_keys = ["a", "e", "r", "o"];
+        $rem_keys = ["a", "e", "o", "r"];
         $ops = [["op" => AEROSPIKE::OP_MAP_REMOVE_BY_KEY_LIST, "key" => $rem_keys,  "bin" => "map", "return_type" => AEROSPIKE::MAP_RETURN_KEY]];
 
         $status = $this->db->operate($key, $ops, $rec);
@@ -328,7 +330,7 @@ final class MapOperationsTest extends TestCase {
 
         $status = $this->db->operate($key, $ops, $rec);
         $this->assertEquals($status, AEROSPIKE::OK);
-        $this->assertEquals($rec["map"], ["a", "e", "r", "o"]);
+        $this->assertEquals($rec["map"], ["a", "e", "o", "r"]);
 
 
         $this->db->get($key, $rec);
