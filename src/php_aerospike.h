@@ -5,7 +5,7 @@
 extern zend_module_entry aerospike_module_entry;
 #define phpext_aerospike_ptr &aerospike_module_entry
 
-#define PHP_AEROSPIKE_VERSION "7.1.1" /* Replace with version number for your extension */
+#define PHP_AEROSPIKE_VERSION "7.1.2" /* Replace with version number for your extension */
 
 #ifdef PHP_WIN32
 #	define PHP_AEROSPIKE_API __declspec(dllexport)

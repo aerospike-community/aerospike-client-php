@@ -176,12 +176,13 @@ static void aerospike_object_free_storage(zend_object *object TSRMLS_DC) {
 	as_error err;
 	/* It is only safe to destroy the client if it has been fully constructed
 	 * and is not being shared */
-	if (client->is_valid && !client->is_persistent) {
+	if (client->is_valid && !client->is_persistent && client->as_client) {
 		/* This was likely called by the destructor,
 		but it is safe to call it again */
 		aerospike_close(client->as_client, &err);
 		aerospike_destroy(client->as_client);
 	}
+	client->is_valid = false;
 	zend_object_std_dtor(object);
  	return;
 }
@@ -190,7 +191,7 @@ static void aerospike_object_destructor(zend_object *object TSRMLS_DC) {
 	as_error err;
 	as_error_init(&err);
 	AerospikeClient* client = get_aerospike_from_zobj(object);
-	if (!client->is_persistent) {
+	if (!client->is_persistent && client->as_client) {
 		/* If this close fails, it will be run again in free storage */
 		aerospike_close(client->as_client, &err);
 	}
