@@ -82,7 +82,7 @@ final class MapOperationsInvalidUseTest extends TestCase {
         $ops = [["op" => AEROSPIKE::OP_MAP_CLEAR, "bin" => "nonrealbin"]];
         $status = $this->db->operate($key, $ops, $rec);
 
-        $this->assertEquals($status, AEROSPIKE::ERR_BIN_INCOMPATIBLE_TYPE);
+        $this->assertTrue(($status == AEROSPIKE::ERR_BIN_INCOMPATIBLE_TYPE) || ($status == AEROSPIKE::OK));
     }
 
     public function testMapClearNoBinEntry() {

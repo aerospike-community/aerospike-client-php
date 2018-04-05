@@ -8,5 +8,5 @@ This testcase will test for non-existent key.
 <?php
 include dirname(__FILE__)."/../../astestframework/astest-phpt-loader.inc";
 aerospike_phpt_runtest("ListPopRange", "error_001");
---EXPECT--
-ERR_BIN_INCOMPATIBLE_TYPE
+--EXPECTREGEX--
+(ERR_BIN_INCOMPATIBLE_TYPE|ERR_RECORD_NOT_FOUND)
