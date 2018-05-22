@@ -48,7 +48,7 @@
  * aerospike.shm.use = false;
  * // Explicitly sets the shm key for this client to store shared-memory
  * // cluster tending results in.
- * aerospike.shm.key = 0xA6000000; // integer value
+ * aerospike.shm.key = 0xA7000000; // integer value
  * // Shared memory maximum number of server nodes allowed. Leave a cushion so
  * // new nodes can be added without needing a client restart.
  * aerospike.shm.max_nodes = 16;
