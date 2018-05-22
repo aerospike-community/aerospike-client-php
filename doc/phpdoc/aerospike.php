@@ -98,7 +98,10 @@ class Aerospike {
      *   ],
      *   "shm" => []
      * ];
-     * $opts = [Aerospike::OPT_POLICY_KEY => Aerospike::POLICY_KEY_SEND];
+     * // Set a default policy for write and read operations
+     * $writeOpts = [Aerospike::OPT_POLICY_KEY => Aerospike::POLICY_KEY_SEND];
+     * $readOpts = [Aerospike::OPT_TOTAL_TIMEOUT => 150];
+     * $opts = [Aerospike::OPT_WRITE_DEFAULT_POL => $writeOpts, Aerospike::OPT_READ_DEFAULT_POL => $readOpts];
      * $client = new Aerospike($config, true, $opts);
      * if (!$client->isConnected()) {
      *   echo "Aerospike failed to connect[{$client->errorno()}]: {$client->error()}\n";
@@ -120,7 +123,7 @@ class Aerospike {
      *     (even an empty one) is provided. Disabled by default.
      * * _shm\_key_ explicitly sets the shm key for the cluster. It is
      *       otherwise implicitly evaluated per unique hostname, and can be
-     *       inspected with shmKey(). (default: 0xA6000000)
+     *       inspected with shmKey(). (default: 0xA7000000)
      * * _shm\_max\_nodes_ maximum number of nodes allowed. Pad so new nodes
      *       can be added without configuration changes (default: 16)
      * * _shm\_max\_namespaces_ maximum number of namespaces allowed (default: 8)
@@ -146,6 +149,14 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * * Aerospike::OPT_POLICY_REPLICA
      * * Aerospike::OPT_POLICY_CONSISTENCY
+     * * Aerospike::OPT_READ_DEFAULT_POL
+     * * Aerospike::OPT_WRITE_DEFAULT_POL
+     * * AEROSPIKE::OPT_REMOVE_DEFAULT_POL
+     * * Aerospike::OPT_BATCH_DEFAULT_POL
+     * * Aerospike::OPT_OPERATE_DEFAULT_POL
+     * * Aerospike::OPT_QUERY_DEFAULT_POL
+     * * Aerospike::OPT_SCAN_DEFAULT_POL
+     * * Aerospike::OPT_APPLY_DEFAULT_POL
      * @see Aerospike::OPT_CONNECT_TIMEOUT Aerospike::OPT_CONNECT_TIMEOUT options
      * @see Aerospike::OPT_READ_TIMEOUT Aerospike::OPT_READ_TIMEOUT options
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
@@ -3227,6 +3238,39 @@ class Aerospike {
      * Used by the constructor, read, write, scan, query, apply, and info
      * operations.
      */
+
+     /* Key used to specify an array of read policy defaults used in the constructor.
+        See https://github.com/aerospike/aerospike-client-php/blob/master/doc/policies.md
+     */
+     const OPT_READ_DEFAULT_POL = "OPT_READ_DEFAULT_POL"
+     /* Key used to specify an array of write policy defaults used in the constructor.
+        See https://github.com/aerospike/aerospike-client-php/blob/master/doc/policies.md
+     */
+     const OPT_WRITE_DEFAULT_POL = "OPT_WRITE_DEFAULT_POL"
+     /* Key used to specify an array of remove policy defaults used in the constructor.
+        See https://github.com/aerospike/aerospike-client-php/blob/master/doc/policies.md
+     */
+     const OPT_REMOVE_DEFAULT_POL = "OPT_REMOVE_DEFAULT_POL"
+     /* Key used to specify an array of batch policy defaults used in the constructor.
+        See https://github.com/aerospike/aerospike-client-php/blob/master/doc/policies.md
+     */
+     const OPT_BATCH_DEFAULT_POL = "OPT_BATCH_DEFAULT_POL"
+     /* Key used to specify an array of operate policy defaults used in the constructor.
+        See https://github.com/aerospike/aerospike-client-php/blob/master/doc/policies.md
+     */
+     const OPT_OPERATE_DEFAULT_POL = "OPT_OPERATE_DEFAULT_POL"
+     /* Key used to specify an array of query policy defaults used in the constructor.
+        See https://github.com/aerospike/aerospike-client-php/blob/master/doc/policies.md
+     */
+     const OPT_QUERY_DEFAULT_POL = "OPT_QUERY_DEFAULT_POL"
+     /* Key used to specify an array of scan policy defaults used in the constructor.
+        See https://github.com/aerospike/aerospike-client-php/blob/master/doc/policies.md
+     */
+     const OPT_SCAN_DEFAULT_POL = "OPT_SCAN_DEFAULT_POL"
+     /* Key used to specify an array of apply policy defaults used in the constructor.
+        See https://github.com/aerospike/aerospike-client-php/blob/master/doc/policies.md
+     */
+     const OPT_APPLY_DEFAULT_POL = "OPT_APPLY_DEFAULT_POL"
 
     /**
      * Defines the length of time (in milliseconds) the client waits on establishing a connection.
