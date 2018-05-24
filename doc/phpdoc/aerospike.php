@@ -134,6 +134,18 @@ class Aerospike {
      * * _compression\_threshold_ client will compress records larger than this value for transport (default: 0)
      * * _tender\_interval_ polling interval in milliseconds for cluster tender (default: 1000)
      * * _cluster\_name_ if specified, only server nodes matching this name will be used when determining the cluster
+     * * Aerospike::OPT_TLS_CONFIG an array of TLS setup parameters whose keys include
+     * * * Aerospike::OPT_TLS_ENABLE boolean Whether or not to enable TLS.
+     * * * Aerospike::OPT_OPT_TLS_CAFILE
+     * * * Aerospike::OPT_TLS_CAPATH
+     * * * Aerospike::OPT_TLS_PROTOCOLS
+     * * * Aerospike::OPT_TLS_CIPHER_SUITE
+     * * * Aerospike::OPT_TLS_CRL_CHECK
+     * * * Aerospike::OPT_TLS_CRL_CHECK_ALL
+     * * * Aerospike::OPT_TLS_CERT_BLACKLIST
+     * * * Aerospike::OPT_TLS_LOG_SESSION_INFO
+     * * * Aerospike::OPT_TLS_KEYFILE
+     * * * Aerospike::OPT_TLS_CERTFILE
      * @param bool $persistent_connection In a multiprocess context, such as a
      *        web server, the client should be configured to use
      *        persistent connections. This allows for reduced overhead,
@@ -149,14 +161,14 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * * Aerospike::OPT_POLICY_REPLICA
      * * Aerospike::OPT_POLICY_CONSISTENCY
-     * * Aerospike::OPT_READ_DEFAULT_POL
-     * * Aerospike::OPT_WRITE_DEFAULT_POL
-     * * AEROSPIKE::OPT_REMOVE_DEFAULT_POL
-     * * Aerospike::OPT_BATCH_DEFAULT_POL
-     * * Aerospike::OPT_OPERATE_DEFAULT_POL
-     * * Aerospike::OPT_QUERY_DEFAULT_POL
-     * * Aerospike::OPT_SCAN_DEFAULT_POL
-     * * Aerospike::OPT_APPLY_DEFAULT_POL
+     * * Aerospike::OPT_READ_DEFAULT_POL An array of default policies for read operations.
+     * * Aerospike::OPT_WRITE_DEFAULT_POL An array of default policies for write operations.
+     * * AEROSPIKE::OPT_REMOVE_DEFAULT_POL An array of default policies for remove operations.
+     * * Aerospike::OPT_BATCH_DEFAULT_POL An array of default policies for batch operations.
+     * * Aerospike::OPT_OPERATE_DEFAULT_POL An array of default policies for operate operations.
+     * * Aerospike::OPT_QUERY_DEFAULT_POL An array of default policies for query operations.
+     * * Aerospike::OPT_SCAN_DEFAULT_POL An array of default policies for scan operations.
+     * * Aerospike::OPT_APPLY_DEFAULT_POL An array of default policies for apply operations.
      * @see Aerospike::OPT_CONNECT_TIMEOUT Aerospike::OPT_CONNECT_TIMEOUT options
      * @see Aerospike::OPT_READ_TIMEOUT Aerospike::OPT_READ_TIMEOUT options
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
@@ -3272,11 +3284,66 @@ class Aerospike {
      */
      const OPT_APPLY_DEFAULT_POL = "OPT_APPLY_DEFAULT_POL"
 
-    /**
+     /*
+     Key used in the options argument of the constructor used to point to an array of TLS
+     configuration parameters. Use of TLS requires an enterprise version of the Aerospike Server.
+     */
+     const OPT_TLS_CONFIG = "OPT_TLS_CONFIG"
+     
+     /* Key used in the OPT_TLS boolean Whether or not to enable TLS.
+     */
+     const OPT_TLS_ENABLE = "OPT_TLS_ENABLE"
+
+     /*
+     Key used to specify a string path to a trusted CA certificate file. By default TLS will use system standard trusted CA certificates
+     */
+     const OPT_OPT_TLS_CAFILE = "OPT_OPT_TLS_CAFILE"
+
+     /*
+     Key used to specify a Path to a directory of trusted certificates. See the OpenSSL SSL_CTX_load_verify_locations manual page for more information about the format of the directory.
+     */
+     const OPT_TLS_CAPATH = "OPT_TLS_CAPATH"
+
+     /*Key used to specify a string representation of allowed protocols. Specifies enabled protocols. This format is the same as Apache's SSLProtocol documented at https://httpd.apache.org/docs/current/mod/mod_ssl.html#sslprotocol . If not specified the client will use "-all +TLSv1.2".
+     */
+     const OPT_TLS_PROTOCOLS ="OPT_TLS_PROTOCOLS"
+
+     /*
+     Key used to specify a string. Specifies enabled cipher suites. The format is the same as OpenSSL's Cipher List Format documented at https://www.openssl.org/docs/manmaster/apps/ciphers.html .If not specified the OpenSSL default cipher suite described in the ciphers documentation will be used. If you are not sure what cipher suite to select this option is best left unspecified
+     */
+     const OPT_TLS_CIPHER_SUITE = "OPT_TLS_CIPHER_SUITE"
+
+     /*
+     Key used to specify a boolean. Enable CRL checking for the certificate chain leaf certificate. An error occurs if a suitable CRL cannot be found. By default CRL checking is disabled.
+     */
+     const OPT_TLS_CRL_CHECK = "OPT_TLS_CRL_CHECK"
+
+     /*
+     Key used to specify a bolean. Enable CRL checking for the entire certificate chain. An error occurs if a suitable CRL cannot be found. By default CRL checking is disabled.
+     */
+     const OPT_TLS_CRL_CHECK_ALL = "OPT_TLS_CRL_CHECK_ALL"
+
+     /* Key used to specify a path to a certificate blacklist file. The file should contain one line for each blacklisted certificate. Each line starts with the certificate serial number expressed in hex. Each entry may optionally specify the issuer name of the certificate (serial numbers are only required to be unique per issuer). Example records: 867EC87482B2 /C=US/ST=CA/O=Acme/OU=Engineering/CN=Test Chain CA E2D4B0E570F9EF8E885C065899886461 */
+     const OPT_TLS_CERT_BLACKLIST = "OPT_TLS_CERT_BLACKLIST"
+     
+     /* Boolean: Log session information for each connection. */
+     const OPT_TLS_LOG_SESSION_INFO = "OPT_TLS_LOG_SESSION_INFO"
+     
+     /*
+     Path to the client's key for mutual authentication. By default mutual authentication is disabled.
+     */
+     const OPT_TLS_KEYFILE = "OPT_TLS_KEYFILE"
+
+     /* Path to the client's certificate chain file for mutual authentication. By default mutual authentication is disabled.
+     */
+     const OPT_TLS_CERTFILE = "OPT_TLS_CERTFILE"
+     
+     /**
      * Defines the length of time (in milliseconds) the client waits on establishing a connection.
      * @const OPT_CONNECT_TIMEOUT value in milliseconds (default: 1000)
      */
     const OPT_CONNECT_TIMEOUT = "OPT_CONNECT_TIMEOUT";
+    
     /**
      * Defines the length of time (in milliseconds) the client waits on a read
      * operation.
