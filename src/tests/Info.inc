@@ -110,32 +110,7 @@ class Info extends AerospikeTestCommon
         }
         return Aerospike::ERR_CLIENT;
     }
-    /**
-     * @test
-     * Basic Info positive for histogram
-     *
-     * @pre
-     * Connect using aerospike object to the specified node
-     *
-     * @post
-     * Info for histogram
-     *
-     * @remark
-     *
-     *
-     * @test_plans{1.1}
-     */
-    function testInfoPositiveForHistogram()
-    {
-        try {
-            $status = $this->db->info('hist-dump:ns=test;hist=ttl', $response, $this->test_host);
-            if(!empty($response))
-                return $status;
-        } catch (ErrorException $e) {
-            return $this->db->errorno();
-        }
-        return Aerospike::ERR_CLIENT;
-    }
+
     /**
      * @test
      * Basic Info positive for jobs
