@@ -38,8 +38,6 @@ as_status as_operate_record_to_zval(const as_record* record, zval* z_bins, as_er
 as_status as_bins_to_zval(const as_record* aerospike_record, zval* z_bins, as_error* err);
 
 as_status zval_to_as_val(zval* zval_to_convert, as_val** retval, as_error* err, int serializer_type);
-//deprecated
-as_status zval_to_select_bins(const zval* z_bins, char*** select_bins, int* bin_count);
 
 as_status z_hashtable_to_as_key(HashTable* z_key_hash, as_key* key, as_error* err);
 as_status z_hashtable_to_as_list(HashTable* php_hash, as_list** list, as_error* err, int serializer_type);

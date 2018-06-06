@@ -26,7 +26,7 @@ LIB_PATH=${PREFIX}
 DOWNLOAD=${DOWNLOAD_C_CLIENT:-1}
 COPY_FILES=1
 DOWNLOAD_DIR=${AEROSPIKE}/package
-AEROSPIKE_C_VERSION=${AEROSPIKE_C_VERSION:-'4.3.5'}
+AEROSPIKE_C_VERSION=${AEROSPIKE_C_VERSION:-'4.3.12'}
 unset PKG_TYPE PKG_VERSION PKG_SUFFIX PKG_ARTIFACT
 
 
@@ -138,7 +138,7 @@ if [ $DOWNLOAD ] && [ $DOWNLOAD == 1 ]; then
           PKG_TYPE="deb"
           ;;
         "ubuntu"* )
-          PKG_SUFFIX="ubuntu16.04.x86_64.deb"
+          PKG_SUFFIX="${PKG_DIST}.04.x86_64.deb"
           PKG_TYPE="deb"
           ;;
         "ami"* )

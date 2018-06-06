@@ -98,7 +98,6 @@ static zend_function_entry Aerospike_class_functions[] =
 	PHP_ME(Aerospike, register, register_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, remove, remove_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, removeBin, remove_bin_arg_info, ZEND_ACC_PUBLIC)
-	PHP_ME(Aerospike, select, select_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, setDeserializer, set_deserializer_arg_info, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Aerospike, setSerializer, set_serializer_arg_info, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Aerospike, shmKey, shm_key_arg_info, ZEND_ACC_PUBLIC)

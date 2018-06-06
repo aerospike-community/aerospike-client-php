@@ -246,13 +246,6 @@ PHP_METHOD(Aerospike, shmKey);
 ZEND_BEGIN_ARG_INFO_EX(shm_key_arg_info, 0, 0, 0)
 ZEND_END_ARG_INFO();
 
-PHP_METHOD(Aerospike, select);
-ZEND_BEGIN_ARG_INFO_EX(select_arg_info, 0, 0, 3)
-ZEND_ARG_PASS_INFO(0)
-ZEND_ARG_PASS_INFO(0)
-ZEND_ARG_PASS_INFO(1)
-ZEND_END_ARG_INFO();
-
 PHP_METHOD(Aerospike, setDeserializer);
 ZEND_BEGIN_ARG_INFO_EX(set_deserializer_arg_info, 0, 0, 1)
 ZEND_END_ARG_INFO();
