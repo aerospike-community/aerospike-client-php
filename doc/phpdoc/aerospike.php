@@ -2509,6 +2509,7 @@ class Aerospike {
      * ```
      *
      * @param int   $job_id  The Job ID
+     * @param int   $job_type The type of the job, either Aerospike::JOB_QUERY, or Aerospike::JOB_SCAN
      * @param array $info    The status of the background job filled (by reference) as an array of
      * ```
      * [
@@ -2523,7 +2524,7 @@ class Aerospike {
      * @see Aerospike::queryApply()
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
-    public function jobInfo(int $job_id, array &$info, array $options = []) {}
+    public function jobInfo(int $job_id, $job_type, array &$info, array $options = []) {}
 
     // UDF Methods
 
@@ -3965,7 +3966,7 @@ class Aerospike {
      * @deprecated Will be reused as ERR_ALWAYS_FORBIDDEN
      * @const ERR_NO_XDR
      */
-    const ERR_NO_XDR = "AEROSPIKE_ERR_NO_XDR";
+    const ERR_ALWAYS_FORBIDDEN = "AEROSPIKE_ERR_ALWAYS_FORBIDDEN";
     /**
      * Server is not accepting requests.
      * Occur during single node on a quick restart to join existing cluster
@@ -4546,15 +4547,15 @@ class Aerospike {
     /**
      * Job status is undefined
      */
-    const JOB_STATUS_UNDEF = "SCAN_STATUS_UNDEF";
+    const JOB_STATUS_UNDEF = "JOB_STATUS_UNDEF";
     /**
      * Job is currently running
      */
-    const JOB_STATUS_INPROGRESS = "SCAN_STATUS_INPROGRESS";
+    const JOB_STATUS_INPROGRESS = "JOB_STATUS_INPROGRESS";
     /**
      * Job completed successfully
      */
-    const JOB_STATUS_COMPLETED = "SCAN_STATUS_COMPLETED";
+    const JOB_STATUS_COMPLETED = "JOB_STATUS_COMPLETED";
 
     // Index (container) types
     /**
