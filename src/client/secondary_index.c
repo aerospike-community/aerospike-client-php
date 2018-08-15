@@ -44,7 +44,7 @@ PHP_METHOD(Aerospike, addIndex) {
 	reset_client_error(getThis());
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, false);
 		RETURN_LONG(err.code);
 	}
 
@@ -55,7 +55,7 @@ PHP_METHOD(Aerospike, addIndex) {
 			&ns, &ns_len, &set, &set_len, &bin_name, &bin_len,
 			&index_name, &index_len, &index_type, &data_type,
 			&z_index_policy) != SUCCESS) {
-				update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to addIndex");
+				update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to addIndex", false);
 				RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -63,26 +63,26 @@ PHP_METHOD(Aerospike, addIndex) {
 			&index_policy_p, &as_client->config.policies.info) == AEROSPIKE_OK) {
 		index_policy_p = &index_policy;
 	} else {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid info policy");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid info policy", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 
 	if (bin_len > AS_BIN_NAME_MAX_LEN) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Bin name is too long");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Bin name is too long", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (aerospike_index_create_complex(
 			as_client, &err, &task, index_policy_p, ns, set, bin_name, index_name, index_type, data_type) !=
 			AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		RETURN_LONG(err.code);
 	}
 	//Wait for the index to be created
 
 	if (aerospike_index_create_wait(&err, &task, 2000) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 
 	RETURN_LONG(err.code);
@@ -109,7 +109,7 @@ PHP_METHOD(Aerospike, dropIndex) {
 
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, false);
 		RETURN_LONG(err.code);
 	}
 	php_client = get_aerospike_from_zobj(Z_OBJ_P(getThis()));
@@ -117,7 +117,7 @@ PHP_METHOD(Aerospike, dropIndex) {
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss|z", &ns, &ns_len, &index_name, &index_len, &z_index_policy) !=
 			SUCCESS) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to dropIndex");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to dropIndex", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -126,13 +126,13 @@ PHP_METHOD(Aerospike, dropIndex) {
 			&index_policy_p, &as_client->config.policies.info) == AEROSPIKE_OK) {
 		index_policy_p = &index_policy;
 	} else {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid info policy");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid info policy", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 
 	if (aerospike_index_remove(as_client, &err, index_policy_p, ns, index_name) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 }

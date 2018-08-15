@@ -74,6 +74,10 @@ PHP_METHOD(Aerospike, errorno);
 ZEND_BEGIN_ARG_INFO_EX(errorno_arg_info, 0, 0, 0)
 ZEND_END_ARG_INFO();
 
+PHP_METHOD(Aerospike, errorInDoubt);
+ZEND_BEGIN_ARG_INFO_EX(error_in_doubt_arg_info, 0, 0, 0)
+ZEND_END_ARG_INFO();
+
 PHP_METHOD(Aerospike, exists);
 ZEND_BEGIN_ARG_INFO_EX(exists_arg_info, 0, 0, 2)
 ZEND_ARG_PASS_INFO(0)
@@ -240,13 +244,6 @@ ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, shmKey);
 ZEND_BEGIN_ARG_INFO_EX(shm_key_arg_info, 0, 0, 0)
-ZEND_END_ARG_INFO();
-
-PHP_METHOD(Aerospike, select);
-ZEND_BEGIN_ARG_INFO_EX(select_arg_info, 0, 0, 3)
-ZEND_ARG_PASS_INFO(0)
-ZEND_ARG_PASS_INFO(0)
-ZEND_ARG_PASS_INFO(1)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, setDeserializer);

@@ -585,7 +585,7 @@ as_status as_val_to_zval(const as_val* aerospike_value, zval* return_val, as_err
 			break;
 		}
 		case AS_LIST: {
-			temp_list = as_list_fromval(aerospike_value);
+			temp_list = as_list_fromval((as_val*)aerospike_value);
 			as_list_to_zval(temp_list, return_val, err);
 			break;
 		}
@@ -1239,59 +1239,6 @@ as_status as_key_to_zval(const as_key* key, zval* z_key, bool show_pk, as_error*
 	return AEROSPIKE_OK;
 }
 
-// MUCH EASIER WITH ALLOCA
-as_status zval_to_select_bins(const zval* z_bins, char*** select_bins, int* bin_count) {
-	HashTable* bin_hash = NULL;
-	zval* bin_val;
-	char** select_bins_array;
-	bool failed = false;
-	if (Z_TYPE_P(z_bins) != IS_ARRAY) {
-		return AEROSPIKE_ERR_PARAM;
-	}
-	bin_hash = Z_ARRVAL_P(z_bins);
-
-	// IF the bins entry has string keys, or non ordered integer keys, exit;
-	if (!hashtable_is_list(bin_hash)) {
-		return AEROSPIKE_ERR_PARAM;
-	}
-
-	// Need one extra entry for a null
-	select_bins_array = calloc((zend_hash_num_elements(bin_hash) + 1), sizeof(char*));
-
-	int i = 0;
-	ulong numeric_key;
-	zend_string* string_key = NULL;
-	ZEND_HASH_FOREACH_KEY_VAL(bin_hash, numeric_key, string_key, bin_val)
-	{
-		// Only interested in values here
-		// If the value isn't a string bail out, need string values only
-		if (Z_TYPE_P(bin_val) != IS_STRING) {
-			failed = true;
-			goto CLEANUP;
-		}
-		select_bins_array[i] = strndup(Z_STRVAL_P(bin_val), AS_BIN_NAME_MAX_LEN);
-		//select_bins_array[i][AS_BIN_NAME_MAX_LEN] = '\0';
-		i++;
-	} ZEND_HASH_FOREACH_END();
-
-	select_bins_array[i] = NULL;
-	*bin_count = i;
-	*select_bins = select_bins_array;
-	return AEROSPIKE_OK;
-
-CLEANUP:
-	for (int j = 0; j < i; j++) {
-		if (select_bins_array[i]) {
-			free(select_bins_array[i]);
-			select_bins_array[i] = NULL;
-		}
-	}
-	free(select_bins_array);
-	select_bins_array = NULL;
-
-	return AEROSPIKE_ERR_PARAM;
-
-}
 
 /**
  * Function to serialize a php zval that does not map to one of the as_val's natively.
@@ -1373,7 +1320,6 @@ as_status unserialize_as_bytes(const as_bytes* bytes, zval* retval, as_error* er
 		if (!AEROSPIKE_G(is_global_user_deserializer_registered)) {
 			return as_bytes_to_zval_bytes(bytes, retval, err);
 		} else {
-			// NOT QUITE RIGHT HERE// BUT MAYBE IT IS?
 			return unserialize_with_user_function(bytes, retval, err);
 		}
 	}

@@ -40,7 +40,7 @@ PHP_METHOD(Aerospike, getNodes)
 
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		RETURN_LONG(err.code);
 	}
 
@@ -49,7 +49,7 @@ PHP_METHOD(Aerospike, getNodes)
 
 	cluster = as_client->cluster;
 	if (!cluster) {
-		update_client_error(getThis(), AEROSPIKE_ERR_CLUSTER, "Invalid cluster");
+		update_client_error(getThis(), AEROSPIKE_ERR_CLUSTER, "Invalid cluster", false);
 		RETURN_LONG(AEROSPIKE_ERR_CLUSTER);
 	}
 

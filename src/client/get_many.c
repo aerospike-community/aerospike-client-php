@@ -99,7 +99,7 @@ PHP_METHOD(Aerospike, getMany) {
 
 	bool use_batch_direct = false;
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		RETURN_LONG(err.code);
 	}
 	php_client = get_aerospike_from_zobj(Z_OBJ_P(getThis()));
@@ -107,7 +107,7 @@ PHP_METHOD(Aerospike, getMany) {
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hz/|h!z",
 			&z_keys, &z_records, &z_filter, &z_policy) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to getMany");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to getMany", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	zval_dtor(z_records);
@@ -120,7 +120,7 @@ PHP_METHOD(Aerospike, getMany) {
 	if (z_policy) {
 		if (zval_to_as_policy_batch(z_policy, &batch_policy,
 				&batch_policy_p, &as_client->config.policies.batch) != AEROSPIKE_OK) {
-			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid batch policy");
+			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid batch policy", false);
 			RETURN_LONG(AEROSPIKE_ERR_PARAM);
 		}
 		batch_policy_p = &batch_policy;
@@ -164,7 +164,7 @@ PHP_METHOD(Aerospike, getMany) {
 CLEANUP:
 
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 

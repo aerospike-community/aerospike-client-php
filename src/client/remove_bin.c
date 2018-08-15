@@ -25,6 +25,7 @@ PHP_METHOD(Aerospike, removeBin)
 {
 	as_key key;
 	as_error err;
+	as_error_init(&err);
 	as_record rec;
 
 	bool record_initialized = false;
@@ -48,25 +49,25 @@ PHP_METHOD(Aerospike, removeBin)
 	client = get_aerospike_from_zobj(Z_OBJ_P(getThis()));
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, false);
 		RETURN_LONG(err.code);
 	}
 	as_ptr = client->as_client;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hh|z", &z_key, &bin_array, &z_write_policy)
 		!= SUCCESS) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to removeBin");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to removeBin", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (zval_to_as_policy_write(z_write_policy, &write_policy,
 			&write_policy_p, &as_ptr->config.policies.write) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid policy to removeBin");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid policy to removeBin", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (z_hashtable_to_as_key(z_key, &key, &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid key");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid key", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	key_initialized = true;
@@ -77,12 +78,12 @@ PHP_METHOD(Aerospike, removeBin)
 
 	as_status gen_status = set_record_generation_from_write_policy(&rec, z_write_policy);
 	if (gen_status != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "generation policy");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "generation policy", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (!hashtable_is_list(bin_array)) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "list of bins must be an array");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "list of bins must be an array", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -102,6 +103,9 @@ PHP_METHOD(Aerospike, removeBin)
 	}
 	if (key_initialized) {
 		as_key_destroy(&key);
+	}
+	if (err.code != AEROSPIKE_OK) {
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(status);
 

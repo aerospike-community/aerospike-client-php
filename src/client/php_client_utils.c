@@ -23,7 +23,7 @@ AerospikeClient* get_aerospike_from_zobj(zend_object* zval_wrapper) {
 	return (AerospikeClient*)((char *)zval_wrapper - XtOffsetOf(AerospikeClient, zobj));
 }
 
-void update_client_error(zval* client_obj, int code, const char* msg) {
+void update_client_error(zval* client_obj, int code, const char* msg, bool in_doubt) {
 	if (!client_obj || Z_TYPE_P(client_obj) != IS_OBJECT) {
 		return;
 	}
@@ -31,6 +31,7 @@ void update_client_error(zval* client_obj, int code, const char* msg) {
 	AerospikeClient* php_client = get_aerospike_from_zobj(Z_OBJ_P(client_obj));
 	if (php_client) {
 		as_error_set_message(&(php_client->client_error), code, msg);
+		php_client->client_error.in_doubt = in_doubt;
 	}
 }
 
@@ -71,18 +72,17 @@ void set_policy_defaults_from_ini(as_config* config, AerospikeClient* client) {
 	config->conn_timeout_ms = INI_INT("aerospike.connect_timeout");
 
 	int_ini_value = INI_INT("aerospike.read_timeout");
-	config->policies.read.timeout = int_ini_value;
+	config->policies.read.base.total_timeout = int_ini_value;
 	config->policies.info.timeout = int_ini_value;
-	config->policies.batch.timeout = int_ini_value;
+	config->policies.batch.base.total_timeout = int_ini_value;
 
 	int_ini_value = INI_INT("aerospike.write_timeout");
-	config->policies.write.timeout = int_ini_value;
-	config->policies.operate.timeout = int_ini_value;
-	config->policies.remove.timeout = int_ini_value;
-	config->policies.apply.timeout = int_ini_value;
+	config->policies.write.base.total_timeout = int_ini_value;
+	config->policies.operate.base.total_timeout = int_ini_value;
+	config->policies.remove.base.total_timeout = int_ini_value;
+	config->policies.apply.base.total_timeout = int_ini_value;
 
 	int_ini_value = INI_INT("aerospike.key_policy");
-	config->policies.key = (as_policy_key)int_ini_value;
 	config->policies.read.key = (as_policy_key)int_ini_value;
 	config->policies.write.key = (as_policy_key)int_ini_value;
 	config->policies.operate.key = (as_policy_key)int_ini_value;
@@ -95,7 +95,10 @@ void set_policy_defaults_from_ini(as_config* config, AerospikeClient* client) {
 	config->policies.write.compression_threshold = int_ini_value;
 
 	int_ini_value = INI_INT("aerospike.key_gen");
-	config->policies.gen = (as_policy_gen)int_ini_value;
+	config->policies.write.gen = (as_policy_gen)int_ini_value;
+	config->policies.operate.gen = (as_policy_gen)int_ini_value;
+	config->policies.apply.gen = (as_policy_gen)int_ini_value;
+	config->policies.remove.gen = (as_policy_gen)int_ini_value;
 
 	lua_system_path_str = INI_STR("aerospike.udf.lua_system_path");
 	if (lua_system_path_str && strlen(lua_system_path_str) < AS_CONFIG_PATH_MAX_SIZE) {

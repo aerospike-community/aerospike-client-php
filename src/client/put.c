@@ -49,19 +49,19 @@ PHP_METHOD(Aerospike, put)
 	aerospike* as_ptr = client->as_client;
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, false);
 		RETURN_LONG(err.code);
 	}
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "hz|z!z",
 			&z_key_hash, &zval_to_store, &z_ttl, &z_write_policy) != SUCCESS) {
 
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to put");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to put", false);
 	  	RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (z_ttl && !(Z_TYPE_P(z_ttl) == IS_NULL || Z_TYPE_P(z_ttl) == IS_LONG)) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "ttl must be null or long");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "ttl must be null or long", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -70,14 +70,14 @@ PHP_METHOD(Aerospike, put)
 	}
 
 	if (Z_TYPE_P(zval_to_store) != IS_ARRAY) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Record must be an array");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Record must be an array", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	z_record_hash = Z_ARRVAL_P(zval_to_store);
 
 	if (!zend_hash_num_elements(z_record_hash)) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Array of bins must not be empty");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Array of bins must not be empty", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -119,7 +119,7 @@ PHP_METHOD(Aerospike, put)
 
 CLEANUP:
     if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
     }
     if (key_initialized) {
 	as_key_destroy(&key);

@@ -40,13 +40,13 @@ PHP_METHOD(Aerospike, touch)
 	reset_client_error(getThis());
 	AerospikeClient* client = get_aerospike_from_zobj(Z_OBJ_P(getThis()));
 	if (!client || !client->is_valid || !client->as_client) {
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Invalid Aerospike object");
+		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Invalid Aerospike object", false);
 		RETURN_LONG(AEROSPIKE_ERR_CLIENT);
 
 	}
 
 	if (!client->is_connected) {
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "No connection to Server");
+		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "No connection to Server", false);
 		RETURN_LONG(AEROSPIKE_ERR_CLIENT);
 	}
 	aerospike* as_ptr = client->as_client;
@@ -57,7 +57,7 @@ PHP_METHOD(Aerospike, touch)
 	}
 
 	if (z_hashtable_to_as_key(z_key, &key, &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Unable to convert key");
+		as_error_update(&err, AEROSPIKE_ERR_PARAM, "Unable to convert key");
 		err.code = AEROSPIKE_ERR_PARAM;
 		goto CLEANUP;
 	}
@@ -65,7 +65,7 @@ PHP_METHOD(Aerospike, touch)
 
 	if (zval_to_as_policy_operate(z_operations_policy, &operate_policy,
 			&operate_policy_p, &as_ptr->config.policies.operate) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid operate policy");
+		as_error_update(&err, AEROSPIKE_ERR_PARAM, "Invalid operate policy");
 		err.code = AEROSPIKE_ERR_PARAM;
 		goto CLEANUP;
 	}
@@ -78,14 +78,14 @@ PHP_METHOD(Aerospike, touch)
 	operations.ttl = ttl_value;
 
 	if (set_operations_generation_from_operate_policy(&operations, z_operations_policy) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid generation policy");
+		as_error_update(&err, AEROSPIKE_ERR_PARAM, "Invalid generation policy");
 		err.code = AEROSPIKE_ERR_PARAM;
 		goto CLEANUP;
 	}
 
 	as_status status = aerospike_key_operate(as_ptr, &err, operate_policy_p, &key, &operations, &rec);
 	if (status != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		goto CLEANUP;
 	}
 
@@ -98,6 +98,9 @@ CLEANUP:
 	}
 	if (rec) {
 		as_record_destroy(rec);
+	}
+	if (err.code != AEROSPIKE_OK) {
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code);
 }

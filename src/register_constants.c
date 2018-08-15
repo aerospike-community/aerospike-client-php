@@ -118,7 +118,7 @@ static AerospikeStatus aerospike_status[] = {
 		{ AEROSPIKE_ERR_CLUSTER_CHANGE            ,   "ERR_CLUSTER_CHANGE"                 },
 		{ AEROSPIKE_ERR_SERVER_FULL               ,   "ERR_SERVER_FULL"                    },
 		{ AEROSPIKE_ERR_TIMEOUT                   ,   "ERR_TIMEOUT"                        },
-		{ AEROSPIKE_ERR_NO_XDR                    ,   "ERR_NO_XDR"                         },
+		{ AEROSPIKE_ERR_ALWAYS_FORBIDDEN          ,   "ERR_ALWAYS_FORBIDDEN"               },
 		{ AEROSPIKE_ERR_CLUSTER                   ,   "ERR_CLUSTER"                        },
 		{ AEROSPIKE_ERR_BIN_INCOMPATIBLE_TYPE     ,   "ERR_BIN_INCOMPATIBLE_TYPE"          },
 		{ AEROSPIKE_ERR_RECORD_TOO_BIG            ,   "ERR_RECORD_TOO_BIG"                 },

@@ -85,7 +85,7 @@ PHP_METHOD(Aerospike, createRole) {
 
 CLEANUP:
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	if (privileges) {
 		for (int i = 0; i < privilege_count; i++) {
@@ -151,7 +151,7 @@ CLEANUP:
 		if (z_privileges) {
 			ZVAL_NULL(z_privileges);
 		}
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	if (role) {
 		as_role_destroy(role);
@@ -208,7 +208,7 @@ PHP_METHOD(Aerospike, queryRoles) {
 
 CLEANUP:
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		if (z_roles) {
 			zval_dtor(z_roles);
 			ZVAL_NULL(z_roles);
@@ -261,7 +261,7 @@ PHP_METHOD(Aerospike, dropRole) {
 
 CLEANUP:
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 
 	RETURN_LONG(err.code);
@@ -349,7 +349,7 @@ CLEANUP:
 	}
 
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 
 	RETURN_LONG(err.code);
@@ -414,7 +414,7 @@ PHP_METHOD(Aerospike, grantPrivileges) {
 
 CLEANUP:
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	if (privileges) {
 		for (int i = 0; i < priv_size; i++) {
@@ -488,7 +488,7 @@ PHP_METHOD(Aerospike, revokePrivileges) {
 
 CLEANUP:
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 
 	if (privileges) {
@@ -561,7 +561,7 @@ PHP_METHOD(Aerospike, changePassword) {
 
 CLEANUP:
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 
 	RETURN_LONG(err.code);
@@ -624,7 +624,7 @@ PHP_METHOD(Aerospike, setPassword) {
 
 CLEANUP:
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 
 	RETURN_LONG(err.code);
@@ -702,7 +702,7 @@ PHP_METHOD(Aerospike, grantRoles) {
 CLEANUP:
 
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 
 	if (roles) {
@@ -789,7 +789,7 @@ PHP_METHOD(Aerospike, revokeRoles) {
 CLEANUP:
 
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 
 	if (roles) {
@@ -872,7 +872,7 @@ PHP_METHOD(Aerospike, queryUser) {
 
 CLEANUP:
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	if (user) {
 		as_user_destroy(user);
@@ -945,7 +945,7 @@ PHP_METHOD(Aerospike, queryUsers) {
 
 CLEANUP:
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	if (users) {
 		as_users_destroy(users, users_size);
@@ -1004,7 +1004,7 @@ PHP_METHOD(Aerospike, dropUser) {
 CLEANUP:
 
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 
 	RETURN_LONG(err.code);

@@ -10,4 +10,3 @@ include dirname(__FILE__)."/../../astestframework/astest-phpt-loader.inc";
 aerospike_phpt_runtest("ListRemove", "error_002");
 --EXPECTREGEX--
 (ERR_BIN_INCOMPATIBLE_TYPE|OK)
-

@@ -3,7 +3,6 @@
 if (getenv("AS_PHPUNIT")) {
     require_once 'PHPUnit.php';
     abstract class ASTestFramework extends PHPUnit_Framework_TestCase {
-
     }
 }
  /* otherwise, the dependency is provided by the loader */

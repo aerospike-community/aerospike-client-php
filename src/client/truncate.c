@@ -43,7 +43,7 @@ PHP_METHOD(Aerospike, truncate)
 	reset_client_error(getThis());
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, false);
 		RETURN_LONG(err.code);
 	}
 
@@ -52,41 +52,41 @@ PHP_METHOD(Aerospike, truncate)
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss!l|z",
 							  &ns, &ns_len, &set, &set_len, &nanos, &z_info_policy) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to truncate");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters to truncate", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (nanos < 0) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Nanos arg must not be negative");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Nanos arg must not be negative", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	nanos64 = (uint64_t)nanos;
 
 	if (ns_len == 0) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Namespace must not be empty");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Namespace must not be empty", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (ns_len >= AS_NAMESPACE_MAX_SIZE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Namespace too long");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Namespace too long", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (set && set_len >= AS_SET_MAX_SIZE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Set too long");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Set too long", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (zval_to_as_policy_info(z_info_policy, &info_policy, &info_policy_p, &as_client->config.policies.info)
 			!= AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid policy");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid policy", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	aerospike_truncate(as_client, &err, info_policy_p, ns, set, nanos64);
 
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	RETURN_LONG(err.code)
 }

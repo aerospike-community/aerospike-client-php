@@ -58,7 +58,7 @@ PHP_METHOD(Aerospike, apply) {
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "hss|h!z/z",
 			&z_key, &module, &module_len, &function, &function_len,
 			&z_args, &z_returned, &z_policy_apply) != SUCCESS) {
-				update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters for apply");
+				update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid parameters for apply", false);
 				RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -112,7 +112,7 @@ PHP_METHOD(Aerospike, apply) {
 
 CLEANUP:
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 	if (key_initialized) {
 		as_key_destroy(&key);

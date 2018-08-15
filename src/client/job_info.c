@@ -50,7 +50,7 @@ PHP_METHOD(Aerospike, jobInfo) {
 	reset_client_error(getThis());
 
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		RETURN_LONG(err.code);
 	}
 
@@ -60,7 +60,7 @@ PHP_METHOD(Aerospike, jobInfo) {
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "lsz/|z",
 			&job_id, &module, &module_len,
 			&z_job_info, &z_policy) == FAILURE) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to job_info.");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments to job_info.", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
@@ -68,13 +68,13 @@ PHP_METHOD(Aerospike, jobInfo) {
 	ZVAL_NULL(z_job_info);
 
 	if (strcmp(module, JOB_INFO_QUERY) && strcmp(module, JOB_INFO_SCAN)) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Module argument must be query or scan");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Module argument must be query or scan", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 
 	if (zval_to_as_policy_info(z_policy, &info_policy,
 							   &info_policy_p, &as_client->config.policies.info) != AEROSPIKE_OK) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid policy.");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid policy.", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	info_policy_p = &info_policy;
@@ -91,7 +91,7 @@ PHP_METHOD(Aerospike, jobInfo) {
 
 CLEANUP:
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 	}
 
 	RETURN_LONG(err.code);

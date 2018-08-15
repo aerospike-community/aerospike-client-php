@@ -60,3 +60,13 @@ as_status set_record_generation_from_write_policy(as_record* record, zval* z_wri
 as_status set_operations_generation_from_operate_policy(as_operations* operations, zval* z_write_policy);
 as_status set_operations_ttl_from_operate_policy(as_operations* operations, zval* z_write_policy);
 as_status set_scan_options_from_policy_hash(as_scan* scan, zval* z_policy);
+
+/* Functions used in the class constructor */
+as_status set_read_policy_from_hash(HashTable* z_policy_hash, as_policy_read* read_policy);
+as_status set_write_policy_from_hash(HashTable* z_policy_hash, as_policy_write* write_policy);
+as_status set_remove_policy_from_hash(HashTable* z_policy_hash, as_policy_remove* remove_policy);
+as_status set_batch_policy_from_hash(HashTable* z_policy_hash, as_policy_batch* batch_policy);
+as_status set_operate_policy_from_hash(HashTable* z_policy_hash, as_policy_operate* operate_policy);
+as_status set_query_policy_from_hash(HashTable* z_policy_hash, as_policy_query* query_policy);
+as_status set_scan_policy_from_hash(HashTable* z_policy_hash, as_policy_scan* scan_policy);
+as_status set_apply_policy_from_hash(HashTable* z_policy_hash, as_policy_apply* apply_policy);

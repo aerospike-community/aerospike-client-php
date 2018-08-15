@@ -8,7 +8,7 @@ require_once 'Common.inc';
 class Operate  extends AerospikeTestCommon
 {
     protected function setUp() {
-        $config = array("hosts"=>array(array("addr"=>AEROSPIKE_CONFIG_NAME, "port"=>AEROSPIKE_CONFIG_PORT)));
+        $config = get_as_config();
         $this->db = new Aerospike($config);
         if (!$this->db->isConnected()) {
             return $this->db->errorno();
@@ -731,7 +731,7 @@ class Operate  extends AerospikeTestCommon
         if ($status == Aerospike::OK && strcmp($returned["Athlete"], "Dan Millman") == 0) {
             sleep(3);
             $status = $this->db->get($key, $get_record);
-            if (strcmp($this->db->error(), "AEROSPIKE_ERR_RECORD_NOT_FOUND") == 0) {
+            if ($status === Aerospike::ERR_RECORD_NOT_FOUND) {
                 return Aerospike::OK;
             }
         }

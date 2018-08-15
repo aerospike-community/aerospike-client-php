@@ -60,7 +60,7 @@ enum Aerospike_serializer_values {
 };
 
 AerospikeClient* get_aerospike_from_zobj(zend_object* zval_wrapper);
-void update_client_error(zval* client_obj, int code, const char* msg);
+void update_client_error(zval* client_obj, int code, const char* msg, bool in_doubt);
 void reset_client_error(zval* client_obj);
 as_status check_object_and_connection(zval* aerospike_container, as_error* err);
 void set_policy_defaults_from_ini(as_config* config, AerospikeClient* client);
@@ -133,7 +133,34 @@ enum Aerospike_opt_keys {
 	OPT_POLICY_DURABLE_DELETE, /* set to true to enable durable delete for the operation                       */
 	OPT_SOCKET_TIMEOUT,       /* Socket timeout to be applied to server as well as client */
 	OPT_MAP_ORDER,            /* Ordering for an as_map */
-	OPT_MAP_WRITE_MODE        /* Write mode for as_maps*/
+	OPT_MAP_WRITE_MODE,        /* Write mode for as_maps*/
+	OPT_TOTAL_TIMEOUT,
+	OPT_MAX_RETRIES,
+	OPT_LINEARIZE_READ,
+	OPT_FAIL_ON_CLUSTER_CHANGE,
+	OPT_BATCH_CONCURRENT,
+	OPT_ALLOW_INLINE,
+	OPT_SEND_SET_NAME,
+	OPT_TLS_CONFIG,
+	OPT_TLS_ENABLE,
+	OPT_TLS_CAFILE,
+	OPT_TLS_CAPATH,
+	OPT_TLS_PROTOCOLS,
+	OPT_TLS_CIPHER_SUITE,
+	OPT_TLS_CRL_CHECK,
+	OPT_TLS_CRL_CHECK_ALL,
+	OPT_TLS_CERT_BLACKLIST,
+	OPT_TLS_LOG_SESSION_INFO,
+	OPT_TLS_KEYFILE,
+	OPT_TLS_CERTFILE,
+	OPT_READ_DEFAULT_POL,
+	OPT_WRITE_DEFAULT_POL,
+	OPT_REMOVE_DEFAULT_POL,
+	OPT_BATCH_DEFAULT_POL,
+	OPT_OPERATE_DEFAULT_POL,
+	OPT_QUERY_DEFAULT_POL,
+	OPT_SCAN_DEFAULT_POL,
+	OPT_APPLY_DEFAULT_POL
 };
 
 #endif

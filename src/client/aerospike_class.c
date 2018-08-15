@@ -27,8 +27,10 @@
 #include "php_aerospike_types.h"
 #include "register_policy_constants.h"
 #include "register_constants.h"
+#include "policy_conversions.h"
 #include "logging.h"
 #include "persistent_list.h"
+#include "tls_config.h"
 #include "zend_exceptions.h"
 #include <stdbool.h>
 #include "aerospike_session.h"
@@ -39,6 +41,7 @@
 static void set_as_config_from_ini(as_config* config);
 static as_status set_as_config(as_config* config, HashTable* z_conf_hash);
 static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClient* client, HashTable* policy_hash);
+static as_status set_subpolicies_from_hash(as_config* config, HashTable* policy_hash);
 static as_status add_hosts_from_zhash(as_config* config, HashTable* z_hosts);
 
 static void aerospike_object_destructor(zend_object *object);
@@ -63,6 +66,7 @@ static zend_function_entry Aerospike_class_functions[] =
 	PHP_ME(Aerospike, dropIndex, drop_index_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, error, error_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, errorno, errorno_arg_info, ZEND_ACC_PUBLIC)
+	PHP_ME(Aerospike, errorInDoubt, error_in_doubt_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, exists, exists_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, get, get_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, getKeyDigest, getKeyDigest_arg_info, ZEND_ACC_PUBLIC)
@@ -94,7 +98,6 @@ static zend_function_entry Aerospike_class_functions[] =
 	PHP_ME(Aerospike, register, register_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, remove, remove_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, removeBin, remove_bin_arg_info, ZEND_ACC_PUBLIC)
-	PHP_ME(Aerospike, select, select_arg_info, ZEND_ACC_PUBLIC)
 	PHP_ME(Aerospike, setDeserializer, set_deserializer_arg_info, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Aerospike, setSerializer, set_serializer_arg_info, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Aerospike, shmKey, shm_key_arg_info, ZEND_ACC_PUBLIC)
@@ -339,7 +342,7 @@ PHP_METHOD(Aerospike, initKey)
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ssz|b",
 		&namespace, &namespace_len, &set, &set_len, &primary_key, &is_digest) != SUCCESS
 		) {
-		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments for initKey");
+		update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid arguments for initKey", false);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
 	reset_client_error(getThis());
@@ -352,7 +355,7 @@ PHP_METHOD(Aerospike, initKey)
 		case(IS_STRING):
 			if (is_digest) {
 				if (Z_STRLEN_P(primary_key) != AS_DIGEST_VALUE_SIZE) {
-					update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Digest Must be 20 bytes");
+					update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Digest Must be 20 bytes", false);
 					zval_dtor(return_value);
 					RETURN_NULL();
 				}
@@ -372,7 +375,7 @@ PHP_METHOD(Aerospike, initKey)
 			break;
 		// case bytes
 		default:
-			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid type for primary key");
+			update_client_error(getThis(), AEROSPIKE_ERR_PARAM, "Invalid type for primary key", false);
 			zval_dtor(return_value);
 			RETURN_NULL();
 	}
@@ -401,6 +404,17 @@ PHP_METHOD(Aerospike, errorno)
 	AerospikeClient* client = get_aerospike_from_zobj(Z_OBJ_P(getThis()));
 	if (client) {
 		RETURN_LONG(client->client_error.code);
+	}
+}
+/* }}} */
+
+/* {{{ proto bool Aerospike::errorInDoubt ( void )
+   Displays the in doubt status associated with the last operation */
+PHP_METHOD(Aerospike, errorInDoubt)
+{
+	AerospikeClient* client = get_aerospike_from_zobj(Z_OBJ_P(getThis()));
+	if (client) {
+		RETURN_BOOL(client->client_error.in_doubt);
 	}
 }
 /* }}} */
@@ -442,18 +456,18 @@ PHP_METHOD(Aerospike, reconnect) {
 	if (client && client->as_client) {
 		as_ptr = client->as_client;
 	} else {
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Client object is invalid");
+		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Client object is invalid", false);
 		RETURN_LONG(AEROSPIKE_ERR_CLIENT);
 	}
 
 	if (client->is_connected) {
-		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Client already connected");
+		update_client_error(getThis(), AEROSPIKE_ERR_CLIENT, "Client already connected", false);
 		RETURN_LONG(AEROSPIKE_ERR_CLIENT);
 	}
 
 	aerospike_connect(as_ptr, &err);
 	if (err.code != AEROSPIKE_OK) {
-		update_client_error(getThis(), err.code, err.message);
+		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		RETURN_LONG(err.code);
 	} else {
 		client->is_connected = true;
@@ -661,6 +675,11 @@ static as_status set_as_config(as_config* config, HashTable* z_conf_hash) {
 		}
 	}
 
+	setting_value = zend_hash_index_find(z_conf_hash, OPT_TLS_CONFIG);
+	if (setting_value && Z_TYPE_P(setting_value) == IS_ARRAY) {
+		setTLSConfig(config, Z_ARRVAL_P(setting_value));
+	}
+
 	/* Authentication information */
 	setting_value = zend_hash_str_find(z_conf_hash, "user", strlen("user"));
 	if (setting_value) {
@@ -779,9 +798,9 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.read.timeout = int_ini_value;
+		config->policies.read.base.total_timeout = int_ini_value;
 		config->policies.info.timeout = int_ini_value;
-		config->policies.batch.timeout = int_ini_value;
+		config->policies.batch.base.total_timeout = int_ini_value;
 	}
 
 	policy_zval = zend_hash_index_find(policy_hash, OPT_WRITE_TIMEOUT);
@@ -790,10 +809,40 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.write.timeout = int_ini_value;
-		config->policies.operate.timeout = int_ini_value;
-		config->policies.remove.timeout = int_ini_value;
-		config->policies.apply.timeout = int_ini_value;
+		config->policies.write.base.total_timeout = int_ini_value;
+		config->policies.operate.base.total_timeout = int_ini_value;
+		config->policies.remove.base.total_timeout = int_ini_value;
+		config->policies.apply.base.total_timeout = int_ini_value;
+	}
+
+
+	policy_zval = zend_hash_index_find(policy_hash, OPT_TOTAL_TIMEOUT);
+	if (policy_zval) {
+		if (Z_TYPE_P(policy_zval) != IS_LONG) {
+			return AEROSPIKE_ERR_PARAM;
+		}
+		int_ini_value = Z_LVAL_P(policy_zval);
+		config->policies.read.base.total_timeout = int_ini_value;
+		config->policies.info.timeout = int_ini_value;
+		config->policies.batch.base.total_timeout = int_ini_value;
+		config->policies.write.base.total_timeout = int_ini_value;
+		config->policies.operate.base.total_timeout = int_ini_value;
+		config->policies.remove.base.total_timeout = int_ini_value;
+		config->policies.apply.base.total_timeout = int_ini_value;
+	}
+
+	policy_zval = zend_hash_index_find(policy_hash, OPT_SOCKET_TIMEOUT);
+	if (policy_zval) {
+		if (Z_TYPE_P(policy_zval) != IS_LONG) {
+			return AEROSPIKE_ERR_PARAM;
+		}
+		int_ini_value = Z_LVAL_P(policy_zval);
+		config->policies.read.base.socket_timeout = int_ini_value;
+		config->policies.batch.base.socket_timeout = int_ini_value;
+		config->policies.write.base.socket_timeout = int_ini_value;
+		config->policies.operate.base.socket_timeout = int_ini_value;
+		config->policies.remove.base.socket_timeout = int_ini_value;
+		config->policies.apply.base.socket_timeout = int_ini_value;
 	}
 
 	policy_zval = zend_hash_index_find(policy_hash, OPT_POLICY_KEY);
@@ -802,7 +851,6 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.key = (as_policy_key)int_ini_value;
 		config->policies.read.key = (as_policy_key)int_ini_value;
 		config->policies.write.key = (as_policy_key)int_ini_value;
 		config->policies.operate.key = (as_policy_key)int_ini_value;
@@ -815,20 +863,23 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.exists = (as_policy_exists)int_ini_value;
 		config->policies.write.exists = (as_policy_exists)int_ini_value;
 	}
 
-	policy_zval = zend_hash_index_find(policy_hash, OPT_POLICY_RETRY);
+	policy_zval = zend_hash_index_find(policy_hash, OPT_MAX_RETRIES);
 	if (policy_zval) {
 		if (Z_TYPE_P(policy_zval) != IS_LONG) {
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.retry = (as_policy_retry)int_ini_value;
-		config->policies.write.retry = (as_policy_retry)int_ini_value;
-		config->policies.operate.retry = (as_policy_retry)int_ini_value;
-		config->policies.remove.retry = (as_policy_retry)int_ini_value;
+		config->policies.write.base.max_retries = int_ini_value;
+		config->policies.operate.base.max_retries = int_ini_value;
+		config->policies.remove.base.max_retries = int_ini_value;
+		config->policies.read.base.max_retries = int_ini_value;
+		config->policies.apply.base.max_retries = int_ini_value;
+		config->policies.query.base.max_retries = int_ini_value;
+		config->policies.scan.base.max_retries = int_ini_value;
+		config->policies.batch.base.max_retries = int_ini_value;
 	}
 
 	policy_zval = zend_hash_index_find(policy_hash, OPT_POLICY_COMMIT_LEVEL);
@@ -837,7 +888,6 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.commit_level = (as_policy_commit_level)int_ini_value;
 		config->policies.write.commit_level = (as_policy_commit_level)int_ini_value;
 		config->policies.remove.commit_level = (as_policy_commit_level)int_ini_value;
 		config->policies.operate.commit_level = (as_policy_commit_level)int_ini_value;
@@ -850,7 +900,6 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.consistency_level = (as_policy_consistency_level)int_ini_value;
 		config->policies.read.consistency_level = (as_policy_consistency_level)int_ini_value;
 		config->policies.operate.consistency_level = (as_policy_consistency_level)int_ini_value;
 		config->policies.batch.consistency_level = (as_policy_consistency_level)int_ini_value;
@@ -862,7 +911,6 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.replica = (as_policy_replica)int_ini_value;
 		config->policies.read.replica = (as_policy_replica)int_ini_value;
 		config->policies.operate.replica = (as_policy_replica)int_ini_value;
 	}
@@ -874,5 +922,84 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 		}
 		client->serializer_type = Z_LVAL_P(policy_zval);
 	}
+
+	return set_subpolicies_from_hash(config, policy_hash);
+}
+
+static as_status set_subpolicies_from_hash(as_config* config, HashTable* policy_hash) {
+	zval* z_subpolicy = NULL;
+
+	z_subpolicy = zend_hash_index_find(policy_hash, OPT_READ_DEFAULT_POL);
+	if (z_subpolicy) {
+		if (Z_TYPE_P(z_subpolicy) == IS_ARRAY) {
+			set_read_policy_from_hash(Z_ARRVAL_P(z_subpolicy), &config->policies.read);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	z_subpolicy = zend_hash_index_find(policy_hash, OPT_WRITE_DEFAULT_POL);
+	if (z_subpolicy) {
+		if (Z_TYPE_P(z_subpolicy) == IS_ARRAY) {
+			set_write_policy_from_hash(Z_ARRVAL_P(z_subpolicy), &config->policies.write);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	z_subpolicy = zend_hash_index_find(policy_hash, OPT_REMOVE_DEFAULT_POL);
+	if (z_subpolicy) {
+		if (Z_TYPE_P(z_subpolicy) == IS_ARRAY) {
+			set_remove_policy_from_hash(Z_ARRVAL_P(z_subpolicy), &config->policies.remove);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	z_subpolicy = zend_hash_index_find(policy_hash, OPT_BATCH_DEFAULT_POL);
+	if (z_subpolicy) {
+		if (Z_TYPE_P(z_subpolicy) == IS_ARRAY) {
+			set_batch_policy_from_hash(Z_ARRVAL_P(z_subpolicy), &config->policies.batch);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	z_subpolicy = zend_hash_index_find(policy_hash, OPT_OPERATE_DEFAULT_POL);
+	if (z_subpolicy) {
+		if (Z_TYPE_P(z_subpolicy) == IS_ARRAY) {
+			set_operate_policy_from_hash(Z_ARRVAL_P(z_subpolicy), &config->policies.operate);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	z_subpolicy = zend_hash_index_find(policy_hash, OPT_QUERY_DEFAULT_POL);
+	if (z_subpolicy) {
+		if (Z_TYPE_P(z_subpolicy) == IS_ARRAY) {
+			set_query_policy_from_hash(Z_ARRVAL_P(z_subpolicy), &config->policies.query);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	z_subpolicy = zend_hash_index_find(policy_hash, OPT_SCAN_DEFAULT_POL);
+	if (z_subpolicy) {
+		if (Z_TYPE_P(z_subpolicy) == IS_ARRAY) {
+			set_scan_policy_from_hash(Z_ARRVAL_P(z_subpolicy), &config->policies.scan);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	z_subpolicy = zend_hash_index_find(policy_hash, OPT_APPLY_DEFAULT_POL);
+	if (z_subpolicy) {
+		if (Z_TYPE_P(z_subpolicy) == IS_ARRAY) {
+			set_apply_policy_from_hash(Z_ARRVAL_P(z_subpolicy), &config->policies.apply);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
 	return AEROSPIKE_OK;
 }

@@ -34,4 +34,43 @@ function array_diff_assoc_recursive($array1, $array2) {
     }
     return $difference;
 }
+
+function get_as_config() {
+
+    $host = ['addr' => AEROSPIKE_CONFIG_NAME, 'port' => AEROSPIKE_CONFIG_PORT];
+    if (getenv("CLIENT_TEST_TLSNAME") != "") {
+        $host["tlst_name"] = getenv("CLIENT_TEST_TLSNAME");
+    }
+
+    //var_dump($host);
+    $config = ["hosts"=>[$host]];
+    $tls_config = [];
+    $use_tls = false;
+    if (defined('AEROSPIKE_USE_TLS') && constant('AEROSPIKE_USE_TLS')) {
+        if (getenv("TLS_ENABLE") != "") {
+            $tls_config[Aerospike::OPT_TLS_ENABLE] = (int)getenv("TLS_ENABLE");
+            $use_tls = (int)getenv("TLS_ENABLE");
+        }
+        if (getenv("TLS_CIPHERSUITE") != "") {
+            $tls_config[Aerospike::OPT_TLS_CIPHER_SUITE] = getenv("TLS_CIPHERSUITE");
+        }
+        if (getenv("TLS_CAFILE") != "") {
+            $tls_config[Aerospike::OPT_TLS_CAFILE] = getenv("TLS_CAFILE");
+        }
+        if (getenv("TLS_KEYFILE") != "") {
+            $tls_config[Aerospike::OPT_TLS_KEYFILE] = getenv("TLS_KEYFILE");
+        }
+        if (getenv("TLS_CERTFILE") != "") {
+            $tls_config[Aerospike::OPT_TLS_CERTFILE] = getenv("TLS_CERTFILE");
+        }
+        if (getenv("TLS_CERTBLACKLIST") != "") {
+            $tls_config[Aerospike::OPT_TLS_CERT_BLACKLIST] = getenv("TLS_CERTBLACKLIST");
+        }
+    }
+    if ($use_tls) {
+        $config[Aerospike::OPT_TLS_CONFIG] = $tls_config;
+    }
+
+    return $config;
+}
 ?>

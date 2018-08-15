@@ -6,4 +6,4 @@ Get - Parameter equence change in Key array
 include dirname(__FILE__)."/../../astestframework/astest-phpt-loader.inc";
 aerospike_phpt_runtest("Get", "testCheckParameterSequenceChangeInKeyArray");
 --EXPECT--
-ERR_NAMESPACE_NOT_FOUND
+ERR_CLIENT
