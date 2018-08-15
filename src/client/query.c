@@ -248,11 +248,7 @@ PHP_METHOD(Aerospike, queryApply) {
 		goto CLEANUP;
 	}
 
-	if (aerospike_query_background(as_client, &err, write_policy_p, &query, &job_id) != AEROSPIKE_OK) {
-		goto CLEANUP;
-	}
-
-	if (aerospike_query_wait(as_client, &err, NULL, &query, job_id, 0) == AEROSPIKE_OK) {
+	if (aerospike_query_background(as_client, &err, write_policy_p, &query, &job_id) == AEROSPIKE_OK) {
 		ZVAL_LONG(z_job_id, job_id);
 	}
 
