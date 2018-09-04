@@ -39,8 +39,7 @@
  * aerospike.key_policy = 0; // only digest
  * // The unsupported type handler. 0: none, 1: PHP, 2: user-defined
  * aerospike.serializer = 1; // php serializer
- * // Path to the system support files for Lua UDFs.
- * aerospike.udf.lua_system_path = /usr/local/aerospike/lua;
+
  * // Path to the user-defined Lua function modules.
  * aerospike.udf.lua_user_path = /usr/local/aerospike/usr-lua;
  * // Indicates if shared memory should be used for cluster tending.
