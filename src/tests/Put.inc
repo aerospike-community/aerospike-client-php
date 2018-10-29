@@ -2705,32 +2705,6 @@ function testMixedTypesWithDefaultSerializer()
 
     /**
      * @test
-     * Basic PUT with bin name exceeding 15 characters limit.
-     *
-     * @pre
-     * Connect using aerospike object to the specified node
-     *
-     * @post
-     * newly initialized Aerospike objects
-     *
-     * @remark
-     * Variants: OO (testPUT)
-     *
-     * @test_plans{1.1}
-     */
-    function testPutBinNameExceedingMaxlimit()
-    {
-        $key = $this->db->initKey("test", "demo", "put_test");
-        $status = $this->db->put($key,  array("1234567890123456789"=>"Hello World"));
-        $this->keys[] = $key;
-        if ($status !== Aerospike::OK) {
-            return $this->db->errorno();
-        }
-        return $s
-    }
-
-    /**
-     * @test
      * put() with no data
      *
      * @pre
