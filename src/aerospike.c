@@ -41,7 +41,6 @@ PHP_INI_BEGIN()
     STD_PHP_INI_ENTRY("aerospike.shm.max_nodes", "16", PHP_INI_PERDIR|PHP_INI_SYSTEM|PHP_INI_USER, OnUpdateLong, shm_max_nodes, zend_aerospike_globals, aerospike_globals)
     STD_PHP_INI_ENTRY("aerospike.shm.max_namespaces", "8", PHP_INI_PERDIR|PHP_INI_SYSTEM|PHP_INI_USER, OnUpdateLong, shm_max_namespaces, zend_aerospike_globals, aerospike_globals)
     STD_PHP_INI_ENTRY("aerospike.shm.takeover_threshold_sec", "30", PHP_INI_PERDIR|PHP_INI_SYSTEM|PHP_INI_USER, OnUpdateLong, shm_takeover_threshold_sec, zend_aerospike_globals, aerospike_globals)
-    STD_PHP_INI_ENTRY("aerospike.use_batch_direct", "false", PHP_INI_PERDIR|PHP_INI_SYSTEM|PHP_INI_USER, OnUpdateLong, use_batch_direct, zend_aerospike_globals, aerospike_globals)
     STD_PHP_INI_ENTRY("aerospike.max_threads", "300", PHP_INI_PERDIR|PHP_INI_SYSTEM|PHP_INI_USER, OnUpdateLong, max_threads, zend_aerospike_globals, aerospike_globals)
 	// This causes issues consider removal
     STD_PHP_INI_ENTRY("aerospike.thread_pool_size", "16", PHP_INI_PERDIR|PHP_INI_SYSTEM|PHP_INI_USER, OnUpdateLong, thread_pool_size, zend_aerospike_globals, aerospike_globals)

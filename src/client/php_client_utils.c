@@ -87,9 +87,6 @@ void set_policy_defaults_from_ini(as_config* config, AerospikeClient* client) {
 	config->policies.operate.key = (as_policy_key)int_ini_value;
 	config->policies.remove.key = (as_policy_key)int_ini_value;
 
-	int_ini_value = INI_INT("aerospike.use_batch_direct");
-	config->policies.batch.use_batch_direct = int_ini_value;
-
 	int_ini_value = INI_INT("aerospike.compression_threshold");
 	config->policies.write.compression_threshold = int_ini_value;
 

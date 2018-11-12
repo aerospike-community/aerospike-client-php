@@ -113,7 +113,7 @@ PHP_METHOD(Aerospike, getMany) {
 	zval_dtor(z_records);
 	ZVAL_NULL(z_records);
 
-	if ( as_client->config.policies.batch.use_batch_direct || (!aerospike_has_batch_index(as_client)) ) {
+	if ( !aerospike_has_batch_index(as_client) ) {
 		use_batch_direct = true;
 	}
 
