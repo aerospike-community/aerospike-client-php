@@ -3255,89 +3255,89 @@ class Aerospike {
      /* Key used to specify an array of read policy defaults used in the constructor.
         See https://github.com/aerospike/aerospike-client-php/blob/master/doc/policies.md
      */
-     const OPT_READ_DEFAULT_POL = "OPT_READ_DEFAULT_POL"
+     const OPT_READ_DEFAULT_POL = "OPT_READ_DEFAULT_POL";
      /* Key used to specify an array of write policy defaults used in the constructor.
         See https://github.com/aerospike/aerospike-client-php/blob/master/doc/policies.md
      */
-     const OPT_WRITE_DEFAULT_POL = "OPT_WRITE_DEFAULT_POL"
+     const OPT_WRITE_DEFAULT_POL = "OPT_WRITE_DEFAULT_POL";
      /* Key used to specify an array of remove policy defaults used in the constructor.
         See https://github.com/aerospike/aerospike-client-php/blob/master/doc/policies.md
      */
-     const OPT_REMOVE_DEFAULT_POL = "OPT_REMOVE_DEFAULT_POL"
+     const OPT_REMOVE_DEFAULT_POL = "OPT_REMOVE_DEFAULT_POL";
      /* Key used to specify an array of batch policy defaults used in the constructor.
         See https://github.com/aerospike/aerospike-client-php/blob/master/doc/policies.md
      */
-     const OPT_BATCH_DEFAULT_POL = "OPT_BATCH_DEFAULT_POL"
+     const OPT_BATCH_DEFAULT_POL = "OPT_BATCH_DEFAULT_POL";
      /* Key used to specify an array of operate policy defaults used in the constructor.
         See https://github.com/aerospike/aerospike-client-php/blob/master/doc/policies.md
      */
-     const OPT_OPERATE_DEFAULT_POL = "OPT_OPERATE_DEFAULT_POL"
+     const OPT_OPERATE_DEFAULT_POL = "OPT_OPERATE_DEFAULT_POL";
      /* Key used to specify an array of query policy defaults used in the constructor.
         See https://github.com/aerospike/aerospike-client-php/blob/master/doc/policies.md
      */
-     const OPT_QUERY_DEFAULT_POL = "OPT_QUERY_DEFAULT_POL"
+     const OPT_QUERY_DEFAULT_POL = "OPT_QUERY_DEFAULT_POL";
      /* Key used to specify an array of scan policy defaults used in the constructor.
         See https://github.com/aerospike/aerospike-client-php/blob/master/doc/policies.md
      */
-     const OPT_SCAN_DEFAULT_POL = "OPT_SCAN_DEFAULT_POL"
+     const OPT_SCAN_DEFAULT_POL = "OPT_SCAN_DEFAULT_POL";
      /* Key used to specify an array of apply policy defaults used in the constructor.
         See https://github.com/aerospike/aerospike-client-php/blob/master/doc/policies.md
      */
-     const OPT_APPLY_DEFAULT_POL = "OPT_APPLY_DEFAULT_POL"
+     const OPT_APPLY_DEFAULT_POL = "OPT_APPLY_DEFAULT_POL";
 
      /*
      Key used in the options argument of the constructor used to point to an array of TLS
      configuration parameters. Use of TLS requires an enterprise version of the Aerospike Server.
      */
-     const OPT_TLS_CONFIG = "OPT_TLS_CONFIG"
+     const OPT_TLS_CONFIG = "OPT_TLS_CONFIG";
      
      /* Key used in the OPT_TLS boolean Whether or not to enable TLS.
      */
-     const OPT_TLS_ENABLE = "OPT_TLS_ENABLE"
+     const OPT_TLS_ENABLE = "OPT_TLS_ENABLE";
 
      /*
      Key used to specify a string path to a trusted CA certificate file. By default TLS will use system standard trusted CA certificates
      */
-     const OPT_OPT_TLS_CAFILE = "OPT_OPT_TLS_CAFILE"
+     const OPT_OPT_TLS_CAFILE = "OPT_OPT_TLS_CAFILE";
 
      /*
      Key used to specify a Path to a directory of trusted certificates. See the OpenSSL SSL_CTX_load_verify_locations manual page for more information about the format of the directory.
      */
-     const OPT_TLS_CAPATH = "OPT_TLS_CAPATH"
+     const OPT_TLS_CAPATH = "OPT_TLS_CAPATH";
 
      /*Key used to specify a string representation of allowed protocols. Specifies enabled protocols. This format is the same as Apache's SSLProtocol documented at https://httpd.apache.org/docs/current/mod/mod_ssl.html#sslprotocol . If not specified the client will use "-all +TLSv1.2".
      */
-     const OPT_TLS_PROTOCOLS ="OPT_TLS_PROTOCOLS"
+     const OPT_TLS_PROTOCOLS ="OPT_TLS_PROTOCOLS";
 
      /*
      Key used to specify a string. Specifies enabled cipher suites. The format is the same as OpenSSL's Cipher List Format documented at https://www.openssl.org/docs/manmaster/apps/ciphers.html .If not specified the OpenSSL default cipher suite described in the ciphers documentation will be used. If you are not sure what cipher suite to select this option is best left unspecified
      */
-     const OPT_TLS_CIPHER_SUITE = "OPT_TLS_CIPHER_SUITE"
+     const OPT_TLS_CIPHER_SUITE = "OPT_TLS_CIPHER_SUITE";
 
      /*
      Key used to specify a boolean. Enable CRL checking for the certificate chain leaf certificate. An error occurs if a suitable CRL cannot be found. By default CRL checking is disabled.
      */
-     const OPT_TLS_CRL_CHECK = "OPT_TLS_CRL_CHECK"
+     const OPT_TLS_CRL_CHECK = "OPT_TLS_CRL_CHECK";
 
      /*
      Key used to specify a bolean. Enable CRL checking for the entire certificate chain. An error occurs if a suitable CRL cannot be found. By default CRL checking is disabled.
      */
-     const OPT_TLS_CRL_CHECK_ALL = "OPT_TLS_CRL_CHECK_ALL"
+     const OPT_TLS_CRL_CHECK_ALL = "OPT_TLS_CRL_CHECK_ALL";
 
      /* Key used to specify a path to a certificate blacklist file. The file should contain one line for each blacklisted certificate. Each line starts with the certificate serial number expressed in hex. Each entry may optionally specify the issuer name of the certificate (serial numbers are only required to be unique per issuer). Example records: 867EC87482B2 /C=US/ST=CA/O=Acme/OU=Engineering/CN=Test Chain CA E2D4B0E570F9EF8E885C065899886461 */
-     const OPT_TLS_CERT_BLACKLIST = "OPT_TLS_CERT_BLACKLIST"
+     const OPT_TLS_CERT_BLACKLIST = "OPT_TLS_CERT_BLACKLIST";
      
      /* Boolean: Log session information for each connection. */
-     const OPT_TLS_LOG_SESSION_INFO = "OPT_TLS_LOG_SESSION_INFO"
+     const OPT_TLS_LOG_SESSION_INFO = "OPT_TLS_LOG_SESSION_INFO";
      
      /*
      Path to the client's key for mutual authentication. By default mutual authentication is disabled.
      */
-     const OPT_TLS_KEYFILE = "OPT_TLS_KEYFILE"
+     const OPT_TLS_KEYFILE = "OPT_TLS_KEYFILE";
 
      /* Path to the client's certificate chain file for mutual authentication. By default mutual authentication is disabled.
      */
-     const OPT_TLS_CERTFILE = "OPT_TLS_CERTFILE"
+     const OPT_TLS_CERTFILE = "OPT_TLS_CERTFILE";
      
      /**
      * Defines the length of time (in milliseconds) the client waits on establishing a connection.
@@ -3555,13 +3555,13 @@ class Aerospike {
       * Default: true
       @const OPT_DESERIALIZE
     */
-    const OPT_DESERIALIZE = "deserialize"
+    const OPT_DESERIALIZE = "deserialize";
 
      /**
       * Milliseconds to sleep between retries.  Enter zero to skip sleep.
       * const OPT_SLEEP_BETWEEN_RETRIES
       */
-    const OPT_SLEEP_BETWEEN_RETRIES = "sleep_between_retries"
+    const OPT_SLEEP_BETWEEN_RETRIES = "sleep_between_retries";
 
     /**
      * Maximum number of retries before aborting the current transaction.
@@ -3573,7 +3573,7 @@ class Aerospike {
      * It's important to use a distinct write policy for non-idempotent
      * writes which sets OPT_MAX_RETRIES = 0;
     **/
-    const OPT_MAX_RETRIES = "OPT_MAX_RETRIES"
+    const OPT_MAX_RETRIES = "OPT_MAX_RETRIES";
      /**
       * Total transaction timeout in milliseconds.
       * The OPT_TOTAL_TIMEOUT is tracked on the client and sent to the server along with
@@ -3584,7 +3584,7 @@ class Aerospike {
       * completes, the transaction will return error ERR_TIMEOUT.
       * If OPT_TOTAL_TIMEOUT is zero, there will be no total time limit.
       */
-    const OPT_TOTAL_TIMEOUT = "OPT_TOTAL_TIMEOUT"
+    const OPT_TOTAL_TIMEOUT = "OPT_TOTAL_TIMEOUT";
 
      /**
       * Socket idle timeout in milliseconds when processing a database command.
@@ -3597,13 +3597,13 @@ class Aerospike {
      * then OPT_SOCKET_TIMEOUT will be set to OPT_TOTAL_TIMEOUT.  If OPT_SOCKET_TIMEOUT is zero, there will be
      * no socket idle limit.
      */
-    const OPT_SOCKET_TIMEOUT = "OPT_SOCKET_TIMEOUT"
+    const OPT_SOCKET_TIMEOUT = "OPT_SOCKET_TIMEOUT";
 
 
     /**
      * Determine if batch commands to each server are run in parallel threads.
      */
-    const OPT_BATCH_CONCURRENT = "OPT_BATCH_CONCURRENT"
+    const OPT_BATCH_CONCURRENT = "OPT_BATCH_CONCURRENT";
      /**
       * Allow batch to be processed immediately in the server's receiving thread when the server
       * deems it to be appropriate.  If false, the batch will always be processed in separate
@@ -3617,7 +3617,7 @@ class Aerospike {
       * can process the entire batch before moving onto the next command.
       * Default: true
       */
-    const OPT_ALLOW_INLINE = "OPT_ALLOW_INLINE"
+    const OPT_ALLOW_INLINE = "OPT_ALLOW_INLINE";
 
      /**
       * Send set name field to server for every key in the batch for batch index protocol.
@@ -3625,18 +3625,18 @@ class Aerospike {
       * on a per set basis.
       * Default: false
       */
-    const OPT_SEND_SET_NAME = "OPT_SEND_SET_NAME"
+    const OPT_SEND_SET_NAME = "OPT_SEND_SET_NAME";
 
     /**
      * Bool
      * Force reads to be linearized for server namespaces that support CP mode. Requires enterprise server >= 4.0.0
     */
-    const OPT_LINEARIZE_READ = "OPT_LINEARIZE_READ"
+    const OPT_LINEARIZE_READ = "OPT_LINEARIZE_READ";
 
     /**
      * Abort the scan if the cluster is not in a stable state. Default false
      */
-    const OPT_FAIL_ON_CLUSTER_CHANGE = "OPT_FAIL_ON_CLUSTER_CHANGE"
+    const OPT_FAIL_ON_CLUSTER_CHANGE = "OPT_FAIL_ON_CLUSTER_CHANGE";
     /**
      * Accepts one of the SCAN_PRIORITY_* values.
      *
