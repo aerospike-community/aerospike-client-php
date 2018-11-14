@@ -110,7 +110,6 @@ Now edit the php.ini file.  If PHP is configured --with-config-file-scan-dir
 directory, otherwise edit `php.ini` directly. Add the following directive:
 
     extension=aerospike.so
-    aerospike.udf.lua_system_path=/path/to/aerospike/lua
     aerospike.udf.lua_user_path=/path/to/aerospike/usr-lua
 
 The *aerospike* module should now be available to the PHP CLI:

@@ -6,7 +6,7 @@ extern zend_module_entry aerospike_module_entry;
 #define phpext_aerospike_ptr &aerospike_module_entry
 
 
-#define PHP_AEROSPIKE_VERSION "7.2.0"
+#define PHP_AEROSPIKE_VERSION "7.3.0"
 
 #ifdef PHP_WIN32
 #	define PHP_AEROSPIKE_API __declspec(dllexport)
@@ -33,7 +33,6 @@ ZEND_BEGIN_MODULE_GLOBALS(aerospike)
 	char *log_path;
 	char *log_level;
 	int serializer;
-	char *lua_system_path;
 	char *lua_user_path;
 	int key_policy;
 	int key_gen;

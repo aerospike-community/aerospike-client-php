@@ -17,9 +17,8 @@
 
 export CLIENTREPO_3X=${PWD}/../aerospike-client-c
 
-export AEROSPIKE_C_VERSION=${AEROSPIKE_C_CLIENT:-4.3.12}
+export AEROSPIKE_C_VERSION=${AEROSPIKE_C_CLIENT:-4.3.20}
 export DOWNLOAD_C_CLIENT=${DOWNLOAD_C_CLIENT:-1}
-export LUA_SYSPATH=${LUA_SYSPATH:-/usr/local/aerospike/lua}
 export LUA_USRPATH=${LUA_USRPATH:-/usr/local/aerospike/usr-lua}
 
 echo "This Aerospike client requires PHP7"
@@ -149,16 +148,6 @@ if [ $? -gt 0 ] ; then
 fi
 #scripts/test-cleanup.sh
 
-if [ ! -d $LUA_SYSPATH ]; then
-    mkdir -p $LUA_SYSPATH
-    if [ $? -gt 0 ] ; then
-        echo "Failed to create a directory for the system lua files.  Please run:"
-        echo "sudo mkdir $LUA_SYSPATH"
-        exit 4
-    fi
-fi
-cp ${PWD}/../modules/aerospike-lua-core/src/*.lua $LUA_SYSPATH
-
 if [ ! -d $LUA_USRPATH ]; then
     mkdir -p $LUA_USRPATH
     if [ $? -gt 0 ] ; then
@@ -188,7 +177,6 @@ config()
     INI_PATH=`echo $2|cut -d '>' -f2`
     echo "$1 file at $INI_PATH with the directive:"
     code "extension=aerospike.so"
-    code "aerospike.udf.lua_system_path=$LUA_SYSPATH"
     code "aerospike.udf.lua_user_path=$LUA_USRPATH"
     echo ""
     echo "If you are using a web server such as Apache or Nginx you will need"

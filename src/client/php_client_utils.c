@@ -65,7 +65,6 @@ as_status check_object_and_connection(zval* aerospike_container, as_error* err) 
 }
 
 void set_policy_defaults_from_ini(as_config* config, AerospikeClient* client) {
-	char* lua_system_path_str = NULL;
 	char* lua_user_path_str = NULL;
 	int int_ini_value;
 
@@ -88,9 +87,6 @@ void set_policy_defaults_from_ini(as_config* config, AerospikeClient* client) {
 	config->policies.operate.key = (as_policy_key)int_ini_value;
 	config->policies.remove.key = (as_policy_key)int_ini_value;
 
-	int_ini_value = INI_INT("aerospike.use_batch_direct");
-	config->policies.batch.use_batch_direct = int_ini_value;
-
 	int_ini_value = INI_INT("aerospike.compression_threshold");
 	config->policies.write.compression_threshold = int_ini_value;
 
@@ -99,11 +95,6 @@ void set_policy_defaults_from_ini(as_config* config, AerospikeClient* client) {
 	config->policies.operate.gen = (as_policy_gen)int_ini_value;
 	config->policies.apply.gen = (as_policy_gen)int_ini_value;
 	config->policies.remove.gen = (as_policy_gen)int_ini_value;
-
-	lua_system_path_str = INI_STR("aerospike.udf.lua_system_path");
-	if (lua_system_path_str && strlen(lua_system_path_str) < AS_CONFIG_PATH_MAX_SIZE) {
-		strcpy(config->lua.system_path, lua_system_path_str);
-	}
 
 	int_ini_value = INI_INT("aerospike.serializer");
 	client->serializer_type = int_ini_value;
