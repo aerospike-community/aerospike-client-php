@@ -3357,12 +3357,6 @@ class Aerospike {
      * @const OPT_WRITE_TIMEOUT value in milliseconds (default: 1000)
      */
     const OPT_WRITE_TIMEOUT = "OPT_WRITE_TIMEOUT";
-    /**
-     * Defines the max socket idle time (in milliseconds) for a database
-     * operation.
-     * @const OPT_SOCKET_TIMEOUT value in milliseconds (default: 10000)
-     */
-    const OPT_SOCKET_TIMEOUT = "OPT_SOCKET_TIMEOUT";
 
     /**
      * Sets the TTL of the record along with a write operation.
