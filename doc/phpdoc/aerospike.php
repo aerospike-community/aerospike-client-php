@@ -846,6 +846,7 @@ class Aerospike {
      * Remove records in a specified namespace/set efficiently. This method is
      * many orders of magnitude faster than deleting records one at a time.
      * **Note:** works with Aerospike Server versions >= 3.12
+     * See {@link https://www.aerospike.com/docs/reference/info#truncate Truncate command information}
      *
      * This asynchronous server call may return before the truncation is complete.
      * The user can still write new records after the server returns because new
