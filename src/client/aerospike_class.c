@@ -747,6 +747,23 @@ static as_status set_as_config(as_config* config, HashTable* z_conf_hash) {
 		as_config_set_cluster_name(config, Z_STRVAL_P(setting_value));
 	}
 
+    /* Set rack aware */
+	setting_value = zend_hash_str_find(z_conf_hash, "rack_aware", strlen("rack_aware"));
+	if (setting_value) {
+		if (Z_TYPE_P(setting_value) == IS_TRUE || Z_TYPE_P(setting_value) == IS_FALSE) {
+			config->rack_aware = Z_TYPE_P(setting_value) == IS_TRUE;
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	setting_value = zend_hash_str_find(z_conf_hash, "rack_id", strlen("rack_id"));
+	if (setting_value) {
+		if (Z_TYPE_P(setting_value) != IS_LONG) {
+			return AEROSPIKE_ERR_PARAM;
+		}
+		config->rack_id = (int)Z_LVAL_P(setting_value);
+	}
 
 	return AEROSPIKE_OK;
 }

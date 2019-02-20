@@ -80,6 +80,7 @@ AerospikeOptionConstant aerospike_option_constants[] = {
 	{ AS_POLICY_REPLICA_MASTER              ,   "POLICY_REPLICA_MASTER"             },
 	{ AS_POLICY_REPLICA_ANY                 ,   "POLICY_REPLICA_ANY"                },
 	{ AS_POLICY_REPLICA_SEQUENCE            ,   "POLICY_REPLICA_SEQUENCE"           },
+    { AS_POLICY_REPLICA_PREFER_RACK         ,   "POLICY_REPLICA_PREFER_RACK"        },
 	{ AS_POLICY_CONSISTENCY_LEVEL_ONE       ,   "POLICY_CONSISTENCY_ONE"            },
 	{ AS_POLICY_CONSISTENCY_LEVEL_ALL       ,   "POLICY_CONSISTENCY_ALL"            },
 	{ AS_POLICY_COMMIT_LEVEL_ALL            ,   "POLICY_COMMIT_LEVEL_ALL"           },

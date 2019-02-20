@@ -25,55 +25,13 @@
 
 as_status get_many_with_batch_read(aerospike* as, as_error* err, const as_policy_batch* policy,
 		char** bins, uint32_t bin_count, HashTable* z_keys, zval* z_records);
-as_status get_many_with_batch_get(aerospike* as, as_error* err, const as_policy_batch* policy,
-		char** bins, uint32_t bin_count, HashTable* z_keys, zval* z_records);
+
 /*
  * These function support the getMany calls, based on whether batch direct is being used,
  * two separate helper functions are called, one utilizes a callback passed to aerospike_batch_get
  * the other handles the stored records from aerospike_batch_read
  */
-typedef struct _batch_get_cb_data {
-	as_error* err;
-	zval* z_record_array;
-}batch_get_cb_data;
 
-bool batch_get_callback(const as_batch_read * results, uint32_t n, void * udata) {
-
-	zval z_key_entry;
-	zval z_record_entry;
-
-	as_batch_read current_result;
-	batch_get_cb_data* cb_data = (batch_get_cb_data*)udata;
-
-	for(int i = 0; i < n; i++) {
-		current_result = results[i];
-		if (current_result.result != AEROSPIKE_OK) {
-			/* Any error other than record not found is an unrecoverable error */
-			if (current_result.result != AEROSPIKE_ERR_RECORD_NOT_FOUND) {
-				return false;
-			}
-
-			if (as_key_to_zval(current_result.key, &z_key_entry, true, cb_data->err) != AEROSPIKE_OK) {
-				return false;
-			}
-			array_init(&z_record_entry);
-
-			add_assoc_zval(&z_record_entry, "key", &z_key_entry);
-			add_assoc_null(&z_record_entry, "bins");
-			add_assoc_null(&z_record_entry, "metadata");
-
-			add_next_index_zval(cb_data->z_record_array, &z_record_entry);
-		} else {
-
-			if (as_record_to_zval(&current_result.record, &z_record_entry,
-					current_result.key, true, cb_data->err) != AEROSPIKE_OK) {
-				return false;
-			}
-			add_next_index_zval(cb_data->z_record_array, &z_record_entry);
-		}
-	}
-    return true;
-}
 
 /* {{{ proto int Aerospike::getMany ( array $keys, array &$records [, array $filter [, array $options]] ) */
 PHP_METHOD(Aerospike, getMany) {
@@ -97,7 +55,6 @@ PHP_METHOD(Aerospike, getMany) {
 	as_error_init(&err);
 	reset_client_error(getThis());
 
-	bool use_batch_direct = false;
 	if (check_object_and_connection(getThis(), &err) != AEROSPIKE_OK) {
 		update_client_error(getThis(), err.code, err.message, err.in_doubt);
 		RETURN_LONG(err.code);
@@ -112,10 +69,6 @@ PHP_METHOD(Aerospike, getMany) {
 	}
 	zval_dtor(z_records);
 	ZVAL_NULL(z_records);
-
-	if ( !aerospike_has_batch_index(as_client) ) {
-		use_batch_direct = true;
-	}
 
 	if (z_policy) {
 		if (zval_to_as_policy_batch(z_policy, &batch_policy,
@@ -154,11 +107,8 @@ PHP_METHOD(Aerospike, getMany) {
 		}ZEND_HASH_FOREACH_END();
 	}
 
-	if (use_batch_direct) {
-		get_many_with_batch_get(as_client, &err, batch_policy_p, bins, bin_count, z_keys, z_records);
-	} else {
-		get_many_with_batch_read(as_client, &err, batch_policy_p, bins, bin_count, z_keys, z_records);
-	}
+
+	get_many_with_batch_read(as_client, &err, batch_policy_p, bins, bin_count, z_keys, z_records);
 
 
 CLEANUP:
@@ -247,57 +197,3 @@ CLEANUP:
 	}
 	return err->code;
 }
-
-as_status get_many_with_batch_get(aerospike* as, as_error* err, const as_policy_batch* policy,
-		char** bins, uint32_t bin_count, HashTable* z_keys, zval* z_records) {
-
-	zval* z_key = NULL;
-	batch_get_cb_data cb_data;
-	bool batch_initialized = false;
-	as_batch batch;
-
-	int num_records;
-
-
-
-	num_records = zend_hash_num_elements(z_keys);
-
-	as_batch_init(&batch, num_records);
-	batch_initialized = true;
-	int i = 0;
-
-	ZEND_HASH_FOREACH_VAL(z_keys, z_key) {
-		if (!z_key || (Z_TYPE_P(z_key) != IS_ARRAY)) {
-			as_error_update(err, AEROSPIKE_ERR_PARAM, "key must be an array");
-			goto CLEANUP;
-		}
-		if (z_hashtable_to_as_key(
-				Z_ARRVAL_P(z_key), as_batch_keyat(&batch, i), err) != AEROSPIKE_OK) {
-			goto CLEANUP;
-		}
-		i++;
-	}ZEND_HASH_FOREACH_END();
-
-	cb_data.err = err;
-	cb_data.z_record_array = z_records;
-	array_init(z_records);
-
-	if (bins) {
-		aerospike_batch_get_bins(as, err, policy, &batch, (const char**)bins, bin_count, batch_get_callback, (void*)&cb_data);
-	} else {
-		aerospike_batch_get(as, err, policy, &batch, batch_get_callback, (void*)&cb_data);
-	}
-
-CLEANUP:
-
-	if (batch_initialized) {
-		as_batch_destroy(&batch);
-	}
-	if(err->code != AEROSPIKE_OK) {
-		zval_dtor(z_records);
-		ZVAL_NULL(z_records);
-	}
-
-	return err->code;
-}
-

@@ -133,6 +133,18 @@ class Aerospike {
      * * _compression\_threshold_ client will compress records larger than this value for transport (default: 0)
      * * _tender\_interval_ polling interval in milliseconds for cluster tender (default: 1000)
      * * _cluster\_name_ if specified, only server nodes matching this name will be used when determining the cluster
+     * * _rack\_aware_ Boolean: Track server rack data.  This field is useful when directing read commands to
+            * the server node that contains the key and exists on the same rack as the client.
+            * This serves to lower cloud provider costs when nodes are distributed across different
+            * racks/data centers.
+            * POLICY_REPLICA_PREFER_RACK must be set as the replica policy for reads and _rack\_id_ must be set toenable this functionality.
+            * (Default: false)
+     * * _rack\_id_ Integer. Rack where this client instance resides.
+        *
+        * _rack\_aware_, POLICY_REPLICA_PREFER_RACK and server rack configuration must also be
+        * set to enable this functionality.
+        *
+        * Default: 0
      * * Aerospike::OPT_TLS_CONFIG an array of TLS setup parameters whose keys include
      * * * Aerospike::OPT_TLS_ENABLE boolean Whether or not to enable TLS.
      * * * Aerospike::OPT_OPT_TLS_CAFILE
@@ -614,7 +626,7 @@ class Aerospike {
      * @link https://www.aerospike.com/docs/guide/kvs.html Key-Value Store
      * @link https://www.aerospike.com/docs/guide/glossary.html Glossary
      * @param array $key The key identifying the record. An array with keys `['ns','set','key']` or `['ns','set','digest']`
-     * @param array $record a pass-by-reference array of `['key', metadata', 'bins]` with the structure:
+     * @param array $record a reference to a variable which will contain the retrieved record of `['key', metadata', 'bins]` with the structure:
      * ```
      * Array:
      *   key => Array
@@ -652,7 +664,7 @@ class Aerospike {
      * @see Aerospike::errorno() errorno()
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
-    public function get(array $key, array &$record, array $select = [], array $options = []) {}
+    public function get(array $key, &$record, array $select = null, array $options = []) {}
 
     /**
      * Get the metadata of a record with a given key, and store it in $metadata
@@ -682,7 +694,7 @@ class Aerospike {
      * ```
      * @link https://www.aerospike.com/docs/guide/glossary.html Glossary
      * @param array $key The key identifying the record. An array with keys `['ns','set','key']` or `['ns','set','digest']`
-     * @param array $metadata a pass-by-reference array of `['ttl', 'generation']` values
+     * @param array $metadata a reference to a variable which will be filled with an array of `['ttl', 'generation']` values
      * @param array $options an optional array of read policy options, whose keys include
      * * Aerospike::OPT_READ_TIMEOUT
      * * Aerospike::OPT_DESERIALIZE
@@ -707,7 +719,7 @@ class Aerospike {
      * @see Aerospike::errorno() errorno()
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
-    public function exists(array $key, array &$metadata, array $options = []) {}
+    public function exists(array $key, &$metadata, array $options = []) {}
 
     /**
      * Touch the record identified by the $key, resetting its time-to-live.
@@ -1397,7 +1409,7 @@ class Aerospike {
      * @see Aerospike::OPERATOR_WRITE Aerospike::OPERATOR_WRITE and other operators
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
-    public function operate(array $key, array $operations, array &$returned = [], array $options = []) {}
+    public function operate(array $key, array $operations, &$returned, array $options = []) {}
 
     /**
      * Count the number of elements in a list type bin
@@ -1610,7 +1622,7 @@ class Aerospike {
      * @param string $bin
      * @param int    $index
      * @param int    $count
-     * @param array  $elements pass-by-reference param
+     * @param array  $elements pass-by-reference param. After the method call it will be an array holding the popped elements.
      * @param array  $options an optional array of policy options, whose keys include
      * * Aerospike::OPT_WRITE_TIMEOUT
      * * Aerospike::OPT_TTL
@@ -1637,7 +1649,7 @@ class Aerospike {
      * @see Aerospike::errorno() errorno()
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
-    public function listPopRange(array $key, $bin, $index, $count, array &$elements, array $options = []) {}
+    public function listPopRange(array $key, $bin, $index, $count, &$elements, array $options = []) {}
 
     /**
      * Remove a list element at a specified index of a list type bin
@@ -1820,7 +1832,7 @@ class Aerospike {
      * @param array  $key The key identifying the record. An array with keys `['ns','set','key']` or `['ns','set','digest']`
      * @param string $bin
      * @param int    $index
-     * @param array  $elements pass-by-reference param
+     * @param  $element pass-by-reference param which will hold the returned element.
      * @param array  $options an optional array of policy options, whose keys include
      * * Aerospike::OPT_READ_TIMEOUT
      * * Aerospike::OPT_POLICY_KEY
@@ -1843,7 +1855,7 @@ class Aerospike {
      * @see Aerospike::errorno() errorno()
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
-    public function listGet(array $key, $bin, $index, array &$elements, array $options = []) {}
+    public function listGet(array $key, $bin, $index, array &$element, array $options = []) {}
 
     /**
      * Get several elements starting at a specified index from a list type bin
@@ -1853,7 +1865,7 @@ class Aerospike {
      * @param string $bin
      * @param int    $index
      * @param int    $count
-     * @param array  $elements pass-by-reference param
+     * @param   $elements pass-by-reference param which will hold an array of returned elements from the specified list bin.
      * @param array  $options an optional array of policy options, whose keys include
      * * Aerospike::OPT_READ_TIMEOUT
      * * Aerospike::OPT_POLICY_KEY
@@ -1876,7 +1888,7 @@ class Aerospike {
      * @see Aerospike::errorno() errorno()
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
-    public function listGetRange(array $key, $bin, $index, $count, array &$elements, array $options = []) {}
+    public function listGetRange(array $key, $bin, $index, $count, &$elements, array $options = []) {}
 
     // Batch Operation Methods
 
@@ -2072,7 +2084,7 @@ class Aerospike {
      * }
      * ```
      * @param array $keys an array of initialized keys, each key an array with keys `['ns','set','key']` or `['ns','set','digest']`
-     * @param array $records a pass-by-reference array of record values, each record an array of `['key', 'metadata', 'bins']`
+     * @param array $records a pass-by-reference variable which will hold an array of record values, each record an array of `['key', 'metadata', 'bins']`
      * @param array $select only these bins out of the record (optional)
      * @param array $options an optional array of read policy options, whose keys include
      * * Aerospike::OPT_READ_TIMEOUT
@@ -2095,7 +2107,7 @@ class Aerospike {
      * @see Aerospike::get() get()
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
-    public function getMany ( array $keys, array &$records, array $select = [], array $options = []) {}
+    public function getMany ( array $keys, &$records, array $select = [], array $options = []) {}
 
 
     /**
@@ -3518,9 +3530,19 @@ class Aerospike {
      *   Always try node containing master partition first. If connection fails and
      *   `retry_on_timeout` is true, try node containing replica partition.
      *   Currently restricted to master and one replica. (default)
-     * @const POLICY_REPLICA_SEQUENCE attemp to read from master first, then try the node containing replica partition if connection failed. (default)
+     * @const POLICY_REPLICA_SEQUENCE attempt to read from master first, then try the node containing replica partition if connection failed. (default)
     */
     const POLICY_REPLICA_SEQUENCE = 2;
+
+	/**
+	 * Try node on the same rack as the client first.  If there are no nodes on the
+	 * same rack, use POLICY_REPLICA_SEQUENCE instead.
+	 *
+	 * "rack_aware" must be set to true in the client constructor, and "rack_id" must match the server rack configuration
+	 * to enable this functionality.
+     * @const POLICY_REPLICA_PREFER_RACK attemp to read from master first, then try the node containing replica partition if connection failed. (default)
+     */
+    const POLICY_REPLICA_PREFER_RACK = 3;
 
     /**
      * Accepts one of the POLICY_CONSISTENCY_* values.

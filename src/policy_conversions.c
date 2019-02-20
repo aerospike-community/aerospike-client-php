@@ -889,7 +889,7 @@ static inline void set_uint32t_policy_value_from_hash_key(HashTable* z_policy_ha
 static inline void set_bool_policy_value_from_hash_index(HashTable* z_policy_hash, bool* target, int policy_index) {
 	zval* setting_val = NULL;
 	setting_val = zend_hash_index_find(z_policy_hash, policy_index);
-	if (setting_val && ((Z_TYPE_P(setting_val) == IS_TRUE) || (Z_TYPE_P(setting_val) == IS_TRUE)) ) {
+	if (setting_val && ((Z_TYPE_P(setting_val) == IS_TRUE) || (Z_TYPE_P(setting_val) == IS_FALSE)) ) {
 		*target = (Z_TYPE_P(setting_val) == IS_TRUE);
 	}
 }
@@ -897,7 +897,7 @@ static inline void set_bool_policy_value_from_hash_index(HashTable* z_policy_has
 static inline void set_bool_policy_value_from_hash_key(HashTable* z_policy_hash, bool* target, const char* policy_key ) {
 	zval* setting_val = NULL;
 	setting_val = zend_hash_str_find(z_policy_hash, policy_key, strlen(policy_key));
-	if (setting_val && ((Z_TYPE_P(setting_val) == IS_TRUE) || (Z_TYPE_P(setting_val) == IS_TRUE)) ) {
+	if (setting_val && ((Z_TYPE_P(setting_val) == IS_TRUE) || (Z_TYPE_P(setting_val) == IS_FALSE)) ) {
 		*target = (Z_TYPE_P(setting_val) == IS_TRUE);
 	}
 }
