@@ -7,7 +7,7 @@ final class OperateTTLTest extends TestCase {
     protected $db;
     protected $key;
 
-    protected function setUp() 
+    protected function setUp() : void
     {
         $config = get_as_config();
         $this->db = new Aerospike($config);
@@ -15,7 +15,7 @@ final class OperateTTLTest extends TestCase {
         $this->db->put($this->key, ["Aero" => "spike", "INCR"=>5, "LST"=>[1,2,3]], 15000);
     }
 
-    protected function tearDown() 
+    protected function tearDown() : void 
     {
 
         $this->db->remove($this->key);

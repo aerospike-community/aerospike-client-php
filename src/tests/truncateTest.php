@@ -8,7 +8,7 @@ final class TruncateTest extends TestCase {
     protected $keys1;
     protected $keys2;
 
-    protected function setUp() 
+    protected function setUp() : void 
     {
         $config = get_as_config();
         $this->db = new Aerospike($config);
@@ -65,7 +65,7 @@ final class TruncateTest extends TestCase {
         return true;
     }
 
-    protected function tearDown() 
+    protected function tearDown() : void
     {
         foreach($this->keys1 as $key) {
             $this->db->remove($key);
@@ -146,9 +146,9 @@ final class TruncateTest extends TestCase {
      *  @param $nanos
      *
      *  @dataProvider invalidParamValues
-     *  @expectedException PHPUnit\Framework\Error\Warning
      */
     public function testTruncateWithNoNamespace($ns, $set, $nanos) {
+        $this->expectException(PHPUnit\Framework\Error\Warning::class);
         try {
             $code = $this->db->truncate($ns, $set, $nanos);
         }catch(ErrorException $e) {
@@ -174,10 +174,8 @@ final class TruncateTest extends TestCase {
         $this->assertNotEquals($this->db->errorno(), Aerospike::OK);
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\Error\Warning
-     */
     public function testTruncateWithTooFewArguments() {
+        $this->expectException(PHPUnit\Framework\Error\Warning::class);
         try {
             $code = $this->db->truncate("test", null);
         } catch(ErrorException $e) {

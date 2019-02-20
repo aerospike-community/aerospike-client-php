@@ -11,7 +11,7 @@ final class MapOperationsInvalidUseTest extends TestCase {
     protected $keys1;
     protected $keys2;
 
-    protected function setUp()
+    protected function setUp() : void
     {
         $config = get_as_config();
         $this->db = new Aerospike($config);
@@ -29,7 +29,7 @@ final class MapOperationsInvalidUseTest extends TestCase {
         // Give some time for any clock differences to resolve.
     }
 
-    protected function tearDown()
+    protected function tearDown() : void
     {
         $this->db->remove($this->key);
     }

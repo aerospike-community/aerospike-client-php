@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 final class ErrorInDoubtTest extends TestCase {
     protected $db;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $config = get_as_config();
         $this->db = new Aerospike($config);

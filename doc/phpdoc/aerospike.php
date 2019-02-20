@@ -140,11 +140,11 @@ class Aerospike {
             * POLICY_REPLICA_PREFER_RACK must be set as the replica policy for reads and _rack\_id_ must be set toenable this functionality.
             * (Default: false)
      * * _rack\_id_ Integer. Rack where this client instance resides.
-        *
-        * _rack\_aware_, POLICY_REPLICA_PREFER_RACK and server rack configuration must also be
-        * set to enable this functionality.
-        *
-        * Default: 0
+            *
+            * _rack\_aware_, POLICY_REPLICA_PREFER_RACK and server rack configuration must also be
+            * set to enable this functionality.
+            *
+            * Default: 0
      * * Aerospike::OPT_TLS_CONFIG an array of TLS setup parameters whose keys include
      * * * Aerospike::OPT_TLS_ENABLE boolean Whether or not to enable TLS.
      * * * Aerospike::OPT_OPT_TLS_CAFILE
