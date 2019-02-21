@@ -47,7 +47,7 @@
  * aerospike.shm.use = false;
  * // Explicitly sets the shm key for this client to store shared-memory
  * // cluster tending results in.
- * aerospike.shm.key = 0xA7000000; // integer value
+ * aerospike.shm.key = 0xA8000000; // integer value
  * // Shared memory maximum number of server nodes allowed. Leave a cushion so
  * // new nodes can be added without needing a client restart.
  * aerospike.shm.max_nodes = 16;
@@ -122,7 +122,7 @@ class Aerospike {
      *     (even an empty one) is provided. Disabled by default.
      * * _shm\_key_ explicitly sets the shm key for the cluster. It is
      *       otherwise implicitly evaluated per unique hostname, and can be
-     *       inspected with shmKey(). (default: 0xA7000000)
+     *       inspected with shmKey(). (default: 0xA8000000)
      * * _shm\_max\_nodes_ maximum number of nodes allowed. Pad so new nodes
      *       can be added without configuration changes (default: 16)
      * * _shm\_max\_namespaces_ maximum number of namespaces allowed (default: 8)
