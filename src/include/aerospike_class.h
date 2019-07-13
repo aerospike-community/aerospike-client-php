@@ -339,12 +339,12 @@ ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, setDeserializer);
 ZEND_BEGIN_ARG_INFO_EX(set_deserializer_arg_info, 0, 0, 1)
-    ZEND_ARG_CALLABLE_INFO(0, unserialize_cb, 0)
+    ZEND_ARG_INFO(0, unserialize_cb)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, setSerializer);
 ZEND_BEGIN_ARG_INFO_EX(set_serializer_arg_info, 0, 0, 1)
-    ZEND_ARG_CALLABLE_INFO(0, serialize_cb, 0)
+    ZEND_ARG_INFO(0, serialize_cb)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, touch);
@@ -435,7 +435,7 @@ ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, setLogHandler);
 ZEND_BEGIN_ARG_INFO_EX(set_log_handler_arg_info, 0, 0, 1)
-    ZEND_ARG_CALLABLE_INFO(0, log_handler, 0)
+    ZEND_ARG_INFO(0, log_handler)
 ZEND_END_ARG_INFO();
 
 /*Info Methods*/
@@ -464,7 +464,7 @@ PHP_METHOD(Aerospike, scan);
 ZEND_BEGIN_ARG_INFO_EX(scan_arg_info, 0, 0, 3)
     ZEND_ARG_INFO(0, ns)
     ZEND_ARG_INFO(0, set)
-    ZEND_ARG_CALLABLE_INFO(0, record_cb, 0)
+    ZEND_ARG_INFO(0, record_cb)
     ZEND_ARG_INFO(0, select)
     ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
@@ -492,7 +492,7 @@ ZEND_BEGIN_ARG_INFO_EX(query_arg_info, 0, 0, 4)
     ZEND_ARG_INFO(0, ns)
     ZEND_ARG_INFO(0, set)
     ZEND_ARG_INFO(0, where)
-    ZEND_ARG_CALLABLE_INFO(0, record_cb, 0)
+    ZEND_ARG_INFO(0, record_cb)
     ZEND_ARG_INFO(0, select)
     ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
