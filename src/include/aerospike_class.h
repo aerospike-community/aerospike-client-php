@@ -34,38 +34,38 @@ zend_object *aerospike_create_object(zend_class_entry *ce);
 
 PHP_METHOD(Aerospike, __construct);
 ZEND_BEGIN_ARG_INFO_EX(construct_arg_info, 0, 0, 1)
-    ZEND_ARG_ARRAY_INFO(0, config, 0)
+    ZEND_ARG_INFO(0, config)
     ZEND_ARG_INFO(0, persistent_connection)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, addIndex);
 ZEND_BEGIN_ARG_INFO_EX(add_index_arg_info, 0, 0, 6)
-    ZEND_ARG_TYPE_INFO(0, ns, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, set, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, bin, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, indexType, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, dataType, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, ns)
+    ZEND_ARG_INFO(0, set)
+    ZEND_ARG_INFO(0, bin)
+    ZEND_ARG_INFO(0, name)
+    ZEND_ARG_INFO(0, indexType)
+    ZEND_ARG_INFO(0, dataType)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, append);
 ZEND_BEGIN_ARG_INFO_EX(append_arg_info, 0, 0, 3)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
-    ZEND_ARG_TYPE_INFO(0, bin, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, value, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, key)
+    ZEND_ARG_INFO(0, bin)
+    ZEND_ARG_INFO(0, value)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, apply);
 ZEND_BEGIN_ARG_INFO_EX(apply_arg_info, 0, 0, 3)
-    ZEND_ARG_TYPE_INFO(0, key, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, module, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, function, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, args, 1)
+    ZEND_ARG_INFO(0, key)
+    ZEND_ARG_INFO(0, module)
+    ZEND_ARG_INFO(0, function)
+    ZEND_ARG_INFO(0, args)
     ZEND_ARG_INFO(1, returned)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, close);
@@ -75,14 +75,14 @@ ZEND_END_ARG_INFO();
 PHP_METHOD(Aerospike, deregister);
 ZEND_BEGIN_ARG_INFO_EX(deregister_arg_info, 0, 0, 1)
     ZEND_ARG_INFO(0, module)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, dropIndex);
 ZEND_BEGIN_ARG_INFO_EX(drop_index_arg_info, 0, 0, 2)
-    ZEND_ARG_TYPE_INFO(0, ns, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, ns)
+    ZEND_ARG_INFO(0, name)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, error);
@@ -99,23 +99,23 @@ ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, exists);
 ZEND_BEGIN_ARG_INFO_EX(exists_arg_info, 0, 0, 2)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
+    ZEND_ARG_INFO(0, key)
     ZEND_ARG_INFO(1, metadata)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, get);
 ZEND_BEGIN_ARG_INFO_EX(get_arg_info, 0, 0, 2)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
+    ZEND_ARG_INFO(0, key)
     ZEND_ARG_INFO(1, record)
-    ZEND_ARG_ARRAY_INFO(0, select, 1)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, select)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, getKeyDigest);
 ZEND_BEGIN_ARG_INFO_EX(getKeyDigest_arg_info, 0, 0, 3)
-    ZEND_ARG_TYPE_INFO(0, ns, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, set, IS_STRING, 0)
+    ZEND_ARG_INFO(0, ns)
+    ZEND_ARG_INFO(0, set)
     ZEND_ARG_INFO(0, pk)
 ZEND_END_ARG_INFO();
 
@@ -125,163 +125,163 @@ ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, increment);
 ZEND_BEGIN_ARG_INFO_EX(increment_arg_info, 0, 0, 3)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
-    ZEND_ARG_TYPE_INFO(0, bin, IS_STRING, 0)
+    ZEND_ARG_INFO(0, key)
+    ZEND_ARG_INFO(0, bin)
     ZEND_ARG_INFO(0, offset)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, initKey);
 ZEND_BEGIN_ARG_INFO_EX(initkey_arg_info, 0, 0, 3)
-    ZEND_ARG_TYPE_INFO(0, ns, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, set, IS_STRING, 0)
+    ZEND_ARG_INFO(0, ns)
+    ZEND_ARG_INFO(0, set)
     ZEND_ARG_INFO(0, pk)
-    ZEND_ARG_TYPE_INFO(0, is_digest, _IS_BOOL, 1)
+    ZEND_ARG_INFO(0, is_digest)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, jobInfo);
 ZEND_BEGIN_ARG_INFO_EX(job_info_arg_info, 0, 0, 3)
-    ZEND_ARG_TYPE_INFO(0, job_id, IS_LONG, 0)
+    ZEND_ARG_INFO(0, job_id)
     ZEND_ARG_INFO(0, job_type)
-    ZEND_ARG_ARRAY_INFO(1, info, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(1, info)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, listAppend);
 ZEND_BEGIN_ARG_INFO_EX(list_append_arg_info, 0, 0, 3)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
+    ZEND_ARG_INFO(0, key)
     ZEND_ARG_INFO(0, bin)
     ZEND_ARG_INFO(0, value)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, listClear);
 ZEND_BEGIN_ARG_INFO_EX(list_clear_arg_info, 0, 0, 2)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
+    ZEND_ARG_INFO(0, key)
     ZEND_ARG_INFO(0, bin)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, listGet);
 ZEND_BEGIN_ARG_INFO_EX(list_get_arg_info, 0, 0, 4)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
+    ZEND_ARG_INFO(0, key)
     ZEND_ARG_INFO(0, bin)
     ZEND_ARG_INFO(0, index)
-    ZEND_ARG_ARRAY_INFO(1, element, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(1, element)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, listGetRange);
 ZEND_BEGIN_ARG_INFO_EX(list_get_range_arg_info, 0, 0, 5)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
+    ZEND_ARG_INFO(0, key)
     ZEND_ARG_INFO(0, bin)
     ZEND_ARG_INFO(0, index)
     ZEND_ARG_INFO(0, count)
-    ZEND_ARG_ARRAY_INFO(1, elements, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(1, elements)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, listInsert);
 ZEND_BEGIN_ARG_INFO_EX(list_insert_arg_info, 0, 0, 4)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
+    ZEND_ARG_INFO(0, key)
     ZEND_ARG_INFO(0, bin)
     ZEND_ARG_INFO(0, index)
     ZEND_ARG_INFO(0, value)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, listInsertItems);
 ZEND_BEGIN_ARG_INFO_EX(list_insert_items_arg_info, 0, 0, 4)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
+    ZEND_ARG_INFO(0, key)
     ZEND_ARG_INFO(0, bin)
     ZEND_ARG_INFO(0, index)
-    ZEND_ARG_ARRAY_INFO(0, elements, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, elements)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, listMerge);
 ZEND_BEGIN_ARG_INFO_EX(list_merge_arg_info, 0, 0, 3)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
+    ZEND_ARG_INFO(0, key)
     ZEND_ARG_INFO(0, bin)
-    ZEND_ARG_ARRAY_INFO(0, items, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, items)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, listPop);
 ZEND_BEGIN_ARG_INFO_EX(list_pop_arg_info, 0, 0, 4)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
+    ZEND_ARG_INFO(0, key)
     ZEND_ARG_INFO(0, bin)
     ZEND_ARG_INFO(0, index)
-    ZEND_ARG_ARRAY_INFO(1, element, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(1, element)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, listPopRange);
 ZEND_BEGIN_ARG_INFO_EX(list_pop_range_arg_info, 0, 0, 5)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
+    ZEND_ARG_INFO(0, key)
     ZEND_ARG_INFO(0, bin)
     ZEND_ARG_INFO(0, index)
     ZEND_ARG_INFO(0, count)
-    ZEND_ARG_ARRAY_INFO(1, elements, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(1, elements)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, listRemove);
 ZEND_BEGIN_ARG_INFO_EX(list_remove_arg_info, 0, 0, 3)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
+    ZEND_ARG_INFO(0, key)
     ZEND_ARG_INFO(0, bin)
     ZEND_ARG_INFO(0, index)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, listRemoveRange);
 ZEND_BEGIN_ARG_INFO_EX(list_remove_range_arg_info, 0, 0, 4)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
+    ZEND_ARG_INFO(0, key)
     ZEND_ARG_INFO(0, bin)
     ZEND_ARG_INFO(0, index)
     ZEND_ARG_INFO(0, count)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, listSet);
 ZEND_BEGIN_ARG_INFO_EX(list_set_arg_info, 0, 0, 4)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
+    ZEND_ARG_INFO(0, key)
     ZEND_ARG_INFO(0, bin)
     ZEND_ARG_INFO(0, index)
     ZEND_ARG_INFO(0, value)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, listSize);
 ZEND_BEGIN_ARG_INFO_EX(list_size_arg_info, 0, 0, 3)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
+    ZEND_ARG_INFO(0, key)
     ZEND_ARG_INFO(0, bin)
     ZEND_ARG_INFO(1, count)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, listTrim);
 ZEND_BEGIN_ARG_INFO_EX(list_trim_arg_info, 0, 0, 4)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
+    ZEND_ARG_INFO(0, key)
     ZEND_ARG_INFO(0, bin)
     ZEND_ARG_INFO(0, index)
     ZEND_ARG_INFO(0, count)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, listRegistered);
 ZEND_BEGIN_ARG_INFO_EX(list_registered_arg_info, 0, 0, 1)
     ZEND_ARG_INFO(1, modules)
     ZEND_ARG_INFO(0, language)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, operate);
 ZEND_BEGIN_ARG_INFO_EX(operate_arg_info, 0, 0, 2)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
-    ZEND_ARG_ARRAY_INFO(0, operations, 0)
+    ZEND_ARG_INFO(0, key)
+    ZEND_ARG_INFO(0, operations)
     ZEND_ARG_INFO(1, returned)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, operateOrdered);
@@ -294,18 +294,18 @@ ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, put);
 ZEND_BEGIN_ARG_INFO_EX(put_arg_info, 0, 0, 2)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
-    ZEND_ARG_ARRAY_INFO(0, bins, 0)
-    ZEND_ARG_TYPE_INFO(0, ttl, IS_LONG, 1)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, key)
+    ZEND_ARG_INFO(0, bins)
+    ZEND_ARG_INFO(0, ttl)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, prepend);
 ZEND_BEGIN_ARG_INFO_EX(prepend_arg_info, 0, 0, 3)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
-    ZEND_ARG_TYPE_INFO(0, bin, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, value, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, key)
+    ZEND_ARG_INFO(0, bin)
+    ZEND_ARG_INFO(0, value)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, reconnect);
@@ -317,20 +317,20 @@ ZEND_BEGIN_ARG_INFO_EX(register_arg_info, 0, 0, 2)
     ZEND_ARG_INFO(0, path)
     ZEND_ARG_INFO(0, module)
     ZEND_ARG_INFO(0, language)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, remove);
 ZEND_BEGIN_ARG_INFO_EX(remove_arg_info, 0, 0, 1)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, key)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, removeBin);
 ZEND_BEGIN_ARG_INFO_EX(remove_bin_arg_info, 0, 0, 2)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
-    ZEND_ARG_ARRAY_INFO(0, bins, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, key)
+    ZEND_ARG_INFO(0, bins)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, shmKey);
@@ -349,17 +349,17 @@ ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, touch);
 ZEND_BEGIN_ARG_INFO_EX(touch_arg_info, 0, 0, 1)
-    ZEND_ARG_ARRAY_INFO(0, key, 0)
-    ZEND_ARG_TYPE_INFO(0, ttl, IS_LONG, 1)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, key)
+    ZEND_ARG_INFO(0, ttl)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, truncate);
 ZEND_BEGIN_ARG_INFO_EX(truncate_arg_info, 0, 0, 3)
-    ZEND_ARG_TYPE_INFO(0, ns, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, set, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, nanos, IS_LONG, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, ns)
+    ZEND_ARG_INFO(0, set)
+    ZEND_ARG_INFO(0, nanos)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 /* UDF METHODS */
@@ -368,69 +368,69 @@ ZEND_BEGIN_ARG_INFO_EX(get_registered_arg_info, 0, 0, 2)
     ZEND_ARG_INFO(0, module)
     ZEND_ARG_INFO(1, code)
     ZEND_ARG_INFO(0, language)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 /*Predicate Methods*/
 PHP_METHOD(Aerospike, predicateEquals);
 ZEND_BEGIN_ARG_INFO_EX(predicate_equals_arg_info, 0, 0, 2)
-    ZEND_ARG_TYPE_INFO(0, bin, IS_STRING, 0)
+    ZEND_ARG_INFO(0, bin)
     ZEND_ARG_INFO(0, val)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, predicateGeoContainsGeoJSONPoint);
 ZEND_BEGIN_ARG_INFO_EX(predicate_geo_contains_json_point_arg_info, 0, 0, 2)
-    ZEND_ARG_TYPE_INFO(0, bin, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, point, IS_STRING, 0)
+    ZEND_ARG_INFO(0, bin)
+    ZEND_ARG_INFO(0, point)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, predicateGeoContainsPoint);
 ZEND_BEGIN_ARG_INFO_EX(predicate_geo_contains_point_arg_info, 0, 0, 3)
-    ZEND_ARG_TYPE_INFO(0, bin, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, long, IS_DOUBLE, 0)
-    ZEND_ARG_TYPE_INFO(0, lat, IS_DOUBLE, 0)
+    ZEND_ARG_INFO(0, bin)
+    ZEND_ARG_INFO(0, long)
+    ZEND_ARG_INFO(0, lat)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, predicateGeoWithinGeoJSONRegion);
 ZEND_BEGIN_ARG_INFO_EX(predicate_geo_within_region_arg_info, 0, 0, 2)
-    ZEND_ARG_TYPE_INFO(0, bin, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, region, IS_STRING, 0)
+    ZEND_ARG_INFO(0, bin)
+    ZEND_ARG_INFO(0, region)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, predicateGeoWithinRadius);
 ZEND_BEGIN_ARG_INFO_EX(predicate_geo_within_radius_arg_info, 0, 0, 4)
-    ZEND_ARG_TYPE_INFO(0, bin, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, long, IS_DOUBLE, 0)
-    ZEND_ARG_TYPE_INFO(0, lat, IS_DOUBLE, 0)
-    ZEND_ARG_TYPE_INFO(0, radiusMeter, IS_DOUBLE, 0)
+    ZEND_ARG_INFO(0, bin)
+    ZEND_ARG_INFO(0, long)
+    ZEND_ARG_INFO(0, lat)
+    ZEND_ARG_INFO(0, radiusMeter)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, predicateRange);
 ZEND_BEGIN_ARG_INFO_EX(predicate_range_arg_info, 0, 0, 4)
-    ZEND_ARG_TYPE_INFO(0, bin, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, index_type, IS_LONG, 0)
-    ZEND_ARG_TYPE_INFO(0, min, IS_LONG, 0)
-    ZEND_ARG_TYPE_INFO(0, max, IS_LONG, 0)
+    ZEND_ARG_INFO(0, bin)
+    ZEND_ARG_INFO(0, index_type)
+    ZEND_ARG_INFO(0, min)
+    ZEND_ARG_INFO(0, max)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, predicateBetween);
 ZEND_BEGIN_ARG_INFO_EX(predicate_between_arg_info, 0, 0, 3)
-    ZEND_ARG_TYPE_INFO(0, bin, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, min, IS_LONG, 0)
-    ZEND_ARG_TYPE_INFO(0, max, IS_LONG, 0)
+    ZEND_ARG_INFO(0, bin)
+    ZEND_ARG_INFO(0, min)
+    ZEND_ARG_INFO(0, max)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, predicateContains);
 ZEND_BEGIN_ARG_INFO_EX(predicate_contains_arg_info, 0, 0, 2)
-    ZEND_ARG_TYPE_INFO(0, bin, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, index_type, IS_LONG, 0)
+    ZEND_ARG_INFO(0, bin)
+    ZEND_ARG_INFO(0, index_type)
     ZEND_ARG_INFO(0, val)
 ZEND_END_ARG_INFO();
 
 /*Logging methods */
 PHP_METHOD(Aerospike, setLogLevel);
 ZEND_BEGIN_ARG_INFO_EX(set_log_level_arg_info, 0, 0, 1)
-    ZEND_ARG_TYPE_INFO(0, log_level, IS_LONG, 0)
+    ZEND_ARG_INFO(0, log_level)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, setLogHandler);
@@ -446,38 +446,38 @@ ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, info);
 ZEND_BEGIN_ARG_INFO_EX(info_arg_info, 0, 0, 2)
-    ZEND_ARG_TYPE_INFO(0, request, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(1, response, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, host, 1)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, request)
+    ZEND_ARG_INFO(1, response)
+    ZEND_ARG_INFO(0, host)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, infoMany);
 ZEND_BEGIN_ARG_INFO_EX(info_many_arg_info, 0, 0, 1)
-    ZEND_ARG_TYPE_INFO(0, request, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, host, 1)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, request)
+    ZEND_ARG_INFO(0, host)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 /*SCAN/QUERY METHODS*/
 PHP_METHOD(Aerospike, scan);
 ZEND_BEGIN_ARG_INFO_EX(scan_arg_info, 0, 0, 3)
-    ZEND_ARG_TYPE_INFO(0, ns, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, set, IS_STRING, 0)
+    ZEND_ARG_INFO(0, ns)
+    ZEND_ARG_INFO(0, set)
     ZEND_ARG_CALLABLE_INFO(0, record_cb, 0)
-    ZEND_ARG_ARRAY_INFO(0, select, 1)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, select)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, scanApply);
 ZEND_BEGIN_ARG_INFO_EX(scan_apply_arg_info, 0, 0, 6)
-    ZEND_ARG_TYPE_INFO(0, ns, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, set, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, module, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, function, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, args, 0)
-    ZEND_ARG_TYPE_INFO(1, job_id, IS_LONG, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, ns)
+    ZEND_ARG_INFO(0, set)
+    ZEND_ARG_INFO(0, module)
+    ZEND_ARG_INFO(0, function)
+    ZEND_ARG_INFO(0, args)
+    ZEND_ARG_INFO(1, job_id)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, scanInfo);
@@ -489,149 +489,149 @@ ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, query);
 ZEND_BEGIN_ARG_INFO_EX(query_arg_info, 0, 0, 4)
-    ZEND_ARG_TYPE_INFO(0, ns, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, set, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, where, 0)
+    ZEND_ARG_INFO(0, ns)
+    ZEND_ARG_INFO(0, set)
+    ZEND_ARG_INFO(0, where)
     ZEND_ARG_CALLABLE_INFO(0, record_cb, 0)
-    ZEND_ARG_ARRAY_INFO(0, select, 1)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, select)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, queryApply);
 ZEND_BEGIN_ARG_INFO_EX(query_apply_arg_info, 0, 0, 7)
-    ZEND_ARG_TYPE_INFO(0, ns, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, set, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, where, 0)
-    ZEND_ARG_TYPE_INFO(0, module, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, function, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, args, 0)
-    ZEND_ARG_TYPE_INFO(1, job_id, IS_LONG, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, ns)
+    ZEND_ARG_INFO(0, set)
+    ZEND_ARG_INFO(0, where)
+    ZEND_ARG_INFO(0, module)
+    ZEND_ARG_INFO(0, function)
+    ZEND_ARG_INFO(0, args)
+    ZEND_ARG_INFO(1, job_id)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, aggregate);
 ZEND_BEGIN_ARG_INFO_EX(aggregate_arg_info, 0, 0, 7)
-    ZEND_ARG_TYPE_INFO(0, ns, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, set, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, where, 0)
-    ZEND_ARG_TYPE_INFO(0, module, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, function, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, args, 0)
+    ZEND_ARG_INFO(0, ns)
+    ZEND_ARG_INFO(0, set)
+    ZEND_ARG_INFO(0, where)
+    ZEND_ARG_INFO(0, module)
+    ZEND_ARG_INFO(0, function)
+    ZEND_ARG_INFO(0, args)
     ZEND_ARG_INFO(1, returned)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 /*BATCH METHODS*/
 PHP_METHOD(Aerospike, existsMany);
 ZEND_BEGIN_ARG_INFO_EX(exists_many_arg_info, 0, 0, 2)
-    ZEND_ARG_ARRAY_INFO(0, keys, 0)
-    ZEND_ARG_ARRAY_INFO(1, metadata, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, keys)
+    ZEND_ARG_INFO(1, metadata)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, getMany);
 ZEND_BEGIN_ARG_INFO_EX(get_many_arg_info, 0, 0, 2)
-    ZEND_ARG_ARRAY_INFO(0, keys, 0)
+    ZEND_ARG_INFO(0, keys)
     ZEND_ARG_INFO(1, records)
-    ZEND_ARG_ARRAY_INFO(0, select, 1)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, select)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 /*Security Methods*/
 
 PHP_METHOD(Aerospike, changePassword);
 ZEND_BEGIN_ARG_INFO_EX(change_password_arg_info, 0, 0, 2)
-    ZEND_ARG_TYPE_INFO(0, user, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, password, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, user)
+    ZEND_ARG_INFO(0, password)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, setPassword);
 ZEND_BEGIN_ARG_INFO_EX(set_password_arg_info, 0, 0, 2)
-    ZEND_ARG_TYPE_INFO(0, user, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, password, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, user)
+    ZEND_ARG_INFO(0, password)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, createRole);
 ZEND_BEGIN_ARG_INFO_EX(create_role_arg_info, 0, 0, 2)
-    ZEND_ARG_TYPE_INFO(0, role, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, privileges, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, role)
+    ZEND_ARG_INFO(0, privileges)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, createUser);
 ZEND_BEGIN_ARG_INFO_EX(create_user_arg_info, 0, 0, 3)
-    ZEND_ARG_TYPE_INFO(0, user, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, password, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, roles, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, user)
+    ZEND_ARG_INFO(0, password)
+    ZEND_ARG_INFO(0, roles)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, queryUser);
 ZEND_BEGIN_ARG_INFO_EX(query_user_arg_info, 0, 0, 2)
-    ZEND_ARG_TYPE_INFO(0, user, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(1, roles, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, user)
+    ZEND_ARG_INFO(1, roles)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, queryUsers);
 ZEND_BEGIN_ARG_INFO_EX(query_users_arg_info, 0, 0, 1)
-    ZEND_ARG_ARRAY_INFO(1, roles, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(1, roles)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 
 PHP_METHOD(Aerospike, queryRole);
 ZEND_BEGIN_ARG_INFO_EX(query_role_arg_info, 0, 0, 2)
-    ZEND_ARG_TYPE_INFO(0, role, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(1, privileges, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, role)
+    ZEND_ARG_INFO(1, privileges)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, queryRoles);
 ZEND_BEGIN_ARG_INFO_EX(query_roles_arg_info, 0, 0, 1)
-    ZEND_ARG_ARRAY_INFO(1, roles, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(1, roles)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, dropRole);
 ZEND_BEGIN_ARG_INFO_EX(drop_role_arg_info, 0, 0, 1)
-    ZEND_ARG_TYPE_INFO(0, role, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, role)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, grantPrivileges);
 ZEND_BEGIN_ARG_INFO_EX(grant_privileges_arg_info, 0, 0, 2)
-    ZEND_ARG_TYPE_INFO(0, role, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, privileges, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, role)
+    ZEND_ARG_INFO(0, privileges)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, revokePrivileges);
 ZEND_BEGIN_ARG_INFO_EX(revoke_privileges_arg_info, 0, 0, 2)
-    ZEND_ARG_TYPE_INFO(0, role, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, privileges, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, role)
+    ZEND_ARG_INFO(0, privileges)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, grantRoles);
 ZEND_BEGIN_ARG_INFO_EX(grant_roles_arg_info, 0, 0, 2)
-    ZEND_ARG_TYPE_INFO(0, user, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, roles, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, user)
+    ZEND_ARG_INFO(0, roles)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, revokeRoles);
 ZEND_BEGIN_ARG_INFO_EX(revoke_roles_arg_info, 0, 0, 2)
-    ZEND_ARG_TYPE_INFO(0, user, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, roles, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, user)
+    ZEND_ARG_INFO(0, roles)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
 PHP_METHOD(Aerospike, dropUser);
 ZEND_BEGIN_ARG_INFO_EX(drop_user_arg_info, 0, 0, 1)
-    ZEND_ARG_TYPE_INFO(0, user, IS_STRING, 0)
-    ZEND_ARG_ARRAY_INFO(0, options, 1)
+    ZEND_ARG_INFO(0, user)
+    ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO();
 
