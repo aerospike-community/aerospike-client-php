@@ -174,6 +174,7 @@ PHP_MINFO_FUNCTION(aerospike)
 {
 	php_info_print_table_start();
 	php_info_print_table_header(2, "aerospike support", "enabled");
+    php_info_print_table_header(2, "client version", PHP_AEROSPIKE_VERSION);
 	php_info_print_table_end();
 
 	/* Remove comments if you have entries in php.ini
