@@ -9,4 +9,4 @@ This testcase will test for listPop() with non-existent index.
 include dirname(__FILE__)."/../../astestframework/astest-phpt-loader.inc";
 aerospike_phpt_runtest("ListPop", "error_003");
 --EXPECT--
-ERR_REQUEST_INVALID
+ERR_OP_NOT_APPLICABLE
