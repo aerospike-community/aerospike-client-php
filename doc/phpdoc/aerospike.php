@@ -4315,7 +4315,8 @@ class Aerospike {
      * each is supported by current server version
      * @const ERR_REQUEST_INVALID
      */
-    const ERR_REQUEST_INVALID = "AEROSPIKE_ERR_REQUEST_INVALID";/**
+    const ERR_REQUEST_INVALID = "AEROSPIKE_ERR_REQUEST_INVALID";
+    /**
      * The operation cannot be applied to the current bin on the server
      * @const ERR_OP_NOT_APPLICABLE
      */
