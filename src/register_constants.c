@@ -113,6 +113,7 @@ static AerospikeStatus aerospike_status[] = {
 		{ AEROSPIKE_ERR_RECORD_NOT_FOUND          ,   "ERR_RECORD_NOT_FOUND"               },
 		{ AEROSPIKE_ERR_RECORD_GENERATION         ,   "ERR_RECORD_GENERATION"              },
 		{ AEROSPIKE_ERR_REQUEST_INVALID           ,   "ERR_REQUEST_INVALID"                },
+		{ AEROSPIKE_ERR_OP_NOT_APPLICABLE         ,   "ERR_OP_NOT_APPLICABLE"              },
 		{ AEROSPIKE_ERR_RECORD_EXISTS             ,   "ERR_RECORD_EXISTS"                  },
 		{ AEROSPIKE_ERR_CLUSTER_CHANGE            ,   "ERR_CLUSTER_CHANGE"                 },
 		{ AEROSPIKE_ERR_SERVER_FULL               ,   "ERR_SERVER_FULL"                    },

@@ -4315,7 +4315,11 @@ class Aerospike {
      * each is supported by current server version
      * @const ERR_REQUEST_INVALID
      */
-    const ERR_REQUEST_INVALID = "AEROSPIKE_ERR_REQUEST_INVALID";
+    const ERR_REQUEST_INVALID = "AEROSPIKE_ERR_REQUEST_INVALID";/**
+     * The operation cannot be applied to the current bin on the server
+     * @const ERR_OP_NOT_APPLICABLE
+     */
+    const ERR_OP_NOT_APPLICABLE = "AEROSPIKE_ERR_OP_NOT_APPLICABLE";
     /**
      * Record already exists. May be returned by a write with the
      * OPT_POLICY_EXISTS write policy set to POLICY_EXISTS_CREATE
