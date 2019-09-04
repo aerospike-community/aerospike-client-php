@@ -1412,6 +1412,377 @@ class Aerospike {
     public function operate(array $key, array $operations, &$returned, array $options = []) {}
 
     /**
+     *  Perform multiple bin operations on a record with a given key, with write operations happening before read ones.
+     *  The order of the resulting elements will correspond to the order of the operations in the parameters.
+     * 
+     *  Non-existent bins being read will have a `NULL` value.
+     *
+     * Currently a call to operateOrdered() can include only one write operation per-bin.
+     * For example, you cannot both append and prepend to the same bin, in the same call.
+     *
+     * Like other bin operations, operateOrdered() only works on existing records (i.e. ones that were previously created with a put()).
+     *
+     * **Example #1 Combining several write operations into one multi-op call**
+     *
+     * ```php
+     * $config = ["hosts" => [["addr"=>"localhost", "port"=>3000]], "shm"=>[]];
+     * $client = new Aerospike($config, true);
+     * if (!$client->isConnected()) {
+     *    echo "Aerospike failed to connect[{$client->errorno()}]: {$client->error()}\n";
+     *    exit(1);
+     * }
+     *
+     * $key = $client->initKey("test", "demo", "pk458");
+     * $operations = [
+     * array("op" => Aerospike::OP_LIST_APPEND, "bin" => "age", "val"=>49),
+     * array("op" => Aerospike::OP_LIST_GET, "bin" => "age", "index"=>0),
+     * array("op" => Aerospike::OP_LIST_POP, "bin" => "age", "index"=>0)
+     * ];
+     * $returned = "output value";
+     * $status = $client->operateOrdered($key, $operations, $returned);
+     * 
+     * if ($status == Aerospike::OK) {
+     *     var_dump($returned);
+     * } else {
+     *     echo "[{$client->errorno()}] ".$client->error();
+     * }
+     * ```
+     *
+     * @link https://www.aerospike.com/docs/guide/kvs.html Key-Value Store
+     * @link https://github.com/aerospike/aerospike-client-php/blob/master/doc/README.md#handling-unsupported-types Handling Unsupported Types
+     * @link https://www.aerospike.com/docs/client/c/usage/kvs/write.html#change-record-time-to-live-ttl Time-to-live
+     * @link https://www.aerospike.com/docs/guide/glossary.html Glossary
+     * @param array $key The key identifying the record. An array with keys `['ns','set','key']` or `['ns','set','digest']`
+     * @param array $operations The array of of one or more per-bin operations conforming to the following structure:
+     * ```
+     * Write Operation:
+     *   op => Aerospike::OPERATOR_WRITE
+     *   bin => bin name (cannot be longer than 14 characters)
+     *   val => the value to store in the bin
+     *
+     * Increment Operation:
+     *   op => Aerospike::OPERATOR_INCR
+     *   bin => bin name
+     *   val => the integer by which to increment the value in the bin
+     *
+     * Prepend Operation:
+     *   op => Aerospike::OPERATOR_PREPEND
+     *   bin => bin name
+     *   val => the string to prepend the string value in the bin
+     *
+     * Append Operation:
+     *   op => Aerospike::OPERATOR_APPEND
+     *   bin => bin name
+     *   val => the string to append the string value in the bin
+     *
+     * Read Operation:
+     *   op => Aerospike::OPERATOR_READ
+     *   bin => name of the bin we want to read after any write operations
+     *
+     * Touch Operation: reset the time-to-live of the record and increment its generation
+     *                  (only combines with read operations)
+     *   op => Aerospike::OPERATOR_TOUCH
+     *   ttl => a positive integer value to set as time-to-live for the record
+     *
+     * List Append Operation:
+     *   op => Aerospike::OP_LIST_APPEND,
+     *   bin =>  "events",
+     *   val =>  1234
+     *
+     * List Merge Operation:
+     *   op => Aerospike::OP_LIST_MERGE,
+     *   bin =>  "events",
+     *   val =>  [ 123, 456 ]
+     *
+     * List Insert Operation:
+     *   op => Aerospike::OP_LIST_INSERT,
+     *   bin =>  "events",
+     *   index =>  2,
+     *   val =>  1234
+     *
+     * List Insert Items Operation:
+     *   op => Aerospike::OP_LIST_INSERT_ITEMS,
+     *   bin =>  "events",
+     *   index =>  2,
+     *   val =>  [ 123, 456 ]
+     *
+     * List Pop Operation:
+     *   op => Aerospike::OP_LIST_POP, # returns a value
+     *   bin =>  "events",
+     *   index =>  2
+     *
+     * List Pop Range Operation:
+     *   op => Aerospike::OP_LIST_POP_RANGE, # returns a value
+     *   bin =>  "events",
+     *   index =>  2,
+     *   val =>  3 # remove 3 elements starting at index 2
+     *
+     * List Remove Operation:
+     *   op => Aerospike::OP_LIST_REMOVE,
+     *   bin =>  "events",
+     *   index =>  2
+     *
+     * List Remove Range Operation:
+     *   op => Aerospike::OP_LIST_REMOVE_RANGE,
+     *   bin =>  "events",
+     *   index =>  2,
+     *   val =>  3 # remove 3 elements starting at index 2
+     *
+     * List Clear Operation:
+     *   op => Aerospike::OP_LIST_CLEAR,
+     *   bin =>  "events"
+     *
+     * List Set Operation:
+     *   op => Aerospike::OP_LIST_SET,
+     *   bin =>  "events",
+     *   index =>  2,
+     *   val =>  "latest event at index 2" # set this value at index 2
+     *
+     * List Get Operation:
+     *   op => Aerospike::OP_LIST_GET, # returns a value
+     *   bin =>  "events",
+     *   index =>  2 # similar to Aerospike::OPERATOR_READ but only returns the value
+     *                 at index 2 of the list, not the whole bin
+     *
+     * List Get Range Operation:
+     *   op => Aerospike::OP_LIST_GET_RANGE, # returns a value
+     *   bin =>  "events",
+     *   index =>  2,
+     *   val =>  3 # get 3 elements starting at index 2
+     *
+     * List Trim Operation:
+     *   op => Aerospike::OP_LIST_TRIM,
+     *   bin =>  "events",
+     *   index =>  2,
+     *   val =>  3 # remove all elements not in the range between index 2 and index 2 + 3
+     *
+     * List Size Operation:
+     *   op => Aerospike::OP_LIST_SIZE, # returns a value
+     *   bin =>  "events" # gets the size of a list contained in the bin
+     *
+     *
+     * Map operations
+     *
+     * Map Policies:
+     * Many of the following operations require a map policy, the policy is an array
+     * containing any of the keys AEROSPIKE::OPT_MAP_ORDER, AEROSPIKE::OPT_MAP_WRITE_MODE
+     *
+     * the value for AEROSPIKE::OPT_MAP_ORDER should be one of AEROSPIKE::AS_MAP_UNORDERED , AEROSPIKE::AS_MAP_KEY_ORDERED , AEROSPIKE::AS_MAP_KEY_VALUE_ORDERED
+     * the default value is currently AEROSPIKE::AS_MAP_UNORDERED
+     *
+     * the value for AEROSPIKE::OPT_MAP_WRITE_MODE should be one of: AEROSPIKE::AS_MAP_UPDATE, AEROSPIKE::AS_MAP_UPDATE_ONLY , AEROSPIKE::AS_MAP_CREATE_ONLY
+     * the default value is currently AEROSPIKE::AS_MAP_UPDATE
+     *
+     * Map return types:
+     * many of the map operations require a return_type entry.
+     * this specifies the format in which the response should be returned. The options are:
+     * AEROSPIKE::AS_MAP_RETURN_NONE # Do not return a result.
+     * AEROSPIKE::AS_MAP_RETURN_INDEX # Return key index order.
+     * AEROSPIKE::AS_MAP_RETURN_REVERSE_INDEX # Return reverse key order.
+     * AEROSPIKE::AS_MAP_RETURN_RANK # Return value order.
+     * AEROSPIKE::AS_MAP_RETURN_REVERSE_RANK # Return reserve value order.
+     * AEROSPIKE::AS_MAP_RETURN_COUNT # Return count of items selected.
+     * AEROSPIKE::AS_MAP_RETURN_KEY # Return key for single key read and key list for range read.
+     * AEROSPIKE::AS_MAP_RETURN_VALUE # Return value for single key read and value list for range read.
+     * AEROSPIKE::AS_MAP_RETURN_KEY_VALUE # Return key/value items. Will be of the form ['key1', 'val1', 'key2', 'val2', 'key3', 'val3]
+     *
+     * Map policy Operation:
+     *   op => Aerospike::OP_MAP_SET_POLICY,
+     *   bin =>  "map",
+     *   map_policy =>  [ AEROSPIKE::OPT_MAP_ORDER => AEROSPIKE::AS_MAP_KEY_ORDERED]
+     *
+     * Map clear operation: (Remove all items from a map)
+     *   op => AEROSPIKE::OP_MAP_CLEAR,
+     *   bin => "bin_name"
+     *
+     *
+     * Map Size Operation: Return the number of items in a map
+     *   op => AEROSPIKE::OP_MAP_SIZE,
+     *   bin => "bin_name"
+     *
+     * Map Get by Key operation
+     *   op => AEROSPIKE::OP_MAP_GET_BY_KEY ,
+     *   bin => "bin_name",
+     *   key => "my_key",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get By Key Range operation:
+     *   op => AEROSPIKE::OP_MAP_GET_BY_KEY_RANGE ,
+     *   bin => "bin_name",
+     *   key => "aaa",
+     *   range_end => "bbb"
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get By Value operation:
+     *   op => AEROSPIKE::OP_MAP_GET_BY_VALUE ,
+     *   bin => "bin_name",
+     *   value => "my_val"
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get by Value Range operation:
+     *   op => AEROSPIKE::OP_MAP_GET_BY_VALUE_RANGE ,
+     *   bin => "bin_name",
+     *   value => "value_a",
+     *   range_end => "value_z",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get By Index operation
+     *   op => AEROSPIKE::OP_MAP_GET_BY_INDEX ,
+     *   bin => "bin_name",
+     *   index => 2,
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get by Index Range operation
+     *   op => AEROSPIKE::OP_MAP_GET_BY_INDEX_RANGE,
+     *   bin => "bin_name",
+     *   index => 2,
+     *   count => 2,
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get By Rank operation
+     *   op => AEROSPIKE::OP_MAP_GET_BY_RANK ,
+     *   bin => "bin_name",
+     *   rank => -1, # get the item with the largest value
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Get by Rank Range operation
+     *   op => AEROSPIKE::OP_MAP_GET_BY_RANK_RANGE ,
+     *   rank => -2 ,
+     *   count => 2 ,
+     *   bin => "bin_name",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Put operation
+     *   op => AEROSPIKE::OP_MAP_PUT ,
+     *   bin => "bin_name",
+     *   key => "aero",
+     *   val => "spike",
+     *   map_policy => [ AEROSPIKE::OPT_MAP_ORDER => AEROSPIKE::AS_MAP_KEY_ORDERED]
+     *
+     * Map Put Items operations
+     *  op => AEROSPIKE::OP_MAP_PUT_ITEMS ,
+     *  bin => "bin_name",
+     *  val => [1, "a", 1.5],
+     *  map_policy => [ AEROSPIKE::OPT_MAP_ORDER => AEROSPIKE::AS_MAP_KEY_ORDERED]
+     *
+     * Map Increment operation
+     *   op => AEROSPIKE::OP_MAP_INCREMENT ,
+     *   bin => "bin_name",
+     *   val => 5, #increment the value by 5
+     *   key => "key_to_increment",
+     *   map_policy => [ AEROSPIKE::OPT_MAP_ORDER => AEROSPIKE::AS_MAP_KEY_ORDERED]
+     *
+     * Map Decrement operation
+     *   op => AEROSPIKE::OP_MAP_DECREMENT ,
+     *   bin => "bin_name",
+     *   key => "key_to_decrement",
+     *   val => 5, #decrement by 5
+     *   map_policy => [ AEROSPIKE::OPT_MAP_ORDER => AEROSPIKE::AS_MAP_KEY_ORDERED]
+     *
+     * Map Remove by Key operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_KEY ,
+     *   bin => "bin_name",
+     *   key => "key_to_remove",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Remove by Key list operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_KEY_LIST ,
+     *   bin => "bin_name",
+     *   key => ["key1", 2, "key3"],
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map remove by Key Range operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_KEY_RANGE ,
+     *   bin => "bin",
+     *   key => "a",
+     *   range_end => "d",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map remove by Value operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_VALUE ,
+     *   bin => "bin_name",
+     *   val => 5,
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map remove by value range operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_VALUE_RANGE ,
+     *   bin => "bin_name",
+     *   val => "a",
+     *   range_end => "d"
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map remove by value list operation
+     *  op => AEROSPIKE::OP_MAP_REMOVE_BY_VALUE_LIST ,
+     *  bin => "bin_name",
+     *  val => [1, 2, 3, 4],
+     *  return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Remove by Index operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_INDEX ,
+     *   index => 2,
+     *   bin => "bin_name",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Remove By Index Range operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_INDEX_RANGE ,
+     *   bin => "bin_name",
+     *   index => 3 ,
+     *   count => 3 ,
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map Remove by Rank operation
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_RANK ,
+     *   rank => -1 ,
+     *   bin => "bin_name",
+     *   return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     * Map remove by rank range
+     *   op => AEROSPIKE::OP_MAP_REMOVE_BY_RANK_RANGE,
+     *   bin => "bin_name",
+     *   rank => -1,
+     *   count => return_type => AEROSPIKE::MAP_RETURN_KEY_VALUE
+     *
+     *
+     *
+     * ```
+     *
+     * @param array $returned a pass-by-reference array of bins retrieved by read operations. If multiple operations exist for a specific bin name, the last operation will be the one placed as the value
+     * @param array $options an optional array of policy options, whose keys include
+     * * Aerospike::OPT_WRITE_TIMEOUT
+     * * Aerospike::OPT_TTL
+     * * Aerospike::OPT_POLICY_KEY
+     * * Aerospike::OPT_POLICY_GEN
+     * * Aerospike::OPT_POLICY_COMMIT_LEVEL
+     * * Aerospike::OPT_POLICY_REPLICA
+     * * Aerospike::OPT_POLICY_CONSISTENCY
+     * * Aerospike::OPT_POLICY_DURABLE_DELETE
+     * * Aerospike::OPT_DESERIALIZE
+     * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
+     * * Aerospike::OPT_TOTAL_TIMEOUT
+     * * Aerospike::OPT_MAX_RETRIES
+     * * Aerospike::OPT_SOCKET_TIMEOUT
+     * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
+     * @see Aerospike::OPT_TTL Aerospike::OPT_TTL options
+     * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
+     * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
+     * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
+     * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
+     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
+     * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
+     * @see Aerospike::OPT_DESERIALIZE Aerospike::OPT_DESERIALIZE option
+     * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
+     * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
+     * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
+     * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
+     * @see Aerospike::OK Aerospike::OK and error status codes
+     * @see Aerospike::error() error()
+     * @see Aerospike::errorno() errorno()
+     * @see Aerospike::OPERATOR_WRITE Aerospike::OPERATOR_WRITE and other operators
+     * @return int The status code of the operation. Compare to the Aerospike class status constants.
+     */
+    public function operateOrdered(array $key, array $operations, &$returned, array $options = []) {}
+
+    /**
      * Count the number of elements in a list type bin
      *
      * @version 3.7 Requires server >= 3.7
