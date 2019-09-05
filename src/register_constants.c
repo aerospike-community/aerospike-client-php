@@ -9,6 +9,7 @@
 #define AEROSPIKE_STATUS_ARR_SIZE (sizeof(aerospike_status)/sizeof(AerospikeStatus))
 #define AEROSPIKE_GENERAL_LONG_CONSTANTS_ARR_SIZE (sizeof(aerospike_general_long_constants)/sizeof(AerospikeGeneralLongConstant))
 #define AEROSPIKE_GENERAL_STRING_CONSTANTS_ARR_SIZE (sizeof(aerospike_general_string_constants)/sizeof(AerospikeGeneralStringConstant))
+#define AEROSPIKE_ERR_OP_NOT_APPLICABLE_STAND_IN 26
 
 /*
  *******************************************************************************************************
@@ -113,7 +114,7 @@ static AerospikeStatus aerospike_status[] = {
 		{ AEROSPIKE_ERR_RECORD_NOT_FOUND          ,   "ERR_RECORD_NOT_FOUND"               },
 		{ AEROSPIKE_ERR_RECORD_GENERATION         ,   "ERR_RECORD_GENERATION"              },
 		{ AEROSPIKE_ERR_REQUEST_INVALID           ,   "ERR_REQUEST_INVALID"                },
-		{ 26 /*AEROSPIKE_ERR_OP_NOT_APPLICABLE*/  ,   "ERR_OP_NOT_APPLICABLE"              },
+		{ AEROSPIKE_ERR_OP_NOT_APPLICABLE_STAND_IN,   "ERR_OP_NOT_APPLICABLE"              },
 		{ AEROSPIKE_ERR_RECORD_EXISTS             ,   "ERR_RECORD_EXISTS"                  },
 		{ AEROSPIKE_ERR_CLUSTER_CHANGE            ,   "ERR_CLUSTER_CHANGE"                 },
 		{ AEROSPIKE_ERR_SERVER_FULL               ,   "ERR_SERVER_FULL"                    },
