@@ -911,15 +911,15 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 		config->policies.apply.commit_level = (as_policy_commit_level)int_ini_value;
 	}
 
-	policy_zval = zend_hash_index_find(policy_hash, OPT_POLICY_CONSISTENCY);
+	policy_zval = zend_hash_index_find(policy_hash, OPT_POLICY_READ_MODE_AP);
 	if (policy_zval) {
 		if (Z_TYPE_P(policy_zval) != IS_LONG) {
 			return AEROSPIKE_ERR_PARAM;
 		}
 		int_ini_value = Z_LVAL_P(policy_zval);
-		config->policies.read.consistency_level = (as_policy_consistency_level)int_ini_value;
-		config->policies.operate.consistency_level = (as_policy_consistency_level)int_ini_value;
-		config->policies.batch.consistency_level = (as_policy_consistency_level)int_ini_value;
+		config->policies.read.read_mode_ap = (as_policy_read_mode_ap)int_ini_value;
+		config->policies.operate.read_mode_ap = (as_policy_read_mode_ap)int_ini_value;
+		config->policies.batch.read_mode_ap = (as_policy_read_mode_ap)int_ini_value;
 	}
 
 	policy_zval = zend_hash_index_find(policy_hash, OPT_POLICY_REPLICA);

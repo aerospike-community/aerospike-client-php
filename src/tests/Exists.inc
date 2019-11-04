@@ -63,7 +63,7 @@ class Exists extends AerospikeTestCommon
        $status = $this->db->exists($this->keys[0], $metadata,
            array(Aerospike::OPT_READ_TIMEOUT=>3000,
            Aerospike::OPT_POLICY_REPLICA=>Aerospike::POLICY_REPLICA_MASTER,
-           Aerospike::OPT_POLICY_CONSISTENCY=>Aerospike::POLICY_CONSISTENCY_ONE));
+           Aerospike::OPT_POLICY_READ_MODE_AP=>Aerospike::POLICY_READ_MODE_AP_ONE));
        if(array_key_exists('generation', $metadata) && array_key_exists('ttl', $metadata)) {
             return $status;
        }

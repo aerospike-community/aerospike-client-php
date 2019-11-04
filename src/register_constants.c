@@ -138,7 +138,6 @@ static AerospikeStatus aerospike_status[] = {
 		{ AEROSPIKE_ERR_BATCH_DISABLED            ,   "ERR_BATCH_DISABLED"                 },
 		{AEROSPIKE_ERR_BATCH_MAX_REQUESTS_EXCEEDED,   "ERR_BATCH_MAX_REQUESTS_EXCEEDED"    },
 		{ AEROSPIKE_ERR_BATCH_QUEUES_FULL         ,   "ERR_BATCH_QUEUES_FULL "             },
-		{ AEROSPIKE_ERR_LARGE_ITEM_NOT_FOUND      ,   "ERR_LARGE_ITEM_NOT_FOUND"           },
 		{ AEROSPIKE_ERR_INDEX_FOUND               ,   "ERR_INDEX_FOUND"                    },
 		{ AEROSPIKE_ERR_INDEX_NOT_FOUND           ,   "ERR_INDEX_NOT_FOUND"                },
 		{ AEROSPIKE_ERR_INDEX_OOM                 ,   "ERR_INDEX_OOM"                      },
