@@ -632,7 +632,9 @@ static as_status set_as_config(as_config* config, HashTable* z_conf_hash) {
 
 	set_as_config_from_ini(config);
 	setting_value = zend_hash_str_find(z_conf_hash, "shm", strlen("shm"));
-	if (setting_value) {
+	if (setting_value && Z_TYPE_P(setting_value) == IS_FALSE) {
+		config->use_shm = false;
+	} else if (setting_value) {
 		config->use_shm = true;
 
 		if (Z_TYPE_P(setting_value) != IS_ARRAY) {
