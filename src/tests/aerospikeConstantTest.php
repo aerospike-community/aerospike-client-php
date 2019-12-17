@@ -176,7 +176,6 @@ final class constantRegistrationTest extends TestCase {
         "ERR_BATCH_DISABLED",
         "ERR_BATCH_MAX_REQUESTS_EXCEEDED",
         "ERR_BATCH_QUEUES_FULL ",
-        "ERR_LARGE_ITEM_NOT_FOUND",
         "ERR_INDEX_FOUND",
         "ERR_INDEX_NOT_FOUND",
         "ERR_INDEX_OOM",
