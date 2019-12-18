@@ -1202,6 +1202,9 @@ class Aerospike {
      * the value for AEROSPIKE::OPT_MAP_WRITE_MODE should be one of: AEROSPIKE::AS_MAP_UPDATE, AEROSPIKE::AS_MAP_UPDATE_ONLY , AEROSPIKE::AS_MAP_CREATE_ONLY
      * the default value is currently AEROSPIKE::AS_MAP_UPDATE
      *
+     * the value for AEROSPIKE::OPT_MAP_WRITE_FLAGS should be one of: AEROSPIKE::AS_MAP_WRITE_DEFAULT, AEROSPIKE::AS_MAP_WRITE_CREATE_ONLY, AEROSPIKE::AS_MAP_WRITE_UPDATE_ONLY, AEROSPIKE::AS_MAP_WRITE_NO_FAIL, AEROSPIKE::AS_MAP_WRITE_PARTIAL
+     * the default value is currently AEROSPIKE::AS_MAP_WRITE_DEFAULT
+     *
      * Map return types:
      * many of the map operations require a return_type entry.
      * this specifies the format in which the response should be returned. The options are:
@@ -1572,6 +1575,9 @@ class Aerospike {
      *
      * the value for AEROSPIKE::OPT_MAP_WRITE_MODE should be one of: AEROSPIKE::AS_MAP_UPDATE, AEROSPIKE::AS_MAP_UPDATE_ONLY , AEROSPIKE::AS_MAP_CREATE_ONLY
      * the default value is currently AEROSPIKE::AS_MAP_UPDATE
+     *
+     * the value for AEROSPIKE::OPT_MAP_WRITE_FLAGS should be one of: AEROSPIKE::AS_MAP_WRITE_DEFAULT, AEROSPIKE::AS_MAP_WRITE_CREATE_ONLY, AEROSPIKE::AS_MAP_WRITE_UPDATE_ONLY, AEROSPIKE::AS_MAP_WRITE_NO_FAIL, AEROSPIKE::AS_MAP_WRITE_PARTIAL
+     * the default value is currently AEROSPIKE::AS_MAP_WRITE_DEFAULT
      *
      * Map return types:
      * many of the map operations require a return_type entry.
@@ -4138,6 +4144,42 @@ class Aerospike {
      * @const AS_MAP_CREATE_ONLY
      */
     const AS_MAP_CREATE_ONLY = "AS_MAP_CREATE_ONLY";
+
+    /**
+     * Map policy flags declaring the behavior of map write operations
+     * @see Aerospike::AS_MAP_WRITE_DEFAULT
+     * @see Aerospike::AS_MAP_WRITE_CREATE_ONLY
+     * @see Aerospike::AS_MAP_WRITE_UPDATE_ONLY
+     * @see Aerospike::AS_MAP_WRITE_NO_FAIL
+     * @see Aerospike::AS_MAP_WRITE_PARTIAL
+     * @const OPT_MAP_WRITE_FLAGS
+     */
+    const OPT_MAP_WRITE_FLAGS = "OPT_MAP_WRITE_FLAGS";
+
+    /**
+     * @const AS_MAP_WRITE_DEFAULT (default)
+     */
+    const AS_MAP_WRITE_DEFAULT = "AS_MAP_WRITE_DEFAULT";
+
+    /**
+     * @const AS_MAP_WRITE_CREATE_ONLY
+     */
+    const AS_MAP_WRITE_CREATE_ONLY = "AS_MAP_WRITE_CREATE_ONLY";
+
+    /**
+     * @const AS_MAP_WRITE_UPDATE_ONLY
+     */
+    const AS_MAP_WRITE_UPDATE_ONLY = "AS_MAP_WRITE_UPDATE_ONLY";
+
+    /**
+     * @const AS_MAP_WRITE_NO_FAIL
+     */
+    const AS_MAP_WRITE_NO_FAIL = "AS_MAP_WRITE_NO_FAIL";
+
+    /**
+     * @const AS_MAP_WRITE_PARTIAL
+     */
+    const AS_MAP_WRITE_PARTIAL = "AS_MAP_WRITE_PARTIAL";
 
     /**
      * Do not return a result for the map operation (get and remove operations)
