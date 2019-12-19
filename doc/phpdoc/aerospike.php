@@ -171,7 +171,8 @@ class Aerospike {
      * * Aerospike::OPT_SERIALIZER
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
+     * * Aerospike::OPT_POLICY_READ_MODE_AP
+     * * Aerospike::OPT_POLICY_READ_MODE_SC
      * * Aerospike::OPT_READ_DEFAULT_POL An array of default policies for read operations.
      * * Aerospike::OPT_WRITE_DEFAULT_POL An array of default policies for write operations.
      * * AEROSPIKE::OPT_REMOVE_DEFAULT_POL An array of default policies for remove operations.
@@ -188,7 +189,8 @@ class Aerospike {
      * @see Aerospike::OPT_SERIALIZER Aerospike::OPT_SERIALIZER options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
+     * @see Aerospike::OPT_POLICY_READ_MODE_AP Aerospike::OPT_POLICY_READ_MODE_AP options
+     * @see Aerospike::OPT_POLICY_READ_MODE_SC Aerospike::OPT_POLICY_READ_MODE_SC options
      * @see Aerospike::isConnected() isConnected()
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -649,7 +651,8 @@ class Aerospike {
      * * Aerospike::OPT_MAX_RETRIES
      * * Aerospike::OPT_SOCKET_TIMEOUT
      * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
+     * * Aerospike::OPT_POLICY_READ_MODE_AP
+     * * Aerospike::OPT_POLICY_READ_MODE_SC
      * @see Aerospike::OPT_READ_TIMEOUT Aerospike::OPT_READ_TIMEOUT options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_DESERIALIZE Aerospike::OPT_DESERIALIZE option
@@ -658,7 +661,8 @@ class Aerospike {
      * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
      * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
+     * @see Aerospike::OPT_POLICY_READ_MODE_AP Aerospike::OPT_POLICY_READ_MODE_AP options
+     * @see Aerospike::OPT_POLICY_READ_MODE_SC Aerospike::OPT_POLICY_READ_MODE_SC options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -704,7 +708,8 @@ class Aerospike {
      * * Aerospike::OPT_SOCKET_TIMEOUT
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
+     * * Aerospike::OPT_POLICY_READ_MODE_AP
+     * * Aerospike::OPT_POLICY_READ_MODE_SC
      * @see Aerospike::OPT_READ_TIMEOUT Aerospike::OPT_READ_TIMEOUT options
      * @see Aerospike::OPT_DESERIALIZE Aerospike::OPT_DESERIALIZE option
      * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
@@ -713,7 +718,8 @@ class Aerospike {
      * @see Aerospike::MAX_RETRIES Aerospike::MAX_RETRIES options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
+     * @see Aerospike::OPT_POLICY_READ_MODE_AP Aerospike::OPT_POLICY_READ_MODE_AP options
+     * @see Aerospike::OPT_POLICY_READ_MODE_SC Aerospike::OPT_POLICY_READ_MODE_SC options
      * @see Aerospike::OK Aerospike::OK and error status codes
      * @see Aerospike::error() error()
      * @see Aerospike::errorno() errorno()
@@ -1383,7 +1389,8 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
+     * * Aerospike::OPT_POLICY_READ_MODE_AP
+     * * Aerospike::OPT_POLICY_READ_MODE_SC
      * * Aerospike::OPT_POLICY_DURABLE_DELETE
      * * Aerospike::OPT_DESERIALIZE
      * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
@@ -1396,7 +1403,8 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
+     * @see Aerospike::OPT_POLICY_READ_MODE_AP Aerospike::OPT_POLICY_READ_MODE_AP options
+     * @see Aerospike::OPT_POLICY_READ_MODE_SC Aerospike::OPT_POLICY_READ_MODE_SC options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_DESERIALIZE Aerospike::OPT_DESERIALIZE option
      * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
@@ -1754,7 +1762,8 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_GEN
      * * Aerospike::OPT_POLICY_COMMIT_LEVEL
      * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
+     * * Aerospike::OPT_POLICY_READ_MODE_AP
+     * * Aerospike::OPT_POLICY_READ_MODE_SC
      * * Aerospike::OPT_POLICY_DURABLE_DELETE
      * * Aerospike::OPT_DESERIALIZE
      * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
@@ -1767,7 +1776,8 @@ class Aerospike {
      * @see Aerospike::OPT_POLICY_GEN Aerospike::OPT_POLICY_GEN options
      * @see Aerospike::OPT_POLICY_COMMIT_LEVEL Aerospike::OPT_POLICY_COMMIT_LEVEL options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
+     * @see Aerospike::OPT_POLICY_READ_MODE_AP Aerospike::OPT_POLICY_READ_MODE_AP options
+     * @see Aerospike::OPT_POLICY_READ_MODE_SC Aerospike::OPT_POLICY_READ_MODE_SC options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_DESERIALIZE Aerospike::OPT_DESERIALIZE option
      * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
@@ -1793,7 +1803,8 @@ class Aerospike {
      * * Aerospike::OPT_READ_TIMEOUT
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
+     * * Aerospike::OPT_POLICY_READ_MODE_AP
+     * * Aerospike::OPT_POLICY_READ_MODE_SC
      * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
      * * Aerospike::OPT_TOTAL_TIMEOUT
      * * Aerospike::OPT_MAX_RETRIES
@@ -1801,7 +1812,8 @@ class Aerospike {
      * @see Aerospike::OPT_READ_TIMEOUT Aerospike::OPT_READ_TIMEOUT options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
+     * @see Aerospike::OPT_POLICY_READ_MODE_AP Aerospike::OPT_POLICY_READ_MODE_AP options
+     * @see Aerospike::OPT_POLICY_READ_MODE_SC Aerospike::OPT_POLICY_READ_MODE_SC options
      * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
      * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
      * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
@@ -2208,7 +2220,8 @@ class Aerospike {
      * * Aerospike::OPT_READ_TIMEOUT
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
+     * * Aerospike::OPT_POLICY_READ_MODE_AP
+     * * Aerospike::OPT_POLICY_READ_MODE_SC
      * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
      * * Aerospike::OPT_TOTAL_TIMEOUT
      * * Aerospike::OPT_MAX_RETRIES
@@ -2216,7 +2229,8 @@ class Aerospike {
      * @see Aerospike::OPT_READ_TIMEOUT Aerospike::OPT_READ_TIMEOUT options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
+     * @see Aerospike::OPT_POLICY_READ_MODE_AP Aerospike::OPT_POLICY_READ_MODE_AP options
+     * @see Aerospike::OPT_POLICY_READ_MODE_SC Aerospike::OPT_POLICY_READ_MODE_SC options
      * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
      * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
      * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
@@ -2241,7 +2255,8 @@ class Aerospike {
      * * Aerospike::OPT_READ_TIMEOUT
      * * Aerospike::OPT_POLICY_KEY
      * * Aerospike::OPT_POLICY_REPLICA
-     * * Aerospike::OPT_POLICY_CONSISTENCY
+     * * Aerospike::OPT_POLICY_READ_MODE_AP
+     * * Aerospike::OPT_POLICY_READ_MODE_SC
      * * Aerospike::OPT_SLEEP_BETWEEN_RETRIES
      * * Aerospike::OPT_TOTAL_TIMEOUT
      * * Aerospike::OPT_MAX_RETRIES
@@ -2249,7 +2264,8 @@ class Aerospike {
      * @see Aerospike::OPT_READ_TIMEOUT Aerospike::OPT_READ_TIMEOUT options
      * @see Aerospike::OPT_POLICY_KEY Aerospike::OPT_POLICY_KEY options
      * @see Aerospike::OPT_POLICY_REPLICA Aerospike::OPT_POLICY_REPLICA options
-     * @see Aerospike::OPT_POLICY_CONSISTENCY Aerospike::OPT_POLICY_CONSISTENCY options
+     * @see Aerospike::OPT_POLICY_READ_MODE_AP Aerospike::OPT_POLICY_READ_MODE_AP options
+     * @see Aerospike::OPT_POLICY_READ_MODE_SC Aerospike::OPT_POLICY_READ_MODE_SC options
      * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
      * @see Aerospike::OPT_TOTAL_TIMEOUT Aerospike::OPT_TOTAL_TIMEOUT options
      * @see Aerospike::OPT_SOCKET_TIMEOUT Aerospike::OPT_SOCKET_TIMEOUT options
@@ -3916,24 +3932,54 @@ class Aerospike {
     const POLICY_REPLICA_PREFER_RACK = 3;
 
     /**
-     * Accepts one of the POLICY_CONSISTENCY_* values.
+     * Accepts one of the POLICY_READ_MODE_AP_* values.
+     *
+     * One of the {@link https://www.aerospike.com/docs/architecture/consistency.html per-transaction consistency levels}.
+     * Specifies the number of replicas to be consulted in a read operation to
+     * provide the desired consistency level in availability mode.
+     * @const OPT_POLICY_READ_MODE_AP policy read option for availability namespaces
+     */
+    const OPT_POLICY_READ_MODE_AP = "OPT_POLICY_READ_MODE_AP";
+    /**
+     * Involve a single replica in the operation.
+     * @const POLICY_READ_MODE_AP_ONE (default)
+     */
+    const POLICY_READ_MODE_AP_ONE = 0;
+    /**
+     * Involve all replicas in the operation.
+     * @const AS_POLICY_READ_MODE_AP_ALL
+     */
+    const AS_POLICY_READ_MODE_AP_ALL = 1;
+
+   /**
+     * Accepts one of the POLICY_READ_MODE_SC_* values.
      *
      * One of the {@link https://www.aerospike.com/docs/architecture/consistency.html per-transaction consistency levels}.
      * Specifies the number of replicas to be consulted in a read operation to
      * provide the desired consistency level.
-     * @const OPT_POLICY_CONSISTENCY commit level policy option
+     * @const OPT_POLICY_READ_MODE_SC policy read option for consistency namespaces
      */
-    const OPT_POLICY_CONSISTENCY = "OPT_POLICY_CONSISTENCY";
+    const OPT_POLICY_READ_MODE_SC = "OPT_POLICY_READ_MODE_SC";
     /**
-     * Involve a single replica in the operation.
-     * @const POLICY_CONSISTENCY_ONE (default)
+     * Always read from master. Record versions are local to session.
+     * @const POLICY_READ_MODE_SC_SESSION (default)
      */
-    const POLICY_CONSISTENCY_ONE = 0;
+    const POLICY_READ_MODE_SC_SESSION = 0;
     /**
-     * Involve all replicas in the operation.
-     * @const POLICY_CONSISTENCY_ALL
+     * Always read from master. Record versions are global and thus serialized.
+     * @const POLICY_READ_MODE_SC_LINEARIZE
      */
-    const POLICY_CONSISTENCY_ALL = 1;
+    const POLICY_READ_MODE_SC_LINEARIZE = 1;
+    /**
+     * Read from master or fully migrated replica. Record versions may not always increase.
+     * @const POLICY_READ_MODE_SC_ALLOW_REPLICA
+     */
+    const POLICY_READ_MODE_SC_ALLOW_REPLICA = 2;
+    /**
+     * Read from master or fully migrated replica. Unavailable partitions are allowed. Record versions may not always increase.
+     * @const POLICY_READ_MODE_SC_ALLOW_UNAVAILABLE
+     */
+    const POLICY_READ_MODE_SC_ALLOW_UNAVAILABLE = 3;
 
 
     /*
@@ -4013,12 +4059,6 @@ class Aerospike {
       * Default: false
       */
     const OPT_SEND_SET_NAME = "OPT_SEND_SET_NAME";
-
-    /**
-     * Bool
-     * Force reads to be linearized for server namespaces that support CP mode. Requires enterprise server >= 4.0.0
-    */
-    const OPT_LINEARIZE_READ = "OPT_LINEARIZE_READ";
 
     /**
      * Abort the scan if the cluster is not in a stable state. Default false
@@ -4635,13 +4675,6 @@ class Aerospike {
      * @const ERR_QUERY
      */
     const ERR_QUERY = "AEROSPIKE_ERR_QUERY";
-
-    /**
-     * @deprecated
-     * @const ERR_LARGE_ITEM_NOT_FOUND
-     */
-    const ERR_LARGE_ITEM_NOT_FOUND = "AEROSPIKE_ERR_LARGE_ITEM_NOT_FOUND";
-
     /**
      * write operator for the operate() method
      * @const OPERATOR_WRITE

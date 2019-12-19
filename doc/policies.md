@@ -80,9 +80,9 @@ Keys:
 * `Aerospike::OPT_SLEEP_BETWEEN_RETRIES` default: `0`
 * `Aerospike::OPT_MAX_RETRIES` default: `2`
 * `Aerospike::OPT_POLICY_KEY` default: `Aerospike::POLICY_KEY_DIGEST`
-* `Aerospike::OPT_POLICY_CONSISTENCY` default: `Aerospike::POLICY_CONSISTENCY_ONE`
+* `Aerospike::OPT_POLICY_READ_MODE_AP` default: `Aerospike::POLICY_READ_MODE_AP_ONE`
+* `Aerospike::OPT_POLICY_READ_MODE_SC` default: `Aerospike::POLICY_READ_MODE_SC_SESSION`
 * `Aerospike::OPT_DESERIALIZE` default: `true`
-* `Aerospike::OPT_LINEARIZE_READ` default: `false`
 
 ## Remove Policies
 
@@ -107,9 +107,9 @@ Keys:
 * `Aerospike::OPT_TOTAL_TIMEOUT` default: `1000`
 * `Aerospike::OPT_SLEEP_BETWEEN_RETRIES` default: `0`
 * `Aerospike::OPT_MAX_RETRIES` default: `2`
-* `Aerospike::OPT_POLICY_CONSISTENCY` default: `Aerospike::POLICY_CONSISTENCY_ONE`
+* `Aerospike::OPT_POLICY_READ_MODE_AP` default: `Aerospike::POLICY_READ_MODE_AP_ONE`
+* `Aerospike::OPT_POLICY_READ_MODE_SC` default: `Aerospike::POLICY_READ_MODE_SC_SESSION`
 * `Aerospike::OPT_DESERIALIZE` default: `true`
-* `Aerospike::OPT_LINEARIZE_READ` default: `false`
 * `Aerospike::OPT_SEND_SET_NAME` default: `false`
 * `Aerospike::OPT_BATCH_CONCURRENT` default: `false`
 * `Aerospike::OPT_ALLOW_INLINE` default: `true`
@@ -128,8 +128,8 @@ Keys:
 * `Aerospike::OPT_POLICY_DURABLE_DELETE` default: `false`
 * `Aerospike::OPT_POLICY_COMMIT_LEVEL` default: `Aerospike::POLICY_COMMIT_LEVEL_ALL`
 * `Aerospike::OPT_DESERIALIZE` default: `true`
-* `Aerospike::OPT_LINEARIZE_READ` default: `false`
-* `Aerospike::OPT_POLICY_CONSISTENCY` default: `Aerospike::POLICY_CONSISTENCY_ONE`
+* `Aerospike::OPT_POLICY_READ_MODE_AP` default: `Aerospike::POLICY_READ_MODE_AP_ONE`
+* `Aerospike::OPT_POLICY_READ_MODE_SC` default: `Aerospike::POLICY_READ_MODE_SC_SESSION`
 * `Aerospike::OPT_POLICY_REPLICA` default: `Aerospike::POLICY_REPLICA_SEQUENCE`
 
 ## Query Policies
@@ -166,7 +166,6 @@ constructor key: `OPT_APPLY_DEFAULT_POL`
 * `Aerospike::OPT_TOTAL_TIMEOUT` default: `1000`
 * `Aerospike::OPT_SLEEP_BETWEEN_RETRIES` default: `0`
 * `Aerospike::OPT_MAX_RETRIES` default: `0`
-* `Aerospike::OPT_LINEARIZE_READ` default: `false`
 * `Aerospike::OPT_POLICY_COMMIT_LEVEL` default: `Aerospike::POLICY_COMMIT_LEVEL_ALL`
 * `Aerospike::OPT_POLICY_DURABLE_DELETE` default: `false`
 * `Aerospike::OPT_POLICY_KEY` default: `Aerospike::POLICY_KEY_DIGEST`
