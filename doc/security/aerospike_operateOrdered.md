@@ -162,7 +162,8 @@ operation:
 - **[Aerospike::OPT_POLICY_KEY](http://www.aerospike.com/apidocs/c/db/d65/group__client__policies.html#gaa9c8a79b2ab9d3812876c3ec5d1d50ec)**
 - **[Aerospike::OPT_POLICY_GEN](http://www.aerospike.com/apidocs/c/db/d65/group__client__policies.html#ga38c1a40903e463e5d0af0141e8c64061)**
 - **[Aerospike::OPT_POLICY_REPLICA](http://www.aerospike.com/apidocs/c/db/d65/group__client__policies.html#gabce1fb468ee9cbfe54b7ab834cec79ab)**
-- **[Aerospike::OPT_POLICY_CONSISTENCY](http://www.aerospike.com/apidocs/c/db/d65/group__client__policies.html#ga34dbe8d01c941be845145af643f9b5ab)**
+- **[Aerospike::OPT_POLICY_READ_MODE_AP](https://www.aerospike.com/apidocs/c/db/d65/group__client__policies.html#gadeed264a3e2331fefff177eeb72b8a27)**
+- **[Aerospike::OPT_POLICY_READ_MODE_SC](https://www.aerospike.com/apidocs/c/db/d65/group__client__policies.html#ga48f29009f4394c481306f788e7802624)**
 - **[Aerospike::OPT_POLICY_COMMIT_LEVEL](http://www.aerospike.com/apidocs/c/db/d65/group__client__policies.html#ga17faf52aeb845998e14ba0f3745e8f23)**
 
 ## Return Values

@@ -125,7 +125,8 @@ enum Aerospike_opt_keys {
 	OPT_POLICY_KEY,          /* records store the digest unique ID, optionally also its (ns, set, key) inputs */
 	OPT_POLICY_GEN,          /* set to one of Aerospike::OPT_POLICY_GEN_*                                     */
 	OPT_POLICY_REPLICA,      /* set to one of Aerospike::POLICY_REPLICA_*                                     */
-	OPT_POLICY_CONSISTENCY,  /* set to one of Aerospike::POLICY_CONSISTENCY_*                                 */
+	OPT_POLICY_READ_MODE_AP,  /* set to one of Aerospike::POLICY_READ_MODE_AP_*                                 */
+	OPT_POLICY_READ_MODE_SC,  /* set to one of Aerospike::POLICY_READ_MODE_SC_*                                 */
 	OPT_POLICY_COMMIT_LEVEL, /* set to one of Aerospike::POLICY_COMMIT_LEVEL_*                                */
 	OPT_TTL,                 /* set to time-to-live of the record in seconds                                  */
 	USE_BATCH_DIRECT,        /* use new batch index protocol if server supports it                            */
@@ -137,7 +138,6 @@ enum Aerospike_opt_keys {
 	OPT_MAP_WRITE_FLAGS,     /* Write flags for as_maps */
 	OPT_TOTAL_TIMEOUT,
 	OPT_MAX_RETRIES,
-	OPT_LINEARIZE_READ,
 	OPT_FAIL_ON_CLUSTER_CHANGE,
 	OPT_BATCH_CONCURRENT,
 	OPT_ALLOW_INLINE,
