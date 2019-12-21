@@ -4197,26 +4197,31 @@ class Aerospike {
     const OPT_MAP_WRITE_FLAGS = "OPT_MAP_WRITE_FLAGS";
 
     /**
+     * Default. Allow create or update.
      * @const AS_MAP_WRITE_DEFAULT (default)
      */
     const AS_MAP_WRITE_DEFAULT = "AS_MAP_WRITE_DEFAULT";
 
     /**
+     * If the key already exists, the item will be denied. If the key does not exist, a new item will be created.
      * @const AS_MAP_WRITE_CREATE_ONLY
      */
     const AS_MAP_WRITE_CREATE_ONLY = "AS_MAP_WRITE_CREATE_ONLY";
 
     /**
+     * If the key already exists, the item will be overwritten. If the key does not exist, the item will be denied.
      * @const AS_MAP_WRITE_UPDATE_ONLY
      */
     const AS_MAP_WRITE_UPDATE_ONLY = "AS_MAP_WRITE_UPDATE_ONLY";
 
     /**
+     * Do not raise error if a map item is denied due to write flag constraints (always succeed).
      * @const AS_MAP_WRITE_NO_FAIL
      */
     const AS_MAP_WRITE_NO_FAIL = "AS_MAP_WRITE_NO_FAIL";
 
     /**
+     * Allow other valid map items to be committed if a map item is denied due to write flag constraints.
      * @const AS_MAP_WRITE_PARTIAL
      */
     const AS_MAP_WRITE_PARTIAL = "AS_MAP_WRITE_PARTIAL";
