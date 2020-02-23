@@ -344,6 +344,17 @@ as_status zval_to_as_policy_scan(zval* z_policy, as_policy_scan* scan_policy,
 		}
 	}
 
+	// RPS limit provided by the client for scan operations.
+	setting_val = zend_hash_index_find(z_policy_hash, OPT_SCAN_RPS_LIMIT);
+	if (setting_val) {
+		if (Z_TYPE_P(setting_val) == IS_LONG) {
+            scan_policy->records_per_second = Z_LVAL_P(setting_val);
+        } else {
+            return AEROSPIKE_ERR_PARAM;
+        }
+        setting_val = NULL;
+	}
+
 	set_scan_policy_from_hash(z_policy_hash, scan_policy);
 
 	return AEROSPIKE_OK;
@@ -841,6 +852,7 @@ as_status set_scan_policy_from_hash(HashTable* z_policy_hash, as_policy_scan* sc
 
 	set_bool_policy_value_from_hash_index(z_policy_hash, &scan_policy->durable_delete, OPT_POLICY_DURABLE_DELETE);
 	set_bool_policy_value_from_hash_index(z_policy_hash, &scan_policy->fail_on_cluster_change, OPT_FAIL_ON_CLUSTER_CHANGE);
+	set_uint32t_policy_value_from_hash_index(z_policy_hash, &scan_policy->records_per_second, OPT_SCAN_RPS_LIMIT);
 	set_base_policy_from_hash(z_policy_hash, &scan_policy->base);
 	return AEROSPIKE_OK;
 }
