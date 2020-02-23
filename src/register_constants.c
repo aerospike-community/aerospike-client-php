@@ -57,6 +57,7 @@ static AerospikeGeneralLongConstant aerospike_general_long_constants[] = {
 	{ AS_OPERATOR_PREPEND,             "OPERATOR_PREPEND"             },
 	{ AS_OPERATOR_APPEND,              "OPERATOR_APPEND"              },
 	{ AS_OPERATOR_TOUCH,               "OPERATOR_TOUCH"               },
+	{ AS_OPERATOR_DELETE,              "OPERATOR_DELETE"              },
 	{ AS_INDEX_GEO2DSPHERE,            "INDEX_GEO2DSPHERE"            },
 	{ OP_LIST_APPEND,       		   "OP_LIST_APPEND"               },
 	{ OP_LIST_MERGE,       		       "OP_LIST_MERGE"                },

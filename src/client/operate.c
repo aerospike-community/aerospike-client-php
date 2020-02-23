@@ -21,6 +21,7 @@
 
 static inline bool op_requires_long_val(int op_type);
 static inline bool op_requires_list_val(int op_type);
+static inline bool op_requires_bin(int op_type);
 static inline bool op_requires_val(int op_type);
 static inline bool op_requires_as_val(int op_type);
 static inline bool op_requires_index(int op_type);
@@ -363,16 +364,18 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 
 		return AEROSPIKE_OK;
 	}
-	z_bin = zend_hash_str_find(op_array, "bin", strlen("bin"));
-	if (!z_bin || Z_TYPE_P(z_bin) != IS_STRING) {
-		as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must contain a bin name of string type");
-		return AEROSPIKE_ERR_PARAM;
-	}
-	bin_name = Z_STRVAL_P(z_bin);
+	if (op_requires_bin(op_type)) {
+		z_bin = zend_hash_str_find(op_array, "bin", strlen("bin"));
+		if (!z_bin || Z_TYPE_P(z_bin) != IS_STRING) {
+			as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must contain a bin name of string type");
+			return AEROSPIKE_ERR_PARAM;
+		}
+		bin_name = Z_STRVAL_P(z_bin);
 
-	if (strlen(bin_name) > AS_BIN_NAME_MAX_LEN) {
-		as_error_update(err, AEROSPIKE_ERR_PARAM, "Bin name is too long");
-		return AEROSPIKE_ERR_PARAM;
+		if (strlen(bin_name) > AS_BIN_NAME_MAX_LEN) {
+			as_error_update(err, AEROSPIKE_ERR_PARAM, "Bin name is too long");
+			return AEROSPIKE_ERR_PARAM;
+		}
 	}
 
 	/*
@@ -501,6 +504,13 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 			}
 			break;
 		}
+		case AS_OPERATOR_DELETE: {
+            if (!as_operations_add_delete(ops)) {
+                as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+                return AEROSPIKE_ERR_CLIENT;
+            }
+            break;
+        }
 		/** Start of list operations **/
 		case OP_LIST_APPEND: {
 			if (!as_operations_add_list_append(ops, bin_name, op_val)) {
@@ -936,13 +946,17 @@ CLEANUP:
 
 }
 
+static inline bool op_requires_bin(int op_type) {
+	return (op_type != AS_OPERATOR_DELETE);
+}
+
 
 static inline bool op_requires_val(int op_type) {
 	return (op_type != AS_OPERATOR_TOUCH && op_type != OP_LIST_CLEAR  &&
 			op_type != AS_OPERATOR_READ  && op_type != OP_LIST_SIZE   &&
 			op_type != OP_LIST_POP       && op_type != OP_LIST_REMOVE &&
 			op_type != OP_LIST_GET       && op_type != OP_MAP_SIZE    &&
-			op_type != OP_MAP_CLEAR);
+			op_type != OP_MAP_CLEAR      && op_type != AS_OPERATOR_DELETE);
 }
 
 static inline bool
