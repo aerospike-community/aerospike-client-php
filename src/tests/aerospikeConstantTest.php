@@ -109,6 +109,7 @@ final class constantRegistrationTest extends TestCase {
         "OPERATOR_PREPEND",
         "OPERATOR_APPEND",
         "OPERATOR_TOUCH",
+        "OPERATOR_DELETE",
         "INDEX_GEO2DSPHERE",
         "OP_LIST_APPEND",
         "OP_LIST_MERGE",

@@ -211,6 +211,46 @@ class OperateOrdered extends AerospikeTestCommon
 
     /**
      * @test
+     * Positive scenario : operateOrdered() with read and delete operations.
+     *
+     * @pre
+     * Connect using aerospike object to the specified node
+     *
+     * @post
+     * newly initialized Aerospike objects
+     *
+     * @remark
+     * Variants: OO (normal_004)
+     *
+     * @test_plans{1.1}
+     */
+    function normal_006() {
+        $key = $this->db->initKey("test", "demo", "pk459");
+        $this->keys[] = $key;
+        $status = $this->db->put($key, ["for_del_bin" => "testVal"]);
+        if ($status != Aerospike::OK)
+            return $status;
+        $operations = array(
+            array("op" => Aerospike::OPERATOR_READ, "bin" => "for_del_bin"),
+            array("op" => Aerospike::OPERATOR_DELETE),
+        );
+        $status = $this->db->operateOrdered($key, $operations, $returned);
+        if ($status != Aerospike::OK) {
+            return $status;
+        }
+
+        if (!$returned || $returned[0][0] != "for_del_bin" || $returned[0][1] != "testVal") {
+            return Aerospike::ERR_CLIENT;
+        }
+
+        $status = $this->db->get($key, $rec);
+        if ($status == Aerospike::ERR_RECORD_NOT_FOUND)
+            return Aerospike::OK;
+        return Aerospike::ERR_CLIENT;
+    }
+
+    /**
+     * @test
      * Negative scenario : operateOrdered() with string value is passed in place of an keys array.
      *
      * @pre
