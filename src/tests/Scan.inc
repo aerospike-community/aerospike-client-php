@@ -119,7 +119,7 @@ class Scan extends AerospikeTestCommon
         $processed = 0;
         $status = $this->db->scan( "test", null, function ($record) use (&$processed, &$db) {
             $processed++;
-        }, array("email"), array(Aerospike::OPT_READ_TIMEOUT=>0));
+        }, array("email"), array(Aerospike::OPT_READ_TIMEOUT=>0, Aerospike::OPT_SCAN_RPS_LIMIT=>5));
         if ($status !== Aerospike::OK || $processed < 1) {
             return Aerospike::ERR_CLIENT;
         }
@@ -338,7 +338,7 @@ class Scan extends AerospikeTestCommon
                 } else {
                     return AEROSPIKE::ERR_CLIENT;
                 }
-        }, array("email"), array(Aerospike::OPT_READ_TIMEOUT=>2000));
+        }, array("email"), array(Aerospike::OPT_READ_TIMEOUT=>2000,Aerospike::OPT_SCAN_RPS_LIMIT=>3700));
         $key = $this->db->initKey("test", "demo", "testing");
         $this->db->get($key, $record);
         if(10 == $record['bins']['bin1']) {
