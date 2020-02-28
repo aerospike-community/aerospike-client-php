@@ -2730,7 +2730,7 @@ class Aerospike {
      * * Aerospike::OPT_TOTAL_TIMEOUT
      * * Aerospike::OPT_MAX_RETRIES
      * * Aerospike::OPT_SOCKET_TIMEOUT
-     * * Aerospike::OPT_QUERY_NO_BINS
+     * * Aerospike::OPT_QUERY_NOBINS
      * @see Aerospike::predicateEquals()
      * @see Aerospike::predicateBetween()
      * @see Aerospike::predicateContains()
