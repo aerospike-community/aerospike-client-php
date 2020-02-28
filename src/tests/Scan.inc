@@ -445,6 +445,36 @@ class Scan extends AerospikeTestCommon
     }
     /**
      * @test
+     * Basic scan check with NO_BINS scan option.
+     *
+     * @pre
+     * Connect using aerospike object to the specified node.
+     *
+     * @post
+     * Newly initialized Aerospike objects.
+     *
+     * @remark
+     * Variants: OO (testScanWithNoBinsArgument).
+     *
+     * @test_plans{1.1}
+     */
+    function testScanWithNoBinsArgument()
+    {
+        $failed = FALSE;
+        $callback = function ($record) use (&$failed) {
+            if($record["bins"] != array()) {
+                $failed = TRUE;
+            }
+        };
+        $status = $this->db->scan("test", "demo", $callback,
+            array( "email", "account"), array(Aerospike::OPT_READ_TIMEOUT=>2000, Aerospike::OPT_SCAN_NOBINS=>TRUE));
+        if($failed) {
+            $this->fail("Record returned bins.");
+        }
+        return Aerospike::OK;
+    }
+    /**
+     * @test
      * Basic SCAN Check with correct arguments and one optional argument
      *
      * @pre

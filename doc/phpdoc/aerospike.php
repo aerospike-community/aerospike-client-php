@@ -2730,6 +2730,7 @@ class Aerospike {
      * * Aerospike::OPT_TOTAL_TIMEOUT
      * * Aerospike::OPT_MAX_RETRIES
      * * Aerospike::OPT_SOCKET_TIMEOUT
+     * * Aerospike::OPT_QUERY_NO_BINS
      * @see Aerospike::predicateEquals()
      * @see Aerospike::predicateBetween()
      * @see Aerospike::predicateContains()
@@ -4117,6 +4118,13 @@ class Aerospike {
      * @const OPT_SCAN_CONCURRENTLY boolean value (default: false)
      */
     const OPT_SCAN_CONCURRENTLY = "OPT_SCAN_CONCURRENTLY";
+
+    /**
+     * Do not return the bins of the records matched by the query.
+     *
+     * @const OPT_QUERY_NOBINS boolean value (default: false)
+     */
+    const OPT_QUERY_NOBINS = "OPT_QUERY_NOBINS";
 
     /**
      * Revert to the older batch-direct protocol, instead of batch-index.

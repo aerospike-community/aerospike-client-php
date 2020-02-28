@@ -154,7 +154,7 @@ constructor key: `OPT_SCAN_DEFAULT_POL`
 * `Aerospike::OPT_SLEEP_BETWEEN_RETRIES` default: `0`
 * `Aerospike::OPT_MAX_RETRIES` default: `0`
 * `Aerospike::OPT_POLICY_DURABLE_DELETE` default: `false`
-* `Aerospike::OPT_FAIL_ON_CLUSTER_CHANGE` edfault: `false`
+* `Aerospike::OPT_FAIL_ON_CLUSTER_CHANGE` default: `false`
 
 ## Apply Policies
 

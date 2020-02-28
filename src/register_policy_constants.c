@@ -146,7 +146,8 @@ AerospikeOptionConstant aerospike_option_constants[] = {
 	{OPT_OPERATE_DEFAULT_POL                ,   "OPT_OPERATE_DEFAULT_POL"           },
 	{OPT_QUERY_DEFAULT_POL                  ,   "OPT_QUERY_DEFAULT_POL"             },
 	{OPT_SCAN_DEFAULT_POL                   ,   "OPT_SCAN_DEFAULT_POL"              },
-	{OPT_APPLY_DEFAULT_POL                  ,   "OPT_APPLY_DEFAULT_POL"             }
+	{OPT_APPLY_DEFAULT_POL                  ,   "OPT_APPLY_DEFAULT_POL"             },
+	{OPT_QUERY_NOBINS                       ,   "OPT_QUERY_NOBINS"                  }
 };
 
 static AerospikeStrOptionConstant aerospike_str_option_constants[] = {

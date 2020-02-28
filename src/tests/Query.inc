@@ -753,6 +753,37 @@ class Query extends AerospikeTestCommon
     }
     /**
      * @test
+     * Query with NO_BINS query option.
+     *
+     * @pre
+     * Connect using aerospike object to the specified node.
+     *
+     * @post
+     * Newly initialized Aerospike objects.
+     *
+     * @remark
+     * Variants: OO (testGETTwoParameter).
+     *
+     * @test_plans{1.1}
+     */
+    function testQueryWithNoBinsArgument()
+    {
+        $failed = FALSE;
+        $where = $this->db->predicateBetween("age", 10, 39);
+        $callback = function ($record) use (&$failed) {
+            if($record["bins"] != array()) {
+                $failed = TRUE;
+            }
+        };
+        $status = $this->db->query("test", "demo", $where, $callback,
+            array( "email", "age"), array(Aerospike::OPT_READ_TIMEOUT=>2000, Aerospike::OPT_QUERY_NOBINS=>TRUE));
+        if($failed) {
+            $this->fail("Record returned bins.");
+        }
+        return Aerospike::OK;
+    }
+    /**
+     * @test
      * Query with empty callback function
      *
      * @pre
