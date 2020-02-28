@@ -58,6 +58,9 @@ Touch Operation: reset the time-to-live of the record and increment its generati
   op => Aerospike::OPERATOR_TOUCH
   ttl => a positive integer value to set as time-to-live for the record
 
+Delete Operation:
+  op => Aerospike::OPERATOR_DELETE
+
 List Append Operation:
   op => Aerospike::OP_LIST_APPEND,
   bin =>  "events",

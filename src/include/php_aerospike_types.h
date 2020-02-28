@@ -118,6 +118,7 @@ enum Aerospike_opt_keys {
 	OPT_POLICY_EXISTS,       /* set to a Aerospike::POLICY_EXISTS_* value                                     */
 	OPT_SERIALIZER,          /* set the unsupported type handler                                              */
 	OPT_SCAN_PRIORITY,       /* set to a Aerospike::SCAN_PRIORITY_* value                                     */
+	OPT_SCAN_RPS_LIMIT,      /* set the results per second(RPS) limit */
 	OPT_SCAN_PERCENTAGE,     /* integer value 1-100, default: 100                                             */
 	OPT_SCAN_CONCURRENTLY,   /* boolean value, default: false                                                 */
 	OPT_SCAN_NOBINS,         /* boolean value, default: false                                                 */

@@ -1119,6 +1119,9 @@ class Aerospike {
      *   op => Aerospike::OPERATOR_TOUCH
      *   ttl => a positive integer value to set as time-to-live for the record
      *
+     * Delete Operation:
+     *   op => Aerospike::OPERATOR_DELETE
+     *
      * List Append Operation:
      *   op => Aerospike::OP_LIST_APPEND,
      *   bin =>  "events",
@@ -1494,6 +1497,9 @@ class Aerospike {
      *                  (only combines with read operations)
      *   op => Aerospike::OPERATOR_TOUCH
      *   ttl => a positive integer value to set as time-to-live for the record
+     *
+     * Delete Operation:
+     *   op => Aerospike::OPERATOR_DELETE
      *
      * List Append Operation:
      *   op => Aerospike::OP_LIST_APPEND,
@@ -2667,6 +2673,7 @@ class Aerospike {
      * * Aerospike::OPT_SCAN_PERCENTAGE of the records in the set to return
      * * Aerospike::OPT_SCAN_CONCURRENTLY whether to run the scan in parallel
      * * Aerospike::OPT_SCAN_NOBINS whether to not retrieve bins for the records
+     * * Aerospike::OPT_SCAN_RPS_LIMIT limit the scan to process OPT_SCAN_RPS_LIMIT per second.
      *
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
@@ -3169,6 +3176,7 @@ class Aerospike {
      * * Aerospike::OPT_MAX_RETRIES
      * * Aerospike::OPT_SOCKET_TIMEOUT
      * * Aerospike::OPT_FAIL_ON_CLUSTER_CHANGE
+     * * Aerospike::OPT_SCAN_RPS_LIMIT
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::ERR_LUA UDF error status codes
@@ -3234,6 +3242,7 @@ class Aerospike {
      * * Aerospike::OPT_TOTAL_TIMEOUT
      * * Aerospike::OPT_MAX_RETRIES
      * * Aerospike::OPT_SOCKET_TIMEOUT
+     * * Aerospike::OPT_SCAN_RPS_LIMIT
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
@@ -4760,6 +4769,11 @@ class Aerospike {
      * @const OPERATOR_TOUCH
      */
     const OPERATOR_TOUCH = "OPERATOR_TOUCH";
+    /**
+     * delete operator for the operate() method
+     * @const OPERATOR_DELETE
+     */
+    const OPERATOR_DELETE = "OPERATOR_DELETE";
 
     // List operation constants
 
