@@ -3242,7 +3242,6 @@ class Aerospike {
      * * Aerospike::OPT_TOTAL_TIMEOUT
      * * Aerospike::OPT_MAX_RETRIES
      * * Aerospike::OPT_SOCKET_TIMEOUT
-     * * Aerospike::OPT_SCAN_RPS_LIMIT
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
