@@ -399,6 +399,33 @@ as_status zval_to_as_policy_query(zval* z_policy, as_policy_query* query_policy,
 	return AEROSPIKE_OK;
 }
 
+as_status set_query_options_from_policy_hash(as_query* query, zval* z_policy) {
+
+	zval* nobins_val = NULL;
+	HashTable* z_policy_hash = NULL;
+
+	if (!z_policy ||  Z_TYPE_P(z_policy) == IS_NULL) {
+		return AEROSPIKE_OK;
+	}
+
+	if (Z_TYPE_P(z_policy) != IS_ARRAY) {
+		return AEROSPIKE_ERR_PARAM;
+	}
+
+	z_policy_hash = Z_ARRVAL_P(z_policy);
+	nobins_val = zend_hash_index_find(z_policy_hash, OPT_QUERY_NOBINS);
+
+	if (nobins_val) {
+		if (Z_TYPE_P(nobins_val) == IS_TRUE || Z_TYPE_P(nobins_val) == IS_FALSE ) {
+			query->no_bins = (zend_bool)Z_LVAL_P(nobins_val);
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	return AEROSPIKE_OK;
+}
+
 as_status zval_to_as_policy_batch(zval* z_policy, as_policy_batch* batch_policy,
 								  as_policy_batch** batch_policy_p, as_policy_batch* default_policy) {
 	as_policy_batch_init(batch_policy);

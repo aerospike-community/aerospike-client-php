@@ -18,6 +18,7 @@
 #include "php.h"
 #include "c_aerospike_types.h"
 #include "aerospike/as_scan.h"
+#include "aerospike/as_query.h"
 #include "aerospike/as_map_operations.h"
 
 as_status zval_to_as_policy_apply(zval* z_info_policy, as_policy_apply* apply_policy,
@@ -60,6 +61,7 @@ as_status set_record_generation_from_write_policy(as_record* record, zval* z_wri
 as_status set_operations_generation_from_operate_policy(as_operations* operations, zval* z_write_policy);
 as_status set_operations_ttl_from_operate_policy(as_operations* operations, zval* z_write_policy);
 as_status set_scan_options_from_policy_hash(as_scan* scan, zval* z_policy);
+as_status set_query_options_from_policy_hash(as_query* query, zval* z_policy);
 
 /* Functions used in the class constructor */
 as_status set_read_policy_from_hash(HashTable* z_policy_hash, as_policy_read* read_policy);

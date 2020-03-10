@@ -2673,6 +2673,7 @@ class Aerospike {
      * * Aerospike::OPT_SCAN_PERCENTAGE of the records in the set to return
      * * Aerospike::OPT_SCAN_CONCURRENTLY whether to run the scan in parallel
      * * Aerospike::OPT_SCAN_NOBINS whether to not retrieve bins for the records
+     * * Aerospike::OPT_SCAN_RPS_LIMIT limit the scan to process OPT_SCAN_RPS_LIMIT per second.
      *
      * @return int The status code of the operation. Compare to the Aerospike class status constants.
      */
@@ -2736,7 +2737,7 @@ class Aerospike {
      * * Aerospike::OPT_TOTAL_TIMEOUT
      * * Aerospike::OPT_MAX_RETRIES
      * * Aerospike::OPT_SOCKET_TIMEOUT
-     * * Aerospike::OPT_SCAN_RPS_LIMIT
+     * * Aerospike::OPT_QUERY_NOBINS
      * @see Aerospike::predicateEquals()
      * @see Aerospike::predicateBetween()
      * @see Aerospike::predicateContains()
@@ -3241,7 +3242,6 @@ class Aerospike {
      * * Aerospike::OPT_TOTAL_TIMEOUT
      * * Aerospike::OPT_MAX_RETRIES
      * * Aerospike::OPT_SOCKET_TIMEOUT
-     * * Aerospike::OPT_SCAN_RPS_LIMIT
      * @see Aerospike::OPT_WRITE_TIMEOUT Aerospike::OPT_WRITE_TIMEOUT options
      * @see Aerospike::OPT_POLICY_DURABLE_DELETE Aerospike::OPT_POLICY_DURABLE_DELETE options
      * @see Aerospike::OPT_SLEEP_BETWEEN_RETRIES Aerospike::OPT_SLEEP_BETWEEN_RETRIES options
@@ -4126,6 +4126,13 @@ class Aerospike {
      * @const OPT_SCAN_CONCURRENTLY boolean value (default: false)
      */
     const OPT_SCAN_CONCURRENTLY = "OPT_SCAN_CONCURRENTLY";
+
+    /**
+     * Do not return the bins of the records matched by the query.
+     *
+     * @const OPT_QUERY_NOBINS boolean value (default: false)
+     */
+    const OPT_QUERY_NOBINS = "OPT_QUERY_NOBINS";
 
     /**
      * Revert to the older batch-direct protocol, instead of batch-index.
