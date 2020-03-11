@@ -331,11 +331,21 @@ CLEANUP:
 static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, as_error* err, int serializer_type) {
 	int op_type;
 	long index;
+	as_list_return_type return_type;
+	uint64_t count;
+	int64_t rank;
 	zval* z_op = NULL;
 	zval* z_op_val = NULL;
 	zval* z_index = NULL;
 	zval* z_bin = NULL;
 	as_val* op_val = NULL;
+	as_val* value = NULL;
+	as_list* values = NULL;
+	as_val* begin = NULL;
+	as_val* end = NULL;
+	as_val* incr = NULL;
+	as_list_sort_flags flags;
+	as_list_order order;
 	char* bin_name = NULL;
 
 	z_op = zend_hash_str_find(op_array, "op", strlen("op"));
@@ -513,7 +523,7 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
         }
 		/** Start of list operations **/
 		case OP_LIST_APPEND: {
-			if (!as_operations_add_list_append(ops, bin_name, op_val)) {
+			if (!as_operations_list_append(ops, bin_name, NULL, NULL, op_val)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
@@ -532,14 +542,14 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 				return err->code;
 			}
 
-			if (!as_operations_add_list_append_items(ops, bin_name, op_list)) {
+			if (!as_operations_list_append_items(ops, bin_name, NULL, NULL, op_list)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_INSERT: {
-			if(!as_operations_add_list_insert(ops, bin_name, index, op_val)) {
+			if(!as_operations_list_insert(ops, bin_name, NULL, NULL, index, op_val)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
@@ -556,14 +566,14 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 				return err->code;
 			}
 
-			if (!as_operations_add_list_insert_items(ops, bin_name, index, (as_list*)op_list)) {
+			if (!as_operations_list_insert_items(ops, bin_name, NULL, NULL, index, (as_list*)op_list)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_POP: {
-			if(!as_operations_add_list_pop(ops, bin_name, index)) {
+			if(!as_operations_list_pop(ops, bin_name, NULL, index)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
@@ -571,43 +581,134 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 		}
 		case OP_LIST_POP_RANGE: {
 			long count = Z_LVAL_P(z_op_val);
-			if(!as_operations_add_list_pop_range(ops, bin_name, index, count)) {
+			if(!as_operations_list_pop_range(ops, bin_name, NULL, index, count)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_POP_RANGE_FROM: {
+			if(!as_operations_list_pop_range_from(ops, bin_name, NULL, index)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_REMOVE: {
-			if(!as_operations_add_list_remove(ops, bin_name, index)) {
+			if(!as_operations_list_remove(ops, bin_name, NULL, index)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_REMOVE_RANGE: {
-			long count = Z_LVAL_P(z_op_val);
-			if(!as_operations_add_list_remove_range(ops, bin_name, index, count)) {
+			count = Z_LVAL_P(z_op_val);
+			if(!as_operations_list_remove_range(ops, bin_name, NULL, index, count)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_REMOVE_BY_INDEX: {
+			if(!as_operations_list_remove_by_index(ops, bin_name, NULL, index, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_REMOVE_BY_INDEX_RANGE: {
+			if(!as_operations_list_remove_by_index_range(ops, bin_name, NULL, index, count, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_REMOVE_BY_INDEX_RANGE_TO_END: {
+			if(!as_operations_list_remove_by_index_range_to_end(ops, bin_name, NULL, index, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_REMOVE_BY_RANK: {
+			if(!as_operations_list_remove_by_rank(ops, bin_name, NULL, rank, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_REMOVE_BY_RANK_RANGE: {
+			if(!as_operations_list_remove_by_rank_range(ops, bin_name, NULL, rank, count, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_REMOVE_BY_RANK_RANGE_TO_END: {
+			if(!as_operations_list_remove_by_rank_range_to_end(ops, bin_name, NULL, rank, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_REMOVE_BY_VALUE: {
+			if(!as_operations_list_remove_by_value(ops, bin_name, NULL, value, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_REMOVE_BY_VALUE_LIST: {
+			if(!as_operations_list_remove_by_value_list(ops, bin_name, NULL, values, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_REMOVE_BY_VALUE_RANGE: {
+			if(!as_operations_list_remove_by_value_range(ops, bin_name, NULL, begin, end, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_REMOVE_BY_VALUE_REL_RANK_RANGE: {
+			if(!as_operations_list_remove_by_value_rel_rank_range(ops, bin_name, NULL, value, rank, count, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_REMOVE_BY_VALUE_REL_RANK_RANGE_TO_END: {
+			if(!as_operations_list_remove_by_value_rel_rank_range_to_end(ops, bin_name, NULL, value, rank, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_REMOVE_RANGE_FROM: {
+			if(!as_operations_list_remove_range_from(ops, bin_name, NULL, index)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_CLEAR: {
-			if(!as_operations_add_list_clear(ops, bin_name)) {
+			if(!as_operations_list_clear(ops, bin_name, NULL)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_SET: {
-			if(!as_operations_add_list_set(ops, bin_name, index, op_val)) {
+			if(!as_operations_list_set(ops, bin_name, NULL, NULL, index, op_val)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_GET: {
-			if(!as_operations_add_list_get(ops, bin_name, index)) {
+			if(!as_operations_list_get(ops, bin_name, NULL, index)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
@@ -615,7 +716,98 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 		}
 		case OP_LIST_GET_RANGE: {
 			long count = Z_LVAL_P(z_op_val);
-			if(!as_operations_add_list_get_range(ops, bin_name, index, count)) {
+			if(!as_operations_list_get_range(ops, bin_name, NULL, index, count)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_GET_BY_INDEX: {
+			if(!as_operations_list_get_by_index(ops, bin_name, NULL, index, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_GET_BY_INDEX_RANGE: {
+			if(!as_operations_list_get_by_index_range(ops, bin_name, NULL, index, count, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_GET_BY_INDEX_RANGE_TO_END: {
+			if(!as_operations_list_get_by_index_range_to_end(ops, bin_name, NULL, index, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_GET_BY_RANK: {
+			if(!as_operations_list_get_by_rank(ops, bin_name, NULL, rank, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_GET_BY_RANK_RANGE: {
+			if(!as_operations_list_get_by_rank_range(ops, bin_name, NULL, rank, count, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_GET_BY_RANK_RANGE_TO_END: {
+			if(!as_operations_list_get_by_rank_range_to_end(ops, bin_name, NULL, rank, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_GET_BY_VALUE: {
+			if(!as_operations_list_get_by_value(ops, bin_name, NULL, value, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_GET_BY_VALUE_LIST: {
+			if(!as_operations_list_get_by_value_list(ops, bin_name, NULL, values, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_GET_BY_VALUE_RANGE: {
+			if(!as_operations_list_get_by_value_range(ops, bin_name, NULL, begin, end, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_GET_BY_VALUE_REL_RANK_RANGE: {
+			if(!as_operations_list_get_by_value_rel_rank_range(ops, bin_name, NULL, value, rank, count, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_GET_BY_VALUE_REL_RANK_RANGE_TO_END: {
+			if(!as_operations_list_get_by_value_rel_rank_range_to_end(ops, bin_name, NULL, value, rank, return_type)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_GET_RANGE_FROM: {
+			if(!as_operations_list_get_range_from(ops, bin_name, NULL, index)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_INCREMENT: {
+			if(!as_operations_list_increment(ops, bin_name, NULL, NULL, index, incr)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
@@ -623,14 +815,28 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 		}
 		case OP_LIST_TRIM: {
 			long count = Z_LVAL_P(z_op_val);
-			if(!as_operations_add_list_trim(ops, bin_name, index, count)) {
+			if(!as_operations_list_trim(ops, bin_name, NULL, index, count)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_SIZE: {
-			if(!as_operations_add_list_size(ops, bin_name)) {
+			if(!as_operations_list_size(ops, bin_name, NULL)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_SET_ORDER: {
+			if(!as_operations_list_set_order(ops, bin_name, NULL, order)) {
+				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
+				return AEROSPIKE_ERR_CLIENT;
+			}
+			break;
+		}
+		case OP_LIST_SORT: {
+			if(!as_operations_list_sort(ops, bin_name, NULL, flags)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
