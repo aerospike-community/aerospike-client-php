@@ -148,7 +148,23 @@ AerospikeOptionConstant aerospike_option_constants[] = {
 	{OPT_QUERY_DEFAULT_POL                  ,   "OPT_QUERY_DEFAULT_POL"             },
 	{OPT_SCAN_DEFAULT_POL                   ,   "OPT_SCAN_DEFAULT_POL"              },
 	{OPT_APPLY_DEFAULT_POL                  ,   "OPT_APPLY_DEFAULT_POL"             },
-	{OPT_QUERY_NOBINS                       ,   "OPT_QUERY_NOBINS"                  }
+	{OPT_QUERY_NOBINS                       ,   "OPT_QUERY_NOBINS"                  },
+	{AS_LIST_WRITE_DEFAULT                  ,   "AS_LIST_WRITE_DEFAULT"             },
+	{AS_LIST_WRITE_ADD_UNIQUE               ,   "AS_LIST_WRITE_ADD_UNIQUE"          },
+	{AS_LIST_WRITE_INSERT_BOUNDED           ,   "AS_LIST_WRITE_INSERT_BOUNDE"       },
+	{AS_LIST_WRITE_NO_FAIL                  ,   "AS_LIST_WRITE_NO_FAIL"             },
+	{AS_LIST_WRITE_PARTIAL                  ,   "AS_LIST_WRITE_PARTIAL"             },
+	{AS_LIST_UNORDERED                      ,   "AS_LIST_UNORDERED"                 },
+	{AS_LIST_ORDERED                        ,   "AS_LIST_ORDERED"                   },
+	{OPT_LIST_ORDER                         ,   "AS_LIST_ORDER"                     },
+	{OPT_LIST_WRITE_FLAGS                   ,   "OPT_LIST_WRITE_FLAGS"              },
+	{AS_LIST_RETURN_NONE                    ,   "AS_LIST_RETURN_NONE"               },
+	{AS_LIST_RETURN_INDEX                   ,   "AS_LIST_RETURN_INDEX"              },
+	{AS_LIST_RETURN_REVERSE_INDEX           ,   "AS_LIST_RETURN_REVERSE_INDEX"      },
+	{AS_LIST_RETURN_REVERSE_RANK            ,   "AS_LIST_RETURN_REVERSE_RANK"       },
+	{AS_LIST_RETURN_COUNT                   ,   "AS_LIST_RETURN_COUNT"              },
+	{AS_LIST_RETURN_VALUE                   ,   "AS_LIST_RETURN_VALUE"              },
+	{AS_LIST_RETURN_INVERTED                ,   "AS_LIST_RETURN_INVERTED"           }
 };
 
 static AerospikeStrOptionConstant aerospike_str_option_constants[] = {

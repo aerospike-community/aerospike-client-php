@@ -26,6 +26,7 @@ static inline bool op_requires_val(int op_type);
 static inline bool op_requires_as_val(int op_type);
 static inline bool op_requires_index(int op_type);
 static inline bool op_is_map_op(int op_type);
+static inline bool op_is_list_op(int op_type);
 
 /* Map op helpers */
 static inline bool map_op_requires_key(int op_type);
@@ -37,6 +38,17 @@ static inline bool map_op_requires_index(int op_type);
 static inline bool map_op_requires_count(int op_type);
 static inline bool map_op_requires_range_end(int op_type);
 
+/* List op helpers */
+static inline bool list_op_requires_count(int op_type);
+static inline bool list_op_requires_index(int op_type);
+static inline bool list_op_requires_rank(int op_type);
+static inline bool list_op_requires_return_type(int op_type);
+static inline bool list_op_requires_list_policy(int op_type);
+static inline bool list_op_requires_range_end(int op_type);
+static inline bool list_op_requires_val(int op_type);
+
+static as_status add_list_op_to_operations(HashTable* op_array, int op_type, const char* bin_name,
+		as_operations* ops, as_error* err, int serializer_type);
 static as_status add_map_op_to_operations(HashTable* op_array, int op_type, const char* bin_name,
 		as_operations* ops, as_error* err, int serializer_type);
 static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, as_error* err, int serializer_type);
@@ -48,7 +60,10 @@ static as_status get_key_from_op_hash(as_error* err, HashTable* op_hash, as_val*
 static as_status get_value_from_op_hash(as_error* err, HashTable* op_hash, as_val** val, int serializer_type);
 static as_status get_range_end_from_op_hash(as_error* err, HashTable* op_hash, as_val** range_end, int serializer_type);
 static as_status get_map_policy_from_op_hash(as_error* err, HashTable* op_hash, as_map_policy* map_policy_p);
-static as_status get_return_type_from_op_hash(as_error* err, HashTable* op_hash, as_map_return_type* return_type);
+static as_status get_map_return_type_from_op_hash(as_error* err, HashTable* op_hash, as_map_return_type* return_type);
+static as_status get_list_policy_from_op_hash(as_error* err, HashTable* op_hash, as_list_policy* list_policy_p);
+static as_status get_list_return_type_from_op_hash(as_error* err, HashTable* op_hash, as_list_return_type* return_type);
+static as_status get_long_value_from_op_hash(as_error* err, HashTable* op_hash, uint64_t* val, int serializer_type);
 
 #define AS_MAP_POLICY_KEY "map_policy"
 #define AS_MAP_RANK_KEY "rank"
@@ -58,6 +73,9 @@ static as_status get_return_type_from_op_hash(as_error* err, HashTable* op_hash,
 #define AS_MAP_RETURN_TYPE_KEY "return_type"
 #define AS_MAP_VALUE_KEY "val"
 #define AS_MAP_RANGE_END "range_end"
+
+#define AS_LIST_POLICY_KEY "list_policy"
+#define AS_LIST_RETURN_TYPE_KEY "return_type"
 
 
 /* {{{ proto int Aerospike::operate( array key, array operations [,array &returned [,array options ]] )
@@ -330,22 +348,10 @@ CLEANUP:
  */
 static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, as_error* err, int serializer_type) {
 	int op_type;
-	long index;
-	as_list_return_type return_type;
-	uint64_t count;
-	int64_t rank;
 	zval* z_op = NULL;
 	zval* z_op_val = NULL;
-	zval* z_index = NULL;
 	zval* z_bin = NULL;
 	as_val* op_val = NULL;
-	as_val* value = NULL;
-	as_list* values = NULL;
-	as_val* begin = NULL;
-	as_val* end = NULL;
-	as_val* incr = NULL;
-	as_list_sort_flags flags;
-	as_list_order order;
 	char* bin_name = NULL;
 
 	z_op = zend_hash_str_find(op_array, "op", strlen("op"));
@@ -391,18 +397,12 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 	/*
 	 * Verify required types and arguments for each operation
 	 */
-	if (op_requires_index(op_type)) {
-		z_index = zend_hash_str_find(op_array, "index", strlen("index"));
-		if (!z_index || Z_TYPE_P(z_index) != IS_LONG) {
-			as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation requires an integer index");
-			return AEROSPIKE_ERR_PARAM;
-		}
-		index = Z_LVAL_P(z_index);
-	}
-
-	/* If it's a map operation, use the map op helper function */
 	if (op_is_map_op(op_type)) {
 		return add_map_op_to_operations(op_array, op_type, bin_name, ops, err, serializer_type);
+	}
+
+	if (op_is_list_op(op_type)) {
+		return add_list_op_to_operations(op_array, op_type, bin_name, ops, err, serializer_type);
 	}
 
 	/*
@@ -521,52 +521,105 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
             }
             break;
         }
-		/** Start of list operations **/
+		default: {
+			if (op_val) {
+				as_val_destroy(op_val);
+			}
+			as_error_update(err, AEROSPIKE_ERR_PARAM, "Unknown operation type");
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	return AEROSPIKE_OK;
+}
+
+static as_status
+add_list_op_to_operations(HashTable* op_array, int op_type, const char* bin_name,
+		as_operations* ops, as_error* err, int serializer_type) {
+	uint64_t count;
+	int64_t index;
+	int64_t rank;
+	uint64_t long_val;
+	as_val* val = NULL;
+	as_val* range_begin = NULL;
+	as_val* range_end = NULL;
+	as_list_order order;
+	as_list_policy list_policy;
+	as_list_sort_flags flags;
+	as_list_return_type return_type;
+
+	if (list_op_requires_count(op_type)) {
+		if (get_count_from_op_hash(err, op_array, &count) != AEROSPIKE_OK) {
+			return err->code;
+		}
+	}
+
+	if (list_op_requires_index(op_type)) {
+		if (get_index_from_op_hash(err, op_array, &index) != AEROSPIKE_OK) {
+			return err->code;
+		}
+	}
+
+	if (list_op_requires_rank(op_type)) {
+		if (get_rank_from_op_hash(err, op_array, &rank) != AEROSPIKE_OK) {
+			return err->code;
+		}
+	}
+
+	if (list_op_requires_return_type(op_type)) {
+		if (get_list_return_type_from_op_hash(err, op_array, &return_type) != AEROSPIKE_OK) {
+			return err->code;
+		}
+	}
+
+	if (list_op_requires_list_policy(op_type)) {
+		if (get_list_policy_from_op_hash(err, op_array, &list_policy) != AEROSPIKE_OK) {
+			return err->code;
+		}
+	}
+
+	if (list_op_requires_range_end(op_type)) {
+		if (get_range_end_from_op_hash(err, op_array, &range_end, serializer_type) != AEROSPIKE_OK) {
+			goto CLEANUP;
+		}
+	}
+
+	if (op_requires_long_val(op_type)) {
+		if (get_long_value_from_op_hash(err, op_array, &long_val, serializer_type) != AEROSPIKE_OK) {
+			goto CLEANUP;
+		}
+	}
+
+	if (list_op_requires_val(op_type)) {
+		if (get_value_from_op_hash(err, op_array, &val, serializer_type) != AEROSPIKE_OK) {
+			goto CLEANUP;
+		}
+	}
+
+	switch(op_type) {
 		case OP_LIST_APPEND: {
-			if (!as_operations_list_append(ops, bin_name, NULL, NULL, op_val)) {
+			if (!as_operations_list_append(ops, bin_name, NULL, NULL, val)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_MERGE: {
-			/* This op requires a zval list*/
-			// We know this is a list because of the check for non list earlier
-			if (!hashtable_is_list(Z_ARRVAL_P(z_op_val))) {
-				as_error_update(err, AEROSPIKE_ERR_PARAM, "List Merge value must not be a map");
-				return AEROSPIKE_ERR_CLIENT;
-			}
-			as_list* op_list = NULL;
-			if (z_hashtable_to_as_list(
-					Z_ARRVAL_P(z_op_val), &op_list, err, serializer_type) != AEROSPIKE_OK) {
-				return err->code;
-			}
-
-			if (!as_operations_list_append_items(ops, bin_name, NULL, NULL, op_list)) {
+			if (!as_operations_list_append_items(ops, bin_name, NULL, NULL, (as_list*)val)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_INSERT: {
-			if(!as_operations_list_insert(ops, bin_name, NULL, NULL, index, op_val)) {
+			if(!as_operations_list_insert(ops, bin_name, NULL, NULL, index, val)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_INSERT_ITEMS: {
-			if (!hashtable_is_list(Z_ARRVAL_P(z_op_val))) {
-				as_error_update(err, AEROSPIKE_ERR_PARAM, "List Merge value must not be a map");
-				return AEROSPIKE_ERR_CLIENT;
-			}
-			as_list* op_list = NULL;
-			if (z_hashtable_to_as_list(
-					Z_ARRVAL_P(z_op_val), &op_list, err, serializer_type) != AEROSPIKE_OK) {
-				return err->code;
-			}
-
-			if (!as_operations_list_insert_items(ops, bin_name, NULL, NULL, index, (as_list*)op_list)) {
+			if (!as_operations_list_insert_items(ops, bin_name, NULL, NULL, index, (as_list*)val)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
@@ -580,7 +633,6 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 			break;
 		}
 		case OP_LIST_POP_RANGE: {
-			long count = Z_LVAL_P(z_op_val);
 			if(!as_operations_list_pop_range(ops, bin_name, NULL, index, count)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
@@ -602,7 +654,6 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 			break;
 		}
 		case OP_LIST_REMOVE_RANGE: {
-			count = Z_LVAL_P(z_op_val);
 			if(!as_operations_list_remove_range(ops, bin_name, NULL, index, count)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
@@ -652,35 +703,35 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 			break;
 		}
 		case OP_LIST_REMOVE_BY_VALUE: {
-			if(!as_operations_list_remove_by_value(ops, bin_name, NULL, value, return_type)) {
+			if(!as_operations_list_remove_by_value(ops, bin_name, NULL, val, return_type)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_REMOVE_BY_VALUE_LIST: {
-			if(!as_operations_list_remove_by_value_list(ops, bin_name, NULL, values, return_type)) {
+			if(!as_operations_list_remove_by_value_list(ops, bin_name, NULL, (as_list*)val, return_type)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_REMOVE_BY_VALUE_RANGE: {
-			if(!as_operations_list_remove_by_value_range(ops, bin_name, NULL, begin, end, return_type)) {
+			if(!as_operations_list_remove_by_value_range(ops, bin_name, NULL, range_begin, range_end, return_type)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_REMOVE_BY_VALUE_REL_RANK_RANGE: {
-			if(!as_operations_list_remove_by_value_rel_rank_range(ops, bin_name, NULL, value, rank, count, return_type)) {
+			if(!as_operations_list_remove_by_value_rel_rank_range(ops, bin_name, NULL, val, rank, count, return_type)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_REMOVE_BY_VALUE_REL_RANK_RANGE_TO_END: {
-			if(!as_operations_list_remove_by_value_rel_rank_range_to_end(ops, bin_name, NULL, value, rank, return_type)) {
+			if(!as_operations_list_remove_by_value_rel_rank_range_to_end(ops, bin_name, NULL, val, rank, return_type)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
@@ -701,7 +752,7 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 			break;
 		}
 		case OP_LIST_SET: {
-			if(!as_operations_list_set(ops, bin_name, NULL, NULL, index, op_val)) {
+			if(!as_operations_list_set(ops, bin_name, NULL, NULL, index, val)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
@@ -715,7 +766,6 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 			break;
 		}
 		case OP_LIST_GET_RANGE: {
-			long count = Z_LVAL_P(z_op_val);
 			if(!as_operations_list_get_range(ops, bin_name, NULL, index, count)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
@@ -765,35 +815,35 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 			break;
 		}
 		case OP_LIST_GET_BY_VALUE: {
-			if(!as_operations_list_get_by_value(ops, bin_name, NULL, value, return_type)) {
+			if(!as_operations_list_get_by_value(ops, bin_name, NULL, val, return_type)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_GET_BY_VALUE_LIST: {
-			if(!as_operations_list_get_by_value_list(ops, bin_name, NULL, values, return_type)) {
+			if(!as_operations_list_get_by_value_list(ops, bin_name, NULL, (as_list*)val, return_type)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_GET_BY_VALUE_RANGE: {
-			if(!as_operations_list_get_by_value_range(ops, bin_name, NULL, begin, end, return_type)) {
+			if(!as_operations_list_get_by_value_range(ops, bin_name, NULL, range_begin, range_end, return_type)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_GET_BY_VALUE_REL_RANK_RANGE: {
-			if(!as_operations_list_get_by_value_rel_rank_range(ops, bin_name, NULL, value, rank, count, return_type)) {
+			if(!as_operations_list_get_by_value_rel_rank_range(ops, bin_name, NULL, val, rank, count, return_type)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_GET_BY_VALUE_REL_RANK_RANGE_TO_END: {
-			if(!as_operations_list_get_by_value_rel_rank_range_to_end(ops, bin_name, NULL, value, rank, return_type)) {
+			if(!as_operations_list_get_by_value_rel_rank_range_to_end(ops, bin_name, NULL, val, rank, return_type)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
@@ -807,14 +857,13 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 			break;
 		}
 		case OP_LIST_INCREMENT: {
-			if(!as_operations_list_increment(ops, bin_name, NULL, NULL, index, incr)) {
+			if(!as_operations_list_increment(ops, bin_name, NULL, NULL, index, val)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_TRIM: {
-			long count = Z_LVAL_P(z_op_val);
 			if(!as_operations_list_trim(ops, bin_name, NULL, index, count)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
@@ -842,16 +891,33 @@ static as_status add_op_to_operations(HashTable* op_array, as_operations* ops, a
 			}
 			break;
 		}
-		default: {
-			if (op_val) {
-				as_val_destroy(op_val);
-			}
-			as_error_update(err, AEROSPIKE_ERR_PARAM, "Unknown operation type");
-			return AEROSPIKE_ERR_PARAM;
-		}
+		default:
+			as_error_update(err, AEROSPIKE_ERR_PARAM, "Unknown list operation");
+			break;
 	}
 
-	return AEROSPIKE_OK;
+CLEANUP:
+
+/*
+ * 	as_val* range_end = NULL;
+	as_val* val = NULL;
+	as_val* key = NULL;
+ */
+	if (err->code != AEROSPIKE_OK) {
+		if (range_end) {
+			as_val_destroy(range_end);
+		}
+
+		if (range_end) {
+			as_val_destroy(range_begin);
+		}
+
+		if (val) {
+			as_val_destroy(val);
+		}
+	}
+	return err->code;
+
 }
 
 static as_status
@@ -885,7 +951,7 @@ add_map_op_to_operations(HashTable* op_array, int op_type, const char* bin_name,
 	}
 
 	if (map_op_requires_return_type(op_type)) {
-		if (get_return_type_from_op_hash(err, op_array, &return_type) != AEROSPIKE_OK) {
+		if (get_map_return_type_from_op_hash(err, op_array, &return_type) != AEROSPIKE_OK) {
 			return err->code;
 		}
 	}
@@ -1166,6 +1232,53 @@ static inline bool op_requires_val(int op_type) {
 }
 
 static inline bool
+op_is_list_op(int op_type) {
+	return (
+				op_type == OP_LIST_APPEND ||
+				op_type == OP_LIST_MERGE ||
+				op_type == OP_LIST_INSERT ||
+				op_type == OP_LIST_INSERT_ITEMS ||
+				op_type == OP_LIST_POP ||
+				op_type == OP_LIST_POP_RANGE ||
+				op_type == OP_LIST_REMOVE ||
+				op_type == OP_LIST_REMOVE_RANGE ||
+				op_type == OP_LIST_CLEAR ||
+				op_type == OP_LIST_SET ||
+				op_type == OP_LIST_GET ||
+				op_type == OP_LIST_GET_RANGE ||
+				op_type == OP_LIST_TRIM ||
+				op_type == OP_LIST_SIZE ||
+				op_type == OP_LIST_POP_RANGE_FROM ||
+				op_type == OP_LIST_GET_BY_INDEX ||
+				op_type == OP_LIST_GET_BY_INDEX_RANGE ||
+				op_type == OP_LIST_GET_BY_INDEX_RANGE_TO_END ||
+				op_type == OP_LIST_GET_BY_RANK ||
+				op_type == OP_LIST_GET_BY_RANK_RANGE ||
+				op_type == OP_LIST_GET_BY_RANK_RANGE_TO_END ||
+				op_type == OP_LIST_GET_BY_VALUE ||
+				op_type == OP_LIST_GET_BY_VALUE_LIST ||
+				op_type == OP_LIST_GET_BY_VALUE_RANGE ||
+				op_type == OP_LIST_GET_BY_VALUE_REL_RANK_RANGE ||
+				op_type == OP_LIST_GET_BY_VALUE_REL_RANK_RANGE_TO_END ||
+				op_type == OP_LIST_GET_RANGE_FROM ||
+				op_type == OP_LIST_INCREMENT ||
+				op_type == OP_LIST_SET_ORDER ||
+				op_type == OP_LIST_SORT ||
+				op_type == OP_LIST_REMOVE_BY_INDEX ||
+				op_type == OP_LIST_REMOVE_BY_INDEX_RANGE ||
+				op_type == OP_LIST_REMOVE_BY_INDEX_RANGE_TO_END ||
+				op_type == OP_LIST_REMOVE_BY_RANK ||
+				op_type == OP_LIST_REMOVE_BY_RANK_RANGE ||
+				op_type == OP_LIST_REMOVE_BY_RANK_RANGE_TO_END ||
+				op_type == OP_LIST_REMOVE_BY_VALUE ||
+				op_type == OP_LIST_REMOVE_BY_VALUE_LIST ||
+				op_type == OP_LIST_REMOVE_BY_VALUE_RANGE ||
+				op_type == OP_LIST_REMOVE_BY_VALUE_REL_RANK_RANGE ||
+				op_type == OP_LIST_REMOVE_BY_VALUE_REL_RANK_RANGE_TO_END||
+				op_type == OP_LIST_REMOVE_RANGE_FROM);
+}
+
+static inline bool
 op_is_map_op(int op_type) {
 	return (
 			 op_type == OP_MAP_SET_POLICY ||
@@ -1214,9 +1327,130 @@ static inline bool op_requires_index(int op_type) {
 			op_type == OP_LIST_POP       || op_type == OP_LIST_POP_RANGE    ||
 			op_type == OP_LIST_REMOVE    || op_type == OP_LIST_REMOVE_RANGE ||
 			op_type == OP_LIST_SET       || op_type == OP_LIST_GET          ||
-			op_type == OP_LIST_GET_RANGE || op_type == OP_LIST_TRIM);
+			op_type == OP_LIST_GET_RANGE || op_type == OP_LIST_TRIM         ||
+			op_type == OP_LIST_POP_RANGE_FROM
+			);
 }
 
+
+/* List op argument classifiers */
+static inline bool
+list_op_requires_return_type(int op_type) {
+	return (
+			op_type == OP_LIST_REMOVE_BY_VALUE ||
+			op_type == OP_LIST_REMOVE_BY_VALUE_LIST ||
+			op_type == OP_LIST_REMOVE_BY_VALUE_RANGE ||
+			op_type == OP_LIST_REMOVE_BY_VALUE_REL_RANK_RANGE ||
+			op_type == OP_LIST_REMOVE_BY_VALUE_REL_RANK_RANGE_TO_END ||
+			op_type == OP_LIST_REMOVE_BY_INDEX ||
+			op_type == OP_LIST_REMOVE_BY_INDEX_RANGE ||
+			op_type == OP_LIST_REMOVE_BY_INDEX_RANGE_TO_END ||
+			op_type == OP_LIST_REMOVE_BY_RANK ||
+			op_type == OP_LIST_REMOVE_BY_RANK_RANGE ||
+			op_type == OP_LIST_REMOVE_BY_RANK_RANGE_TO_END ||
+			op_type == OP_LIST_GET_BY_VALUE ||
+			op_type == OP_LIST_GET_BY_VALUE_LIST ||
+			op_type == OP_LIST_GET_BY_VALUE_REL_RANK_RANGE ||
+			op_type == OP_LIST_GET_BY_VALUE_REL_RANK_RANGE_TO_END ||
+			op_type == OP_LIST_GET_BY_INDEX ||
+			op_type == OP_LIST_GET_BY_INDEX_RANGE ||
+			op_type == OP_LIST_GET_BY_INDEX_RANGE_TO_END ||
+			op_type == OP_LIST_GET_BY_RANK ||
+			op_type == OP_LIST_GET_BY_RANK_RANGE || 
+			op_type == OP_LIST_GET_BY_RANK_RANGE_TO_END);
+
+}
+
+static inline bool list_op_requires_val(int op_type) {
+	return (
+			op_type == OP_LIST_APPEND ||
+			op_type == OP_LIST_MERGE ||
+			op_type == OP_LIST_INSERT ||
+			op_type == OP_LIST_INSERT_ITEMS ||
+			op_type == OP_LIST_SET ||
+			op_type == OP_LIST_INCREMENT ||
+			op_type == OP_LIST_REMOVE_BY_VALUE ||
+			op_type == OP_LIST_REMOVE_BY_VALUE_LIST ||
+			op_type == OP_LIST_REMOVE_BY_VALUE_RANGE ||
+			op_type == OP_LIST_REMOVE_BY_VALUE_REL_RANK_RANGE ||
+			op_type == OP_LIST_REMOVE_BY_VALUE_REL_RANK_RANGE_TO_END ||
+			op_type == OP_LIST_GET_BY_VALUE ||
+			op_type == OP_LIST_GET_BY_VALUE_LIST ||
+			op_type == OP_LIST_GET_BY_VALUE_REL_RANK_RANGE ||
+			op_type == OP_LIST_GET_BY_VALUE_REL_RANK_RANGE_TO_END);
+}
+
+static inline bool list_op_requires_rank(int op_type) {
+	return (
+			op_type == OP_LIST_GET_BY_VALUE_REL_RANK_RANGE ||
+			op_type == OP_LIST_GET_BY_VALUE_REL_RANK_RANGE_TO_END ||
+			op_type == OP_LIST_GET_BY_RANK_RANGE_TO_END ||
+			op_type == OP_LIST_GET_BY_RANK_RANGE ||
+			op_type == OP_LIST_GET_BY_RANK ||
+			op_type == OP_LIST_REMOVE_BY_VALUE_REL_RANK_RANGE_TO_END ||
+			op_type == OP_LIST_REMOVE_BY_VALUE_REL_RANK_RANGE ||
+			op_type == OP_LIST_REMOVE_BY_RANK_RANGE_TO_END ||
+			op_type == OP_LIST_REMOVE_BY_RANK_RANGE ||
+			op_type == OP_LIST_REMOVE_BY_RANK);
+}
+
+static inline bool list_op_requires_list_policy(int op_type) {
+	return (
+			op_type == OP_LIST_APPEND ||
+			op_type == OP_LIST_MERGE ||
+			op_type == OP_LIST_INSERT ||
+			op_type == OP_LIST_INSERT_ITEMS ||
+			op_type == OP_LIST_SET ||
+			op_type == OP_LIST_INCREMENT);
+}
+
+static inline bool list_op_requires_index(int op_type) {
+	return (
+			op_type == OP_LIST_INSERT ||
+			op_type == OP_LIST_INSERT_ITEMS ||
+			op_type == OP_LIST_POP ||
+			op_type == OP_LIST_POP_RANGE ||
+			op_type == OP_LIST_POP_RANGE_FROM ||
+			op_type == OP_LIST_REMOVE_RANGE ||
+			op_type == OP_LIST_REMOVE_BY_INDEX ||
+			op_type == OP_LIST_REMOVE_BY_INDEX_RANGE ||
+			op_type == OP_LIST_REMOVE_BY_INDEX_RANGE_TO_END ||
+			op_type == OP_LIST_REMOVE_RANGE_FROM ||
+			op_type == OP_LIST_SET ||
+			op_type == OP_LIST_GET ||
+			op_type == OP_LIST_GET_RANGE ||
+			op_type == OP_LIST_GET_BY_INDEX ||
+			op_type == OP_LIST_GET_BY_INDEX_RANGE ||
+			op_type == OP_LIST_GET_BY_INDEX_RANGE_TO_END ||
+			op_type == OP_LIST_GET_RANGE_FROM ||
+			op_type == OP_LIST_INCREMENT ||
+			op_type == OP_LIST_TRIM ||
+			op_type == OP_LIST_GET_BY_INDEX_RANGE_TO_END ||
+			op_type == OP_LIST_GET_BY_INDEX_RANGE_TO_END ||
+			op_type == OP_LIST_GET_BY_INDEX_RANGE_TO_END ||
+			op_type == OP_LIST_GET_BY_INDEX_RANGE_TO_END ||
+			op_type == OP_LIST_GET_BY_INDEX_RANGE_TO_END);
+}
+
+static inline bool list_op_requires_count(int op_type) {
+	return (
+			op_type == OP_LIST_TRIM ||
+			op_type == OP_LIST_GET_BY_VALUE_REL_RANK_RANGE ||
+			op_type == OP_LIST_GET_BY_RANK_RANGE ||
+			op_type == OP_LIST_GET_BY_INDEX_RANGE ||
+			op_type == OP_LIST_GET_RANGE ||
+			op_type == OP_LIST_REMOVE_BY_VALUE_REL_RANK_RANGE ||
+			op_type == OP_LIST_REMOVE_BY_RANK_RANGE ||
+			op_type == OP_LIST_REMOVE_BY_INDEX_RANGE ||
+			op_type == OP_LIST_REMOVE_RANGE ||
+			op_type == OP_LIST_POP_RANGE);
+}
+
+static inline bool list_op_requires_range_end(int op_type) {
+	return (
+			op_type == OP_LIST_REMOVE_BY_VALUE_RANGE ||
+			op_type == OP_LIST_GET_BY_VALUE_RANGE);
+}
 
 /* Map op argument classifiers */
 static inline bool
@@ -1469,7 +1703,7 @@ static as_status get_map_policy_from_op_hash(as_error* err, HashTable* op_hash, 
 	return AEROSPIKE_OK;
 }
 
-static as_status get_return_type_from_op_hash(as_error* err, HashTable* op_hash, as_map_return_type* return_type) {
+static as_status get_map_return_type_from_op_hash(as_error* err, HashTable* op_hash, as_map_return_type* return_type) {
 	zval* z_return_type = NULL;
 
 	if (!op_hash) {
@@ -1485,6 +1719,66 @@ static as_status get_return_type_from_op_hash(as_error* err, HashTable* op_hash,
 		return as_error_update(err, AEROSPIKE_ERR_PARAM, "return_type must be a long");
 	}
 	*return_type = (as_map_return_type)Z_LVAL_P(z_return_type);
+
+	return AEROSPIKE_OK;
+}
+
+static as_status get_list_policy_from_op_hash(as_error* err, HashTable* op_hash, as_list_policy* list_policy_p) {
+	zval* z_list_policy = NULL;
+	as_status status = AEROSPIKE_OK;
+	if (!op_hash) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
+	}
+
+	z_list_policy = zend_hash_str_find(op_hash, AS_LIST_POLICY_KEY, strlen(AS_LIST_POLICY_KEY));
+	if (!z_list_policy) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required list_policy entry");
+	}
+
+	status = zval_to_as_policy_list(z_list_policy, list_policy_p);
+	if (status != AEROSPIKE_OK) {
+		return as_error_update(err, status, "Invalid map_policy");
+	}
+	return AEROSPIKE_OK;
+}
+
+static as_status get_list_return_type_from_op_hash(as_error* err, HashTable* op_hash, as_list_return_type* return_type) {
+	zval* z_return_type = NULL;
+
+	if (!op_hash) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
+	}
+
+	z_return_type = zend_hash_str_find(op_hash, AS_LIST_RETURN_TYPE_KEY, strlen(AS_LIST_RETURN_TYPE_KEY));
+	if (!z_return_type) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required return_type entry");
+	}
+
+	if (Z_TYPE_P(z_return_type) != IS_LONG) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "return_type must be a long");
+	}
+	*return_type = (as_list_return_type)Z_LVAL_P(z_return_type);
+
+	return AEROSPIKE_OK;
+}
+
+static as_status get_long_value_from_op_hash(as_error* err, HashTable* op_hash, uint64_t* val, int serializer_type) {
+	zval* z_value = NULL;
+	if (!op_hash) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
+	}
+
+	z_value = zend_hash_str_find(op_hash, AS_MAP_VALUE_KEY, strlen(AS_MAP_VALUE_KEY));
+	if (!z_value) {
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required val entry");
+	}
+
+	if (Z_TYPE_P(z_value) != IS_LONG) {
+		as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation requires an integer val entry");
+		return AEROSPIKE_ERR_PARAM;
+	}
+
+	*val = Z_LVAL_P(z_value);
 
 	return AEROSPIKE_OK;
 }

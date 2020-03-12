@@ -54,6 +54,9 @@ as_status zval_to_as_policy_admin(zval* z_policy, as_policy_admin* admin_policy,
 as_status
 zval_to_as_policy_map(zval* z_policy, as_map_policy* map_policy);
 
+as_status
+zval_to_as_policy_list(zval* z_policy, as_list_policy* list_policy);
+
 // The following functions initialize a policy object with INI entries
 as_status set_serializer_from_policy_hash(int* serializer_type, zval* z_policy);
 as_status set_deserializer_from_policy_hash(int* deserializer_type, zval* z_policy);

@@ -797,6 +797,63 @@ zval_to_as_policy_map(zval* z_policy, as_map_policy* map_policy) {
 	return AEROSPIKE_OK;
 }
 
+as_status
+zval_to_as_policy_list(zval* z_policy, as_list_policy* list_policy) {
+
+	HashTable* policy_hash = NULL;
+	as_list_policy_init(list_policy);
+	long list_order = AS_LIST_UNORDERED;
+	long write_flags = AS_LIST_WRITE_DEFAULT;
+
+	if (!z_policy || Z_TYPE_P(z_policy) == IS_NULL) {
+		return AEROSPIKE_OK;
+	}
+
+	if (Z_TYPE_P(z_policy) != IS_ARRAY) {
+		return AEROSPIKE_ERR_PARAM;
+	}
+
+	policy_hash = Z_ARRVAL_P(z_policy);
+
+	zval* list_policy_val = NULL;
+	zval* list_policy_flags_val = NULL;
+
+	list_policy_val = zend_hash_index_find(policy_hash, OPT_LIST_ORDER);
+	if (list_policy_val) {
+		if (Z_TYPE_P(list_policy_val) == IS_LONG) {
+			list_order = Z_LVAL_P(list_policy_val);
+			if (list_order != AS_LIST_UNORDERED &&
+				list_order != AS_LIST_ORDERED) {
+				return AEROSPIKE_ERR_PARAM;
+			}
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	list_policy_flags_val = zend_hash_index_find(policy_hash, OPT_MAP_WRITE_FLAGS);
+	if (list_policy_flags_val) {
+		if (Z_TYPE_P(list_policy_flags_val) == IS_LONG) {
+			write_flags = Z_LVAL_P(list_policy_flags_val);
+			long write_flags_chk = write_flags & ~AS_MAP_WRITE_NO_FAIL &
+									~AS_MAP_WRITE_PARTIAL;
+			if (write_flags_chk != AS_LIST_WRITE_DEFAULT &&
+				write_flags_chk != AS_LIST_WRITE_ADD_UNIQUE &&
+				write_flags_chk != AS_LIST_WRITE_INSERT_BOUNDED &&
+				write_flags_chk != AS_LIST_WRITE_NO_FAIL &&
+				write_flags_chk != AS_LIST_WRITE_PARTIAL) {
+				return AEROSPIKE_ERR_PARAM;
+			}
+		} else {
+			return AEROSPIKE_ERR_PARAM;
+		}
+	}
+
+	as_list_policy_set(list_policy, list_order, write_flags);
+
+	return AEROSPIKE_OK;
+}
+
 as_status set_read_policy_from_hash(HashTable* z_policy_hash, as_policy_read* read_policy) {
 
 	if (!z_policy_hash) {
