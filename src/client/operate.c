@@ -549,7 +549,15 @@ add_list_op_to_operations(HashTable* op_array, int op_type, const char* bin_name
 	as_list_return_type return_type;
 
 	if (list_op_requires_count(op_type)) {
-		if (get_count_from_op_hash(err, op_array, &count) != AEROSPIKE_OK) {
+		// This check provides backwards compatibility with the
+		// old set of list ops that used the generic 'val' parameter
+		// For count.
+		if (op_requires_long_val(op_type)) {
+			if (get_long_value_from_op_hash(err, op_array, &count, serializer_type) != AEROSPIKE_OK) {
+				return err->code;
+			}
+		}
+		else if (get_count_from_op_hash(err, op_array, &count) != AEROSPIKE_OK) {
 			return err->code;
 		}
 	}
@@ -908,7 +916,7 @@ CLEANUP:
 			as_val_destroy(range_end);
 		}
 
-		if (range_end) {
+		if (range_begin) {
 			as_val_destroy(range_begin);
 		}
 
@@ -1312,6 +1320,9 @@ static inline bool op_requires_list_val(int op_type) {
 	return (op_type == OP_LIST_MERGE || op_type == OP_LIST_INSERT_ITEMS);
 }
 
+// This check provides backwards compatibility with the
+// old set of list ops that used the generic 'val' parameter
+// For count.
 static inline bool op_requires_long_val(int op_type) {
 	return (op_type == OP_LIST_POP_RANGE || op_type == OP_LIST_REMOVE_RANGE ||
 			op_type == OP_LIST_GET_RANGE || op_type == OP_LIST_TRIM);
@@ -1411,6 +1422,7 @@ static inline bool list_op_requires_index(int op_type) {
 			op_type == OP_LIST_POP ||
 			op_type == OP_LIST_POP_RANGE ||
 			op_type == OP_LIST_POP_RANGE_FROM ||
+			op_type == OP_LIST_REMOVE ||
 			op_type == OP_LIST_REMOVE_RANGE ||
 			op_type == OP_LIST_REMOVE_BY_INDEX ||
 			op_type == OP_LIST_REMOVE_BY_INDEX_RANGE ||
