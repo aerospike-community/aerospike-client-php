@@ -160,6 +160,7 @@ AerospikeOptionConstant aerospike_option_constants[] = {
 	{OPT_LIST_WRITE_FLAGS                   ,   "OPT_LIST_WRITE_FLAGS"              },
 	{AS_LIST_RETURN_NONE                    ,   "AS_LIST_RETURN_NONE"               },
 	{AS_LIST_RETURN_INDEX                   ,   "AS_LIST_RETURN_INDEX"              },
+	{AS_LIST_RETURN_RANK                    ,   "AS_LIST_RETURN_RANK"               },
 	{AS_LIST_RETURN_REVERSE_INDEX           ,   "AS_LIST_RETURN_REVERSE_INDEX"      },
 	{AS_LIST_RETURN_REVERSE_RANK            ,   "AS_LIST_RETURN_REVERSE_RANK"       },
 	{AS_LIST_RETURN_COUNT                   ,   "AS_LIST_RETURN_COUNT"              },

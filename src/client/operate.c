@@ -44,7 +44,7 @@ static inline bool list_op_requires_index(int op_type);
 static inline bool list_op_requires_rank(int op_type);
 static inline bool list_op_requires_return_type(int op_type);
 static inline bool list_op_requires_list_policy(int op_type);
-static inline bool list_op_requires_range_end(int op_type);
+static inline bool list_op_requires_range_begin_and_end(int op_type);
 static inline bool list_op_requires_val(int op_type);
 
 static as_status add_list_op_to_operations(HashTable* op_array, int op_type, const char* bin_name,
@@ -59,6 +59,7 @@ static as_status get_index_from_op_hash(as_error* err, HashTable* op_hash, int64
 static as_status get_key_from_op_hash(as_error* err, HashTable* op_hash, as_val** key, int serializer_type);
 static as_status get_value_from_op_hash(as_error* err, HashTable* op_hash, as_val** val, int serializer_type);
 static as_status get_range_end_from_op_hash(as_error* err, HashTable* op_hash, as_val** range_end, int serializer_type);
+static as_status get_range_begin_from_op_hash(as_error* err, HashTable* op_hash, as_val** range_begin, int serializer_type);
 static as_status get_map_policy_from_op_hash(as_error* err, HashTable* op_hash, as_map_policy* map_policy_p);
 static as_status get_map_return_type_from_op_hash(as_error* err, HashTable* op_hash, as_map_return_type* return_type);
 static as_status get_list_policy_from_op_hash(as_error* err, HashTable* op_hash, as_list_policy* list_policy_p);
@@ -66,16 +67,18 @@ static as_status get_list_return_type_from_op_hash(as_error* err, HashTable* op_
 static as_status get_long_value_from_op_hash(as_error* err, HashTable* op_hash, uint64_t* val, int serializer_type);
 
 #define AS_MAP_POLICY_KEY "map_policy"
-#define AS_MAP_RANK_KEY "rank"
-#define AS_MAP_COUNT_KEY "count"
-#define AS_MAP_KEY_KEY "key"
-#define AS_MAP_INDEX_KEY "index"
-#define AS_MAP_RETURN_TYPE_KEY "return_type"
-#define AS_MAP_VALUE_KEY "val"
-#define AS_MAP_RANGE_END "range_end"
 
 #define AS_LIST_POLICY_KEY "list_policy"
 #define AS_LIST_RETURN_TYPE_KEY "return_type"
+
+#define AS_OP_RANK_KEY "rank"
+#define AS_OP_COUNT_KEY "count"
+#define AS_OP_KEY_KEY "key"
+#define AS_OP_INDEX_KEY "index"
+#define AS_OP_RETURN_TYPE_KEY "return_type"
+#define AS_OP_VALUE_KEY "val"
+#define AS_OP_RANGE_END "range_end"
+#define AS_OP_RANGE_BEGIN "range_begin"
 
 
 /* {{{ proto int Aerospike::operate( array key, array operations [,array &returned [,array options ]] )
@@ -545,6 +548,7 @@ add_list_op_to_operations(HashTable* op_array, int op_type, const char* bin_name
 	as_val* range_end = NULL;
 	as_list_order order;
 	as_list_policy list_policy;
+	as_list_policy* list_policy_pointer = NULL;
 	as_list_sort_flags flags;
 	as_list_return_type return_type;
 
@@ -584,9 +588,14 @@ add_list_op_to_operations(HashTable* op_array, int op_type, const char* bin_name
 		if (get_list_policy_from_op_hash(err, op_array, &list_policy) != AEROSPIKE_OK) {
 			return err->code;
 		}
+		list_policy_pointer = &list_policy;
 	}
 
-	if (list_op_requires_range_end(op_type)) {
+	if (list_op_requires_range_begin_and_end(op_type)) {
+		if (get_range_begin_from_op_hash(err, op_array, &range_begin, serializer_type) != AEROSPIKE_OK) {
+			goto CLEANUP;
+		}
+
 		if (get_range_end_from_op_hash(err, op_array, &range_end, serializer_type) != AEROSPIKE_OK) {
 			goto CLEANUP;
 		}
@@ -606,28 +615,28 @@ add_list_op_to_operations(HashTable* op_array, int op_type, const char* bin_name
 
 	switch(op_type) {
 		case OP_LIST_APPEND: {
-			if (!as_operations_list_append(ops, bin_name, NULL, NULL, val)) {
+			if (!as_operations_list_append(ops, bin_name, NULL, list_policy_pointer, val)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_MERGE: {
-			if (!as_operations_list_append_items(ops, bin_name, NULL, NULL, (as_list*)val)) {
+			if (!as_operations_list_append_items(ops, bin_name, NULL, list_policy_pointer, (as_list*)val)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_INSERT: {
-			if(!as_operations_list_insert(ops, bin_name, NULL, NULL, index, val)) {
+			if(!as_operations_list_insert(ops, bin_name, NULL, list_policy_pointer, index, val)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
 			break;
 		}
 		case OP_LIST_INSERT_ITEMS: {
-			if (!as_operations_list_insert_items(ops, bin_name, NULL, NULL, index, (as_list*)val)) {
+			if (!as_operations_list_insert_items(ops, bin_name, NULL, list_policy_pointer, index, (as_list*)val)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
@@ -760,7 +769,7 @@ add_list_op_to_operations(HashTable* op_array, int op_type, const char* bin_name
 			break;
 		}
 		case OP_LIST_SET: {
-			if(!as_operations_list_set(ops, bin_name, NULL, NULL, index, val)) {
+			if(!as_operations_list_set(ops, bin_name, NULL, list_policy_pointer, index, val)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
@@ -865,7 +874,7 @@ add_list_op_to_operations(HashTable* op_array, int op_type, const char* bin_name
 			break;
 		}
 		case OP_LIST_INCREMENT: {
-			if(!as_operations_list_increment(ops, bin_name, NULL, NULL, index, val)) {
+			if(!as_operations_list_increment(ops, bin_name, NULL, list_policy_pointer, index, val)) {
 				as_error_update(err, AEROSPIKE_ERR_CLIENT, "Unable to add operation");
 				return AEROSPIKE_ERR_CLIENT;
 			}
@@ -1382,7 +1391,6 @@ static inline bool list_op_requires_val(int op_type) {
 			op_type == OP_LIST_INCREMENT ||
 			op_type == OP_LIST_REMOVE_BY_VALUE ||
 			op_type == OP_LIST_REMOVE_BY_VALUE_LIST ||
-			op_type == OP_LIST_REMOVE_BY_VALUE_RANGE ||
 			op_type == OP_LIST_REMOVE_BY_VALUE_REL_RANK_RANGE ||
 			op_type == OP_LIST_REMOVE_BY_VALUE_REL_RANK_RANGE_TO_END ||
 			op_type == OP_LIST_GET_BY_VALUE ||
@@ -1458,7 +1466,7 @@ static inline bool list_op_requires_count(int op_type) {
 			op_type == OP_LIST_POP_RANGE);
 }
 
-static inline bool list_op_requires_range_end(int op_type) {
+static inline bool list_op_requires_range_begin_and_end(int op_type) {
 	return (
 			op_type == OP_LIST_REMOVE_BY_VALUE_RANGE ||
 			op_type == OP_LIST_GET_BY_VALUE_RANGE);
@@ -1585,7 +1593,7 @@ static as_status get_count_from_op_hash(as_error* err, HashTable* op_hash, uint6
 		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
 	}
 
-	z_count = zend_hash_str_find(op_hash, AS_MAP_COUNT_KEY, strlen(AS_MAP_COUNT_KEY));
+	z_count = zend_hash_str_find(op_hash, AS_OP_COUNT_KEY, strlen(AS_OP_COUNT_KEY));
 	if (!z_count) {
 		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required count entry");
 	}
@@ -1608,7 +1616,7 @@ static as_status get_index_from_op_hash(as_error* err, HashTable* op_hash, int64
 		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
 	}
 
-	z_index = zend_hash_str_find(op_hash, AS_MAP_INDEX_KEY, strlen(AS_MAP_INDEX_KEY));
+	z_index = zend_hash_str_find(op_hash, AS_OP_INDEX_KEY, strlen(AS_OP_INDEX_KEY));
 	if (!z_index) {
 		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required index entry");
 	}
@@ -1627,7 +1635,7 @@ static as_status get_rank_from_op_hash(as_error* err, HashTable* op_hash, int64_
 		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
 	}
 
-	z_rank = zend_hash_str_find(op_hash, AS_MAP_RANK_KEY, strlen(AS_MAP_RANK_KEY));
+	z_rank = zend_hash_str_find(op_hash, AS_OP_RANK_KEY, strlen(AS_OP_RANK_KEY));
 	if (!z_rank) {
 		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required rank entry");
 	}
@@ -1649,7 +1657,7 @@ static as_status get_key_from_op_hash(as_error* err, HashTable* op_hash, as_val*
 		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
 	}
 
-	z_key = zend_hash_str_find(op_hash, AS_MAP_KEY_KEY, strlen(AS_MAP_KEY_KEY));
+	z_key = zend_hash_str_find(op_hash, AS_OP_KEY_KEY, strlen(AS_OP_KEY_KEY));
 	if (!z_key) {
 		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required key entry");
 	}
@@ -1666,7 +1674,7 @@ static as_status get_value_from_op_hash(as_error* err, HashTable* op_hash, as_va
 		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
 	}
 
-	z_value = zend_hash_str_find(op_hash, AS_MAP_VALUE_KEY, strlen(AS_MAP_VALUE_KEY));
+	z_value = zend_hash_str_find(op_hash, AS_OP_VALUE_KEY, strlen(AS_OP_VALUE_KEY));
 	if (!z_value) {
 		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required val entry");
 	}
@@ -1684,12 +1692,33 @@ static as_status get_range_end_from_op_hash(as_error* err, HashTable* op_hash, a
 		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
 	}
 
-	z_range_end = zend_hash_str_find(op_hash, AS_MAP_RANGE_END, strlen(AS_MAP_RANGE_END));
+	z_range_end = zend_hash_str_find(op_hash, AS_OP_RANGE_END, strlen(AS_OP_RANGE_END));
 	if (!z_range_end) {
 		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required range_end entry");
 	}
 
 	if (zval_to_as_val(z_range_end, range_end, err, serializer_type) != AEROSPIKE_OK) {
+		return err->code;
+	}
+
+	return AEROSPIKE_OK;
+}
+
+static as_status get_range_begin_from_op_hash(as_error* err, HashTable* op_hash, as_val** range_begin, int serializer_type) {
+	zval* z_range_begin = NULL;
+	if (!op_hash) {
+		printf("ERR1\n");
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
+	}
+
+	z_range_begin = zend_hash_str_find(op_hash, AS_OP_RANGE_BEGIN, strlen(AS_OP_RANGE_BEGIN));
+	if (!z_range_begin) {
+		printf("ERR2\n");
+		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required range_begin entry");
+	}
+
+	if (zval_to_as_val(z_range_begin, range_begin, err, serializer_type) != AEROSPIKE_OK) {
+		printf("ERR3\n");
 		return err->code;
 	}
 
@@ -1722,7 +1751,7 @@ static as_status get_map_return_type_from_op_hash(as_error* err, HashTable* op_h
 		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
 	}
 
-	z_return_type = zend_hash_str_find(op_hash, AS_MAP_RETURN_TYPE_KEY, strlen(AS_MAP_RETURN_TYPE_KEY));
+	z_return_type = zend_hash_str_find(op_hash, AS_OP_RETURN_TYPE_KEY, strlen(AS_OP_RETURN_TYPE_KEY));
 	if (!z_return_type) {
 		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required return_type entry");
 	}
@@ -1744,7 +1773,7 @@ static as_status get_list_policy_from_op_hash(as_error* err, HashTable* op_hash,
 
 	z_list_policy = zend_hash_str_find(op_hash, AS_LIST_POLICY_KEY, strlen(AS_LIST_POLICY_KEY));
 	if (!z_list_policy) {
-		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required list_policy entry");
+		return AEROSPIKE_OK;
 	}
 
 	status = zval_to_as_policy_list(z_list_policy, list_policy_p);
@@ -1780,7 +1809,7 @@ static as_status get_long_value_from_op_hash(as_error* err, HashTable* op_hash, 
 		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation must not be empty");
 	}
 
-	z_value = zend_hash_str_find(op_hash, AS_MAP_VALUE_KEY, strlen(AS_MAP_VALUE_KEY));
+	z_value = zend_hash_str_find(op_hash, AS_OP_VALUE_KEY, strlen(AS_OP_VALUE_KEY));
 	if (!z_value) {
 		return as_error_update(err, AEROSPIKE_ERR_PARAM, "Operation missing a required val entry");
 	}

@@ -45,6 +45,7 @@ class OperateOrdered extends AerospikeTestCommon
         );
         $status = $this->db->operateOrdered($key, $operations, $returned);
         if ($status != Aerospike::OK) {
+            var_dump($status);
             return Aerospike::ERR_CLIENT;
         }
 
