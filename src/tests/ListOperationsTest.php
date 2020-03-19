@@ -219,7 +219,7 @@ final class ListOperationsTest extends TestCase {
         $ops = [["op" => AEROSPIKE::OP_LIST_REMOVE_BY_VALUE_RANGE, "bin" => "numList", "range_begin" => 2, "range_end" => 5, "return_type" => AEROSPIKE::AS_LIST_RETURN_COUNT]];
         $status = $this->db->operate($key, $ops, $rec);
         $this->assertEquals($status, AEROSPIKE::OK);
-        //$this->assertEquals($rec, array("numList" => 2));
+        $this->assertEquals($rec, array("numList" => 2));
         $this->db->get($key, $record);
         $this->assertEquals($record["bins"]["numList"], array(1));
     }
@@ -285,6 +285,102 @@ final class ListOperationsTest extends TestCase {
         $status = $this->db->operate($key, $ops, $rec);
         $this->assertEquals($status, AEROSPIKE::OK);
         $this->assertEquals($rec, array("stringList" => array("alpha", "charlie")));
+    }
+
+    public function testListGetByIndex() {
+        $key = $this->key;
+        $ops = [["op" => AEROSPIKE::OP_LIST_GET_BY_INDEX, "bin" => "stringList", "index" => 0, "return_type" => AEROSPIKE::AS_LIST_RETURN_VALUE]];
+        $status = $this->db->operate($key, $ops, $rec);
+        $this->assertEquals($status, AEROSPIKE::OK);
+        $this->assertEquals($rec, array("stringList" => "alpha"));
+    }
+
+    public function testListGetByIndexRange() {
+        $key = $this->key;
+        $ops = [["op" => AEROSPIKE::OP_LIST_GET_BY_INDEX_RANGE, "bin" => "stringList", "index" => 0, "count" => 2, "return_type" => AEROSPIKE::AS_LIST_RETURN_VALUE]];
+        $status = $this->db->operate($key, $ops, $rec);
+        $this->assertEquals($status, AEROSPIKE::OK);
+        $this->assertEquals($rec, array("stringList" => array("alpha", "charlie")));
+    }
+
+    public function testListGetByIndexRangeToEnd() {
+        $key = $this->key;
+        $ops = [["op" => AEROSPIKE::OP_LIST_GET_BY_INDEX_RANGE_TO_END, "bin" => "stringList", "index" => 1, "return_type" => AEROSPIKE::AS_LIST_RETURN_INDEX]];
+        $status = $this->db->operate($key, $ops, $rec);
+        $this->assertEquals($status, AEROSPIKE::OK);
+        $this->assertEquals($rec, array("stringList" => array(1, 2)));
+    }
+
+    public function testListGetByRank() {
+        $key = $this->key;
+        $ops = [["op" => AEROSPIKE::OP_LIST_GET_BY_RANK, "bin" => "numList", "rank" => 1, "return_type" => AEROSPIKE::AS_LIST_RETURN_VALUE]];
+        $status = $this->db->operate($key, $ops, $rec);
+        $this->assertEquals($status, AEROSPIKE::OK);
+        $this->assertEquals($rec, array("numList" => 2));
+    }
+
+    public function testListGetByRankRange() {
+        $key = $this->key;
+        $ops = [["op" => AEROSPIKE::OP_LIST_GET_BY_RANK_RANGE, "bin" => "numList", "rank" => 1, "count" => 2, "return_type" => AEROSPIKE::AS_LIST_RETURN_VALUE]];
+        $status = $this->db->operate($key, $ops, $rec);
+        $this->assertEquals($status, AEROSPIKE::OK);
+        $this->assertEquals($rec, array("numList" => array(2, 3)));
+    }
+
+    public function testListGetByRankRangeToEnd() {
+        $key = $this->key;
+        $ops = [["op" => AEROSPIKE::OP_LIST_GET_BY_RANK_RANGE_TO_END, "bin" => "numList", "rank" => 1, "return_type" => AEROSPIKE::AS_LIST_RETURN_RANK]];
+        $status = $this->db->operate($key, $ops, $rec);
+        $this->assertEquals($status, AEROSPIKE::OK);
+        $this->assertEquals($rec, array("numList" => array(1, 2)));
+    }
+
+    public function testListGetByValue() {
+        $key = $this->key;
+        $ops = [["op" => AEROSPIKE::OP_LIST_GET_BY_VALUE, "bin" => "numList", "val" => 2, "return_type" => AEROSPIKE::AS_LIST_RETURN_VALUE]];
+        $status = $this->db->operate($key, $ops, $rec);
+        $this->assertEquals($status, AEROSPIKE::OK);
+        $this->assertEquals($rec, array("numList" => array(2)));
+    }
+
+    public function testListGetByValueList() {
+        $key = $this->key;
+        $ops = [["op" => AEROSPIKE::OP_LIST_GET_BY_VALUE_LIST, "bin" => "numList", "val" => array(2, 3), "return_type" => AEROSPIKE::AS_LIST_RETURN_INDEX]];
+        $status = $this->db->operate($key, $ops, $rec);
+        $this->assertEquals($status, AEROSPIKE::OK);
+        $this->assertEquals($rec, array("numList" => array(1, 2)));
+    }
+
+    public function testListGetByValueRange() {
+        $key = $this->key;
+        $ops = [["op" => AEROSPIKE::OP_LIST_GET_BY_VALUE_RANGE, "bin" => "numList", "range_begin" => 1, "range_end" => 3, "return_type" => AEROSPIKE::AS_LIST_RETURN_VALUE]];
+        $status = $this->db->operate($key, $ops, $rec);
+        $this->assertEquals($status, AEROSPIKE::OK);
+        $this->assertEquals($rec, array("numList" => array(1, 2)));
+    }
+
+    public function testListGetByValueRankRange() {
+        $key = $this->key;
+        $ops = [["op" => AEROSPIKE::OP_LIST_GET_BY_VALUE_REL_RANK_RANGE, "bin" => "numList", "val" => 2, "rank" => 0, "count" => 2, "return_type" => AEROSPIKE::AS_LIST_RETURN_VALUE]];
+        $status = $this->db->operate($key, $ops, $rec);
+        $this->assertEquals($status, AEROSPIKE::OK);
+        $this->assertEquals($rec, array("numList" => array(2, 3)));
+    }
+
+    public function testListGetByValueRankRangeToEnd() {
+        $key = $this->key;
+        $ops = [["op" => AEROSPIKE::OP_LIST_GET_BY_VALUE_REL_RANK_RANGE_TO_END, "bin" => "numList", "val" => 2, "rank" => 0, "return_type" => AEROSPIKE::AS_LIST_RETURN_VALUE]];
+        $status = $this->db->operate($key, $ops, $rec);
+        $this->assertEquals($status, AEROSPIKE::OK);
+        $this->assertEquals($rec, array("numList" => array(2, 3)));
+    }
+
+    public function testListGetRangeFrom() {
+        $key = $this->key;
+        $ops = [["op" => AEROSPIKE::OP_LIST_GET_RANGE_FROM, "bin" => "numList", "index" => 1]];
+        $status = $this->db->operate($key, $ops, $rec);
+        $this->assertEquals($status, AEROSPIKE::OK);
+        $this->assertEquals($rec, array("numList" => array(3, 2)));
     }
 }
 ?>

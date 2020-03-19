@@ -1360,6 +1360,7 @@ list_op_requires_return_type(int op_type) {
 			op_type == OP_LIST_REMOVE_BY_VALUE ||
 			op_type == OP_LIST_REMOVE_BY_VALUE_LIST ||
 			op_type == OP_LIST_REMOVE_BY_VALUE_RANGE ||
+			op_type == OP_LIST_GET_BY_VALUE_RANGE ||
 			op_type == OP_LIST_REMOVE_BY_VALUE_REL_RANK_RANGE ||
 			op_type == OP_LIST_REMOVE_BY_VALUE_REL_RANK_RANGE_TO_END ||
 			op_type == OP_LIST_REMOVE_BY_INDEX ||
