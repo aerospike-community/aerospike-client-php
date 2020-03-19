@@ -454,7 +454,7 @@ as_status z_hashtable_to_as_map(HashTable* php_hash, as_map** c_map, as_error* e
 		goto CLEANUP;
 	}
 
-	ulong numeric_key;
+	zend_ulong numeric_key;
 	zend_string* string_key;
 	zval* php_value;
 	ZEND_HASH_FOREACH_KEY_VAL(php_hash, numeric_key, string_key, php_value)
@@ -878,7 +878,7 @@ as_status z_hashtable_to_as_key(HashTable* z_key_hash, as_key* key, as_error* er
 bool hashtable_is_list(HashTable* php_hash) {
 	int i = 0;
 
-	ulong numeric_key;
+	zend_ulong numeric_key;
 	zend_string* string_key;
 
 	ZEND_HASH_FOREACH_KEY(php_hash, numeric_key, string_key)
