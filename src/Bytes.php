@@ -94,3 +94,4 @@ class Bytes implements \Serializable
     }
 
 }
+
