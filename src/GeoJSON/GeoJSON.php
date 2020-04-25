@@ -77,4 +77,4 @@ class GeoJSON implements \Aerospike\GeoJSON\Serializable
         return new \Aerospike\GeoJSON($geo_obj);
     }
 }
-?>
+

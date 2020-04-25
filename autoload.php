@@ -17,5 +17,3 @@ if (!is_array($autoloaders) || !array_key_exists('Aerospike\\Bytes', $autoloader
         }
     });
 }
-
-?>
