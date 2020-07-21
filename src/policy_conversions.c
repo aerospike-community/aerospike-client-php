@@ -560,6 +560,16 @@ as_status set_scan_options_from_policy_hash(as_scan* scan, zval* z_policy) {
 			scan->no_bins = true;
 		}
 	}
+	/* setting_val = zend_hash_index_find(z_policy_ary, USE_ALTERNATE_DEVICE); */
+	/* if (setting_val) { */
+
+	/* 	if ((Z_TYPE_P(setting_val) != IS_TRUE) && (Z_TYPE_P(setting_val) != IS_FALSE)) { */
+	/* 		return AEROSPIKE_ERR_PARAM; */
+	/* 	} */
+	/* 	if (Z_TYPE_P(setting_val) == IS_TRUE) { */
+	/* 		scan->no_bins = true; */
+	/* 	} */
+	/* } */
 	/* Omitting LDT due to deprecation */
 
 	return AEROSPIKE_OK;

@@ -111,6 +111,7 @@ enum Aerospike_map_operations {
 };
 
 enum Aerospike_opt_keys {
+    USE_ALTERNATE_DEVICE,    /* boolean value, default: false                                                 */
 	OPT_CONNECT_TIMEOUT = 1, /* value in milliseconds, default: 1000                                          */
 	OPT_READ_TIMEOUT,        /* value in milliseconds, default: 1000                                          */
 	OPT_WRITE_TIMEOUT,       /* value in milliseconds, default: 1000                                          */

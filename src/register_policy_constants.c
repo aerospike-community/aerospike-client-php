@@ -42,6 +42,7 @@ AerospikeOptionConstant aerospike_option_constants[] = {
 	{ OPT_SCAN_RPS_LIMIT                    ,   "OPT_SCAN_RPS_LIMIT"                },
 	{ OPT_SCAN_PERCENTAGE                   ,   "OPT_SCAN_PERCENTAGE"               },
 	{ OPT_SCAN_CONCURRENTLY                 ,   "OPT_SCAN_CONCURRENTLY"             },
+	{ USE_ALTERNATE_DEVICE                  ,   "USE_ALTERNATE_DEVICE"              },
 	{ OPT_SCAN_NOBINS                       ,   "OPT_SCAN_NOBINS"                   },
 	{ OPT_SCAN_INCLUDELDT                   ,   "OPT_SCAN_INCLUDELDT"               },
 	{ OPT_POLICY_GEN                        ,   "OPT_POLICY_GEN"                    },
