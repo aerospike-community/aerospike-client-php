@@ -173,6 +173,7 @@ class Aerospike {
      * * Aerospike::OPT_POLICY_REPLICA
      * * Aerospike::OPT_POLICY_READ_MODE_AP
      * * Aerospike::OPT_POLICY_READ_MODE_SC
+     * * Aerospike::USE_SERVICES_ALTERNATE
      * * Aerospike::OPT_READ_DEFAULT_POL An array of default policies for read operations.
      * * Aerospike::OPT_WRITE_DEFAULT_POL An array of default policies for write operations.
      * * AEROSPIKE::OPT_REMOVE_DEFAULT_POL An array of default policies for remove operations.
@@ -4133,6 +4134,13 @@ class Aerospike {
      * @const OPT_QUERY_NOBINS boolean value (default: false)
      */
     const OPT_QUERY_NOBINS = "OPT_QUERY_NOBINS";
+
+    /**
+     * Flag to signify if "services-alternate" should be used instead of "services"
+     *
+     * @const USE_SERVICES_ALTERNATE boolean value (default: false)
+     */
+    const USE_SERVICES_ALTERNATE = "USE_SERVICES_ALTERNATE";
 
     /**
      * Revert to the older batch-direct protocol, instead of batch-index.
