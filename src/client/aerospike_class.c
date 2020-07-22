@@ -808,6 +808,14 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 		}
 		config->conn_timeout_ms = Z_LVAL_P(policy_zval);
 	}
+	policy_zval = zend_hash_index_find(policy_hash, USE_ALTERNATE_DEVICE);
+	if (policy_zval) {
+
+		if ((Z_TYPE_P(policy_zval) != IS_TRUE) && (Z_TYPE_P(policy_zval) != IS_FALSE)) {
+			return AEROSPIKE_ERR_PARAM;
+		}
+			config->use_services_alternate = Z_LVAL_P(policy_zval);
+	}
 
 	policy_zval = zend_hash_index_find(policy_hash, OPT_READ_TIMEOUT);
 	if (policy_zval) {

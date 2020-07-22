@@ -108,7 +108,7 @@ OS=`uname`
 CFLAGS="-std=gnu99 -g -D__AEROSPIKE_PHP_CLIENT_LOG_LEVEL__=${LOGLEVEL} -Wall"
 
 if [ $OS = "Darwin" ] ; then
-    LDFLAGS="-L/usr/local/opt/openssl@1.1/lib"
+    LDFLAGS="-L/usr/local/opt/openssl@1.1/lib -L$CLIENTREPO_3X/lib -laerospike -lcrypto"
 
 else
     LDFLAGS="-Wl,-Bstatic -L$CLIENTREPO_3X/lib -laerospike -Wl,-Bdynamic"
