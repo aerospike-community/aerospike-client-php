@@ -90,17 +90,17 @@ parse_args () {
     done
 }
 
-# if [ ! -z "$(which php-config)" ]; then
-#     PHP_CONFIG=`which php-config`
-# else
-PHP_CONFIG="/Users/Zeyad/php-private/php-config"
-# fi
+if [ ! -z "$(which php-config)" ]; then
+    PHP_CONFIG=`which php-config`
+else
+    PHP_CONFIG="php-config"
+fi
 
 if [ -f Makefile ]; then
   make clean
 fi
 parse_args $@
-~/php-private/phpize
+phpize
 ./configure --enable-aerospike --with-php-config=$PHP_CONFIG "CFLAGS=-g -O2"
 
 OS=`uname`
@@ -108,8 +108,7 @@ OS=`uname`
 CFLAGS="-std=gnu99 -g -D__AEROSPIKE_PHP_CLIENT_LOG_LEVEL__=${LOGLEVEL} -Wall"
 
 if [ $OS = "Darwin" ] ; then
-    LDFLAGS="-L/usr/local/opt/openssl@1.1/lib -L$CLIENTREPO_3X/lib -laerospike -lcrypto"
-
+    LDFLAGS="-L$CLIENTREPO_3X/lib -laerospike -lcrypto"
 else
     LDFLAGS="-Wl,-Bstatic -L$CLIENTREPO_3X/lib -laerospike -Wl,-Bdynamic"
     # Find and link to libcrypto (provided by OpenSSL)
