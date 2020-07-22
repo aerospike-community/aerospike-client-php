@@ -810,7 +810,6 @@ static as_status set_policy_defaults_from_hash(as_config* config, AerospikeClien
 	}
 	policy_zval = zend_hash_index_find(policy_hash, USE_SERVICES_ALTERNATE);
 	if (policy_zval) {
-
 		if ((Z_TYPE_P(policy_zval) != IS_TRUE) && (Z_TYPE_P(policy_zval) != IS_FALSE)) {
 			return AEROSPIKE_ERR_PARAM;
 		}
