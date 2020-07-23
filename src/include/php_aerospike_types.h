@@ -131,6 +131,7 @@ enum Aerospike_opt_keys {
 	OPT_POLICY_COMMIT_LEVEL, /* set to one of Aerospike::POLICY_COMMIT_LEVEL_*                                */
 	OPT_TTL,                 /* set to time-to-live of the record in seconds                                  */
 	USE_BATCH_DIRECT,        /* use new batch index protocol if server supports it                            */
+      USE_SERVICES_ALTERNATE,  /* boolean value, default: false                                                 */
 	COMPRESSION_THRESHOLD,   /* Minimum record size beyond which it is compressed and sent to the server      */
 	OPT_POLICY_DURABLE_DELETE, /* set to true to enable durable delete for the operation                       */
 	OPT_SOCKET_TIMEOUT,       /* Socket timeout to be applied to server as well as client */

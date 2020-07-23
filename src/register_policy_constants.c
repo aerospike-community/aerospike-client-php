@@ -50,6 +50,7 @@ AerospikeOptionConstant aerospike_option_constants[] = {
 	{ OPT_POLICY_READ_MODE_SC               ,   "OPT_POLICY_READ_MODE_SC"           },
 	{ OPT_POLICY_COMMIT_LEVEL               ,   "OPT_POLICY_COMMIT_LEVEL"           },
 	{ OPT_TTL                               ,   "OPT_TTL"                           },
+	{ USE_SERVICES_ALTERNATE                ,   "USE_SERVICES_ALTERNATE"            },
 	{ USE_BATCH_DIRECT                      ,   "USE_BATCH_DIRECT"                  },
 	{ COMPRESSION_THRESHOLD                 ,   "COMPRESSION_THRESHOLD"             },
 	{ AS_POLICY_RETRY_NONE                  ,   "POLICY_RETRY_NONE"                 },
