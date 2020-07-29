@@ -23,6 +23,7 @@ final class constantRegistrationTest extends TestCase {
         "OPT_POLICY_READ_MODE_SC",
         "OPT_POLICY_COMMIT_LEVEL",
         "OPT_TTL",
+        "USE_SERVICES_ALTERNATE",
         "USE_BATCH_DIRECT",
         "COMPRESSION_THRESHOLD",
         "POLICY_RETRY_NONE",
