@@ -37,11 +37,13 @@ install:
 - cd ../..
 - sleep 3
 script:
+- composer install
 - cd src/
 - ./build.sh
 - make install
 - ../.travis/edit-php-ini.sh
 - cp ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini tmp-php.ini
+- vendor/bin/phpstan analyse examples
 - phpunit -v || true
 - phpunit tests
 notifications:
