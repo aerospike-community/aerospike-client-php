@@ -44,6 +44,8 @@ script:
 - make install
 - ../.travis/edit-php-ini.sh
 - cp ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini tmp-php.ini
+- pwd
+- cd ..
 - vendor/bin/phpstan analyse examples
 - phpunit -v || true
 - phpunit tests
