@@ -38,6 +38,7 @@ install:
 - sleep 3
 script:
 - composer install
+- cd src
 - make install
 - ../.travis/edit-php-ini.sh
 - cp ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini tmp-php.ini
