@@ -39,6 +39,7 @@ install:
 - sleep 3
 script:
 - composer install
+- rm -rf aerospike-client-c
 - cd src
 - ./build.sh
 - make install
