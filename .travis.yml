@@ -37,7 +37,7 @@ install:
 - cd ../..
 - sleep 3
 script:
-- cd src/
+- cd src
 - ./build.sh
 - make install
 - ../.travis/edit-php-ini.sh
