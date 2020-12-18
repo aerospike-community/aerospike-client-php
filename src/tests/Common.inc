@@ -29,6 +29,30 @@ abstract class AerospikeTestCommon extends ASTestFramework
         $this->skipALL();
         $this->keys = array();
         $this->modules = array();
+        echo "Aerospike connection to host $HOST_ADDR:$HOST_PORT successful\n";
+        $this->handle->setLogLevel(Aerospike::LOG_LEVEL_DEBUG);
+        $this->handle->setLogHandler(function ($level, $file, $function, $line) {
+            switch ($level) {
+                case Aerospike::LOG_LEVEL_ERROR:
+                    $lvl_str = 'ERROR';
+                break;
+                case Aerospike::LOG_LEVEL_WARN:
+                    $lvl_str = 'WARN';
+                break;
+                case Aerospike::LOG_LEVEL_INFO:
+                    $lvl_str = 'INFO';
+                break;
+                case Aerospike::LOG_LEVEL_DEBUG:
+                    $lvl_str = 'DEBUG';
+                break;
+                case Aerospike::LOG_LEVEL_TRACE:
+                    $lvl_str = 'TRACE';
+                break;
+                default:
+                    $lvl_str = '???';
+            }
+            error_log("[$lvl_str] in $function at $file:$line");
+        });
     }
 
     protected function tearDown() {

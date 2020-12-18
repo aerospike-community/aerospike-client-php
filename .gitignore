@@ -40,3 +40,5 @@ src/tests/**/*.log
 src/tests/**/*.sh
 aerospike-client-c
 php-headers
+vendor
+src/.phpunit.result.cache
