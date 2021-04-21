@@ -4352,7 +4352,7 @@ class Aerospike {
      *
      * @const OK Success
      */
-    const OK = "AEROSPIKE_OK";
+    const OK = 0;
 
     // -10 - -1 - Client Errors
 
