@@ -48,11 +48,10 @@ class Autoloader
         $parts = explode('\\', $class_name);
 
         if ($parts[0] == "Aerospike" && $parts[1] == "GeoJSON") {
-           if (count($parts) == 2) {
-                require __DIR__. DIRECTORY_SEPARATOR. 'GeoJSON.php';
-            }
-            elseif ($parts[2] == 'Serializable') {
-                require __DIR__. DIRECTORY_SEPARATOR. 'Serializable.php';
+            if (count($parts) == 2) {
+                require __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'GeoJSON.php';
+            } elseif ($parts[2] == 'Serializable') {
+                require __DIR__ . DIRECTORY_SEPARATOR . 'Serializable.php';
             }
         }
     }
