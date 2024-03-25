@@ -1,8 +1,9 @@
 # Aerospike PHP Client
-[![Build Status](https://travis-ci.org/aerospike/aerospike-client-php.svg?branch=master)](https://travis-ci.org/aerospike/aerospike-client-php)
 [![License](https://img.shields.io/packagist/l/aerospike/aerospike-client-php.svg)](https://img.shields.io/packagist/l/aerospike/aerospike-client-php.svg)
 
-Note: This client supports PHP versions >= 7 . If you are looking for the Legacy client which supports PHP versions up through 5, it can be found at the [aerospike-client-php5 repo](https://github.com/aerospike/aerospike-client-php5)
+**Note:** a new PHP 8 compatible client for Aerospike Database is at [aerospike/php-client](https://github.com/aerospike/php-client).
+
+This legacy client supported PHP versions >= 7 . The older client that supported PHP versions up through 5, is at the [aerospike-client-php5 repo](https://github.com/aerospike/aerospike-client-php5)
 
 ## Differences from the previous Aerospike PHP Client:
 
@@ -23,12 +24,11 @@ Note: This client supports PHP versions >= 7 . If you are looking for the Legacy
 
 ## Documentation
 
-Documentation of the Aerospike PHP Client may be found in the [doc directory](doc/README.md).
+Documentation of this legacy Aerospike PHP Client is in the [doc directory](doc/README.md).
 Notes on the internals of the implementation are in [doc/internals.md](doc/internals.md).
 
 [Example PHP code](examples/) can be found in the `examples/` directory.
 
-Full documentation of the Aerospike database is available at http://www.aerospike.com/docs/
 
 ## Dependencies
 
